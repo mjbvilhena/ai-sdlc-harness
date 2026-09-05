@@ -1,0 +1,19 @@
+name: example-skill
+description: A template skill demonstrating the ai-sdlc-harness directory layout and skill.yaml schema.
+version: 0.1.0
+author: your-github-handle
+
+# List of harnesses this skill has been authored for.
+# The presence of a harness here should match the presence of a
+# corresponding subdirectory (agy/, claude/, ghcp/) in this folder.
+targets:
+  - agy
+  - claude
+  - ghcp
+
+# One or more trigger phrases or slash commands that activate this skill.
+# The exact format depends on the target harness, but this field documents
+# the intended activation surface.
+triggers:
+  - /example
+  - "run example"
