@@ -2,7 +2,7 @@
 
 ## Vision
 
-The AI SDLC Harness is a simple, dependency-free installer that deploys a curated library of AI skills and agents into the local configuration directories of popular AI developer tools.
+The AI SDLC Harness is a simple, dependency-free installer that deploys a curated library of AI skills, rules, and agents into the local configuration directories of popular AI developer tools.
 
 The core philosophy is built on three pillars:
 1. **Multi-Harness Native Authoring**: Rather than compiling a universal format into multiple targets, skills are **authored directly in the native format of each target harness**. Installing them means copying those files to the right place.
@@ -11,7 +11,7 @@ The core philosophy is built on three pillars:
 
 ## Goals
 
-1. **Frictionless Installation**: Simple shell scripts (`./install_claude.sh`, `./install_cursor.sh`, `./install_ghcp.sh`, `./install_agy.sh`, etc.) deploy the right prompts to the right places without complex build steps.
+1. **Frictionless Installation**: Simple shell and PowerShell scripts (`./install_claude.sh`, `./install_claude.ps1`, etc.) deploy the right prompts to the right places without complex build steps.
 2. **Author-native skills**: Skill authors write directly in the format that each AI tool understands — no intermediate abstraction layer.
 3. **Universal Knowledge & Governance**: By shifting Domain, Layer, and Lifecycle governance (DoD, checklists, templates) into an MCP server, all harnesses (e.g., Claude Code, Cursor, GitHub Copilot, Antigravity) share the exact same standards and policies.
 4. **Lean Driver Payloads**: Harness-specific prompts (the "Drivers") are stripped down to focus exclusively on execution flow and tool invocation, querying MCP just-in-time for both lifecycle requirements and domain/layer knowledge.

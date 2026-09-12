@@ -3,7 +3,7 @@
 The AI SDLC Harness has a deliberately minimal architecture. There is no compiler engine, no schema parser, and no runtime. The system consists entirely of:
 
 1. **A skill/agent/rule library** — directories of pre-authored, target-specific files.
-2. **Installer shell scripts** — scripts that copy those files to the correct locations on the user's machine.
+2. **Installer scripts (Bash / PowerShell)** — scripts that copy those files to the correct locations on the user's machine.
 
 ## High-Level Flow
 
@@ -29,7 +29,7 @@ install_claude.sh
                     Copy contents → ~/.claude/commands/
 ```
 
-The same pattern applies for `install_cursor.sh`, `install_ghcp.sh`, and `install_agy.sh`, with different source subdirectories and destination paths.
+The same pattern applies for `install_cursor`, `install_ghcp`, and `install_agy` across both `.sh` and `.ps1` variants.
 
 ## Skill Library Layout
 
@@ -56,7 +56,7 @@ Each target-specific file is authored natively — it contains exactly what the 
 Each installer script follows the same internal structure:
 
 ```
-install_<harness>.sh
+install_<harness>.sh | .ps1
     │
     ├─ 1. Resolve DEST (destination directory, absolute path)
     │       e.g., CLAUDE_COMMANDS_DIR="${HOME}/.claude/commands"
