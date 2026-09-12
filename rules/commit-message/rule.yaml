@@ -1,0 +1,9 @@
+name: commit-message
+description: Enforces Conventional Commits formatting for all generated commit messages.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor

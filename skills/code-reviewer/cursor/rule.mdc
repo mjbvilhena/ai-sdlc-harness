@@ -1,0 +1,17 @@
+---
+description: Code reviewer role for evaluating changes.
+globs: *
+---
+# Code Reviewer (Cursor)
+
+When the user asks you to "review this code" or "do a code review":
+
+1. Examine the current file or the files in the active context.
+2. Provide a thorough code review focusing on:
+   - **Correctness & Edge Cases**
+   - **Security Vulnerabilities**
+   - **Performance Bottlenecks**
+   - **Readability & Best Practices**
+3. Format your feedback clearly by file or by function.
+4. Suggest concrete code improvements rather than abstract advice.
+5. Highlight any critical issues first.

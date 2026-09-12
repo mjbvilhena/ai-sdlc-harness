@@ -1,0 +1,18 @@
+---
+description: Enforces Conventional Commits formatting.
+globs: *
+---
+# Conventional Commits Rule (Cursor)
+
+When generating a commit message or proposing a commit:
+
+1. Always use the Conventional Commits format:
+   `<type>[optional scope]: <description>`
+
+2. Valid types:
+   - `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
+
+3. Formatting rules:
+   - The description must be imperative, present tense (e.g. "change" not "changed" or "changes").
+   - Do not capitalize the first letter.
+   - Do not put a period at the end.
