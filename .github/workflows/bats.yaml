@@ -1,0 +1,21 @@
+name: BATS Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup BATS
+        uses: migret/setup-bats@v1
+        with:
+          bats-version: 1.10.0
+          
+      - name: Run BATS tests
+        run: bats tests/bats/installers.bats
