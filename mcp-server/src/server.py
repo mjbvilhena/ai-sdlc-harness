@@ -7,6 +7,7 @@ from thefuzz import process
 mcp = MCPServer("SDLC Knowledge Base")
 
 DATA_DIR = Path(os.path.dirname(os.path.dirname(__file__))) / "data"
+WORKSPACE_ROOT = Path(os.getenv("WORKSPACE_ROOT", os.getcwd()))
 
 def get_available_files(directory: str) -> dict[str, str]:
     """Returns a dictionary mapping logical names to file paths."""
@@ -111,6 +112,71 @@ def get_definition_of_done(component: str) -> str:
     for opt in options:
         msg += f"- {opt}\n"
     msg += "\nPlease try again with one of the options above."
+    return msg
+
+def scan_for_consultants(filename: str) -> dict[str, str]:
+    """
+    Dynamically scans the workspace for specific consultant knowledge payloads.
+    Returns a dictionary mapping the parent directory name to the file path.
+    """
+    consultants = {}
+    for root, _, files in os.walk(WORKSPACE_ROOT):
+        # Ignore common hidden/build directories
+        if any(ignored in root for ignored in ['.git', 'node_modules', 'venv', '__pycache__']):
+            continue
+        if filename in files:
+            logical_name = os.path.basename(root).lower().replace('-', ' ').replace('_', ' ')
+            consultants[logical_name] = os.path.join(root, filename)
+    return consultants
+
+@mcp.tool()
+def get_domain_consultant(domain: str) -> str:
+    """
+    Retrieve the Domain Consultant payload dynamically from the workspace.
+    
+    Args:
+        domain: The domain you need constraints or context for (e.g., 'auth', 'billing').
+    """
+    files = scan_for_consultants("DOMAIN.md")
+    options = list(files.keys())
+    
+    best_match = fuzzy_match(domain, options)
+    
+    if best_match:
+        try:
+            with open(files[best_match], 'r', encoding='utf-8') as f:
+                return f.read()
+        except Exception as e:
+            return f"Error reading Domain Consultant: {e}"
+            
+    msg = f"Domain Consultant for '{domain}' not found.\n\nAvailable domains are:\n"
+    for opt in options:
+        msg += f"- {opt}\n"
+    return msg
+
+@mcp.tool()
+def get_layer_consultant(layer: str) -> str:
+    """
+    Retrieve the Layer Consultant payload dynamically from the workspace.
+    
+    Args:
+        layer: The architectural layer you need constraints for (e.g., 'database', 'ui').
+    """
+    files = scan_for_consultants("LAYER.md")
+    options = list(files.keys())
+    
+    best_match = fuzzy_match(layer, options)
+    
+    if best_match:
+        try:
+            with open(files[best_match], 'r', encoding='utf-8') as f:
+                return f.read()
+        except Exception as e:
+            return f"Error reading Layer Consultant: {e}"
+            
+    msg = f"Layer Consultant for '{layer}' not found.\n\nAvailable layers are:\n"
+    for opt in options:
+        msg += f"- {opt}\n"
     return msg
 
 if __name__ == "__main__":
