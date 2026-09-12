@@ -74,7 +74,7 @@ install_<harness>.sh
 
 ## Design Principles
 
-- **No runtime dependencies**: Scripts use only POSIX utilities (`bash`, `cp`, `mkdir`, `ln`, `find`).
+- **No runtime dependencies**: Installers use only native system shell utilities (POSIX `bash`, `cp`, `mkdir` for Unix systems, and native PowerShell for Windows).
 - **No parsing**: Metadata files (`skill.yaml`, `rule.yaml`, etc.) are read by humans and CI validators only; installer scripts do not parse them.
 - **Idempotency**: Copying files with `cp -r` is naturally idempotent. Running installers multiple times is safe.
 - **Isolation**: Each harness installer is independent. Running `install_claude.sh` does not affect Cursor or Antigravity configuration, and vice versa.

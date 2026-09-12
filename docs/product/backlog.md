@@ -1,8 +1,8 @@
 # Product Backlog
 
-## Epic 1: Shell Installer Scripts
+## Epic 1: Installer Scripts
 
-> Goal: Deliver working installer scripts for each supported harness.
+> Goal: Deliver working installer scripts for each supported harness across macOS, Linux, and Windows.
 
 - **Task 1.1**: Implement `install_claude.sh` — discovers `skills/*/claude/` and copies `.md` files to `~/.claude/commands/`.
 - **Task 1.2**: Implement `install_cursor.sh` — discovers `skills/*/cursor/` and copies rules to `.cursor/rules/`.
@@ -10,6 +10,7 @@
 - **Task 1.4**: Implement `install_agy.sh` — discovers `skills/*/agy/` and copies contents to `~/.gemini/antigravity-cli/builtin/skills/<name>/`.
 - **Task 1.5**: Add agent and rule support to all four installers (i.e., also iterate over `agents/*/` and `rules/*/`).
 - **Task 1.6**: Write installer test stubs (dry-run mode or `--dry-run` flag) that print what would be copied without performing any file operations.
+- **Task 1.7**: Implement PowerShell equivalents (`.ps1`) for all installers to provide native, zero-dependency support for Windows users.
 
 ## Epic 2: Bundled Skill Library
 

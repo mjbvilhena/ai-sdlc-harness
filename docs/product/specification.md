@@ -95,8 +95,8 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 
 ## 5. Non-Functional Requirements
 
-- **Zero dependencies**: The installer requires only standard Unix utilities. No Python, Node, or other runtimes.
-- **Portable**: Scripts must work on macOS and Linux with `bash >= 3.2`.
+- **Zero dependencies**: The installer requires no external runtimes like Python or Node.
+- **Portable**: Scripts must work on macOS and Linux (via `bash >= 3.2`) and Windows (via native `PowerShell` scripts, i.e., `.ps1`).
 - **Readable**: Installer scripts must be thoroughly commented so that authors understand and can trust what is being installed.
 - **Safe**: Installers must not delete existing user configuration. Overwrites of previously installed skill files are acceptable; deletion of other files is not.
 
