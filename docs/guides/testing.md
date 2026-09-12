@@ -58,3 +58,7 @@ This repository is protected by automated security workflows (`.github/workflows
 
 1. **Gitleaks (Secret Scanning)**: Automatically scans all commits in a PR to ensure no API keys, passwords, or tokens are accidentally merged into the repository.
 2. **Bandit (Python SAST)**: Statically analyzes the Python code in the `mcp-server/` directory to identify common security vulnerabilities before they reach production.
+
+### Real IDE CLI Integration Tests (Headless)
+We also include `tests/e2e/test_cli_integration.py` which dynamically checks if you have the `agy` or `claude` CLI installed on your machine. If it detects them, it will use Python's `subprocess` to spawn a headless, non-interactive execution (e.g., `agy -p "/sdlc-example-skill"`) to ensure that the installed skills actually load and execute in a real production binary. 
+*(Note: If your local CLI is out of credits or requires interactive authentication, this test will gracefully skip itself).*

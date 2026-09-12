@@ -3,3 +3,4 @@ pytest
 thefuzz
 python-Levenshtein
 google-genai
+pexpect>=4.9.0
