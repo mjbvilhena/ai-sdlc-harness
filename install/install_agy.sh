@@ -23,8 +23,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Antigravity skills destination directory
+# Antigravity skills destination directory (default global)
 AGY_SKILLS_DIR="${HOME}/.gemini/antigravity-cli/builtin/skills"
+WORKSPACE=""
 
 # Target harness subdirectory name (within each skill/agent folder)
 HARNESS="agy"
@@ -36,15 +37,26 @@ DRY_RUN=false
 # Argument parsing
 # ---------------------------------------------------------------------------
 
-for arg in "$@"; do
-  case "$arg" in
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --workspace)
+      if [[ -z "${2:-}" ]]; then
+        echo "Error: --workspace requires a path argument." >&2
+        exit 1
+      fi
+      WORKSPACE="$2"
+      WORKSPACE="$(cd "$WORKSPACE" && pwd)"
+      AGY_SKILLS_DIR="${WORKSPACE}/.antigravity/skills"
+      shift 2
+      ;;
     --dry-run)
       DRY_RUN=true
       echo "[dry-run] No files will be modified."
+      shift
       ;;
     *)
-      echo "Unknown argument: $arg" >&2
-      echo "Usage: $0 [--dry-run]" >&2
+      echo "Unknown argument: $1" >&2
+      echo "Usage: $0 [--workspace <path>] [--dry-run]" >&2
       exit 1
       ;;
   esac

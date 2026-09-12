@@ -23,6 +23,7 @@ Preview only
 #>
 
 param(
+    [string]$Workspace = "",
     [switch]$DryRun
 )
 
@@ -34,7 +35,12 @@ $ErrorActionPreference = "Stop"
 
 $ScriptDir = $PSScriptRoot
 $ProjectRoot = Split-Path -Path $ScriptDir -Parent
-$ClaudeCommandsDir = Join-Path $HOME ".claude\commands"
+if ($Workspace) {
+    $Workspace = (Resolve-Path $Workspace).Path
+    $ClaudeCommandsDir = Join-Path $Workspace ".claude\commands"
+} else {
+    $ClaudeCommandsDir = Join-Path $HOME ".claude\commands"
+}
 $Harness = "claude"
 $CommandFile = "command.md"
 

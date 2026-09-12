@@ -20,6 +20,7 @@ Preview only
 #>
 
 param(
+    [string]$Workspace = "",
     [switch]$DryRun
 )
 
@@ -31,7 +32,12 @@ $ErrorActionPreference = "Stop"
 
 $ScriptDir = $PSScriptRoot
 $ProjectRoot = Split-Path -Path $ScriptDir -Parent
-$AgySkillsDir = Join-Path $HOME ".gemini\antigravity-cli\builtin\skills"
+if ($Workspace) {
+    $Workspace = (Resolve-Path $Workspace).Path
+    $AgySkillsDir = Join-Path $Workspace ".antigravity\skills"
+} else {
+    $AgySkillsDir = Join-Path $HOME ".gemini\antigravity-cli\builtin\skills"
+}
 $Harness = "agy"
 
 # ---------------------------------------------------------------------------
