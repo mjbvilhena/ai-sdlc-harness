@@ -34,5 +34,5 @@ jobs:
         run: pip install bandit
         
       - name: Run Bandit Security Scan
-        # Scan the mcp-server directory but exclude the tests directory
-        run: bandit -r mcp-server/ -x mcp-server/tests/
+        # Scan the mcp-server directory but exclude tests and venv
+        run: bandit -r mcp-server/ -x mcp-server/tests/,mcp-server/venv/

@@ -16,7 +16,7 @@ else
     fi
     source venv/bin/activate
     pip install -r requirements.txt -q
-    pip install pyyaml -q
+    pip install pyyaml bandit -q
     cd ..
 
     # 1. Metadata Validation
@@ -32,8 +32,15 @@ else
     cd ..
     echo ""
 
-    # 3. E2E Agent Behavior Tests
-    echo "--- 3. E2E Agent Behavior Tests ---"
+    # 3. Python Security Scan (Bandit)
+    echo "--- 3. Python Security Scan (Bandit) ---"
+    echo "Running Bandit SAST..."
+    bandit -r mcp-server/ -x mcp-server/tests/,mcp-server/venv/ -q
+    echo "Bandit scan passed."
+    echo ""
+
+    # 4. E2E Agent Behavior Tests
+    echo "--- 4. E2E Agent Behavior Tests ---"
     if [ -n "$GEMINI_API_KEY" ] || [ -n "$gemini_api_key" ]; then
         echo "API key detected. Running E2E Agent tests..."
         cd mcp-server
@@ -49,8 +56,8 @@ else
     deactivate
 fi
 
-# 4. BATS Installer Tests
-echo "--- 4. Installer Tests (BATS) ---"
+# 5. Installer Tests (BATS)
+echo "--- 5. Installer Tests (BATS) ---"
 if command -v bats >/dev/null 2>&1; then
     bats tests/bats/installers.bats
 else
@@ -61,6 +68,17 @@ else
         echo "Please install BATS (Bash Automated Testing System) to run these tests."
         echo "See: https://bats-core.readthedocs.io/en/stable/installation.html"
     fi
+fi
+echo ""
+
+# 6. Gitleaks Secret Scan
+echo "--- 6. Gitleaks Secret Scan ---"
+if command -v gitleaks >/dev/null 2>&1; then
+    gitleaks detect -v
+else
+    echo "Notice: 'gitleaks' command not found. Skipping local secret scan."
+    echo "This will still run in GitHub Actions, but you can install it locally to verify before pushing."
+    echo "See: https://github.com/gitleaks/gitleaks"
 fi
 echo ""
 
