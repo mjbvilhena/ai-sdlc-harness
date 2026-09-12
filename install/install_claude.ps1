@@ -126,6 +126,48 @@ Process-Category "skills"
 Process-Category "agents"
 Process-Category "rules"
 
+
+# ---------------------------------------------------------------------------
+# Configure MCP Server
+# ---------------------------------------------------------------------------
+if ($DryRun) {
+    Write-Host "[dry-run] Would configure MCP Server in claude.json"
+} else {
+    Write-Host "Configuring MCP Server..."
+    
+    $McpConfigDir = ""
+    if ($Workspace) {
+        $McpConfigDir = $Workspace
+    } else {
+        $McpConfigDir = Join-Path $HOME ".claude"
+    }
+    
+    if (-not (Test-Path -Path $McpConfigDir)) {
+        New-Item -ItemType Directory -Force -Path $McpConfigDir | Out-Null
+    }
+    
+    $McpConfigFile = Join-Path $McpConfigDir "claude.json"
+    $McpServerPath = Join-Path $ProjectRoot "mcp-server\src\server.py"
+    
+    if (-not (Test-Path -Path $McpConfigFile)) {
+        $JsonContent = @"
+{
+  "mcpServers": {
+    "sdlc-knowledge": {
+      "command": "python3",
+      "args": ["$($McpServerPath -replace '\', '\\')"]
+    }
+  }
+}
+"@
+        Set-Content -Path $McpConfigFile -Value $JsonContent
+        Write-Host "  [ok] Created MCP configuration: $McpConfigFile"
+    } else {
+        Write-Host "  [info] MCP configuration already exists at $McpConfigFile."
+        Write-Host "  [info] Please ensure 'sdlc-knowledge' server is registered pointing to $McpServerPath."
+    }
+}
+Write-Host ""
 Write-Host "--------------------------------------------------"
 if ($DryRun) {
     Write-Host " Dry-run complete. $InstallCount item(s) would be installed, $SkipCount skipped."

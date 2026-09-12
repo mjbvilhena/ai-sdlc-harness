@@ -183,6 +183,53 @@ else
 fi
 
 echo ""
+
+# ---------------------------------------------------------------------------
+# Configure MCP Server
+# ---------------------------------------------------------------------------
+if [[ "$DRY_RUN" == true ]]; then
+  echo "[dry-run] Would configure MCP Server in mcp.json"
+else
+  echo "Configuring MCP Server..."
+  if [[ -n "$WORKSPACE" ]]; then
+    MCP_CONFIG_DIR="${WORKSPACE}/.cursor"
+  else
+    # Cursor globally stores MCP config in its internal AppData, but we can't easily guess it on Linux/Mac/Win identically without jq.
+    # For global installs, we'll skip or just put it in a known Cursor config path. 
+    # For now, we only automatically configure for workspace.
+    MCP_CONFIG_DIR=""
+  fi
+  
+  if [[ -n "$MCP_CONFIG_DIR" ]]; then
+    mkdir -p "$MCP_CONFIG_DIR"
+    MCP_CONFIG_FILE="${MCP_CONFIG_DIR}/mcp.json"
+    
+    MCP_SERVER_PATH="${PROJECT_ROOT}/mcp-server/src/server.py"
+    
+    if [[ ! -f "$MCP_CONFIG_FILE" ]]; then
+      cat <<EOF > "$MCP_CONFIG_FILE"
+{
+  "mcpServers": {
+    "sdlc-knowledge": {
+      "command": "python3",
+      "args": ["${MCP_SERVER_PATH}"]
+    }
+  }
+}
+EOF
+      echo "  [ok] Created MCP configuration: ${MCP_CONFIG_FILE}"
+    else
+      echo "  [info] MCP configuration already exists at ${MCP_CONFIG_FILE}."
+      echo "  [info] Please ensure 'sdlc-knowledge' server is registered pointing to ${MCP_SERVER_PATH}."
+    fi
+  else
+    echo "  [info] Global Cursor MCP config is managed in Cursor UI. Please manually add the MCP server:"
+    echo "         Command: python3"
+    echo "         Args:    ${PROJECT_ROOT}/mcp-server/src/server.py"
+  fi
+fi
+
+echo ""
 echo "-------------------------------------------------------"
 if [[ "$DRY_RUN" == true ]]; then
   echo " Dry-run complete. ${install_count} item(s) would be installed, ${skip_count} skipped."

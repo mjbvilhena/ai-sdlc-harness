@@ -173,6 +173,44 @@ else
 fi
 
 echo ""
+
+# ---------------------------------------------------------------------------
+# Configure MCP Server
+# ---------------------------------------------------------------------------
+if [[ "$DRY_RUN" == true ]]; then
+  echo "[dry-run] Would configure MCP Server in claude.json"
+else
+  echo "Configuring MCP Server..."
+  if [[ -n "$WORKSPACE" ]]; then
+    MCP_CONFIG_DIR="${WORKSPACE}"
+  else
+    MCP_CONFIG_DIR="${HOME}/.claude"
+  fi
+  
+  mkdir -p "$MCP_CONFIG_DIR"
+  MCP_CONFIG_FILE="${MCP_CONFIG_DIR}/claude.json"
+  
+  MCP_SERVER_PATH="${PROJECT_ROOT}/mcp-server/src/server.py"
+  
+  if [[ ! -f "$MCP_CONFIG_FILE" ]]; then
+    cat <<EOF > "$MCP_CONFIG_FILE"
+{
+  "mcpServers": {
+    "sdlc-knowledge": {
+      "command": "python3",
+      "args": ["${MCP_SERVER_PATH}"]
+    }
+  }
+}
+EOF
+    echo "  [ok] Created MCP configuration: ${MCP_CONFIG_FILE}"
+  else
+    echo "  [info] MCP configuration already exists at ${MCP_CONFIG_FILE}."
+    echo "  [info] Please ensure 'sdlc-knowledge' server is registered pointing to ${MCP_SERVER_PATH}."
+  fi
+fi
+
+echo ""
 echo "--------------------------------------------------"
 if [[ "$DRY_RUN" == true ]]; then
   echo " Dry-run complete. ${install_count} item(s) would be installed, ${skip_count} skipped."
