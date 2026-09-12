@@ -91,7 +91,40 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 - **Readable**: Installer scripts must be thoroughly commented so that authors understand and can trust what is being installed.
 - **Safe**: Installers must not delete existing user configuration. Overwrites of previously installed skill files are acceptable; deletion of other files is not.
 
-## 6. Out of Scope for v1
+## 6. Automated Testing of the Harness
+
+Given the shell-based nature of the installers and the modular nature of the skill library and MCP server, automated testing will be broken down into the following strategies:
+
+### 6.1 Shell Script Testing
+- **Framework**: BATS (Bash Automated Testing System) will be used to test the installer scripts (`install_agy.sh`, `install_claude.sh`, etc.).
+- **Test Cases**: 
+  - Verify correct file copying to target directories based on mock skill structures.
+  - Verify idempotency (multiple runs produce the same safe result).
+  - Verify skipping of skills/agents that lack the target harness subdirectory.
+  - Verify proper handling of the `--workspace` flag and creation of destination directories.
+
+### 6.2 MCP Server Testing
+- **Framework**: Standard language-specific testing frameworks (`pytest` for Python, or `Jest`/`Vitest` for TypeScript).
+- **Test Cases**:
+  - Unit tests for API contracts (e.g., `get_sdlc_template(doc_type)`).
+  - Mocked integration tests to verify the MCP server correctly parses and serves the underlying knowledge documents.
+
+### 6.3 Linting and Static Validation
+- **Shell Scripts**: `shellcheck` will be used in CI to ensure bash scripts are safe and follow best practices.
+- **YAML Validation**: A CI step to validate that all `skill.yaml` and agent manifest files conform to a defined structural schema.
+- **Markdown**: `markdownlint` to ensure consistency in prompt files and documentation.
+
+### 6.4 Agent Behavioral & E2E Testing
+- **Framework**: LLM evaluation tools (e.g., `promptfoo`, or custom scripts utilizing standard test runners like `pytest`) integrated with headless harness execution.
+- **Test Cases (Mock Projects)**:
+  - Maintain sandboxed mock repositories (e.g., a simple API or frontend app) with predefined feature requests, bugs, or refactoring tasks.
+  - Programmatically invoke the AI agent/skill (e.g., "Review this PR" or "Implement feature X") against the mock repository.
+- **Validation Criteria**:
+  - **Functional correctness**: Run the mock project's test suite post-execution to verify the agent's code changes compile and pass tests.
+  - **Structural correctness**: Assert that the agent generated the expected files and adhered to standard directory structures.
+  - **LLM-as-a-Judge / Evaluation**: Programmatically evaluate the agent's compliance with the specific SDLC standards and Constraints served by the MCP server, and ensure it did not hallucinate or deviate from the given persona.
+
+## 7. Out of Scope for v1
 
 - **Universal format / compilation**: Writing a skill in one format and auto-generating the others is out of scope. Each target is authored directly.
 - **Cloud registry**: No hosted skill registry or auto-update mechanism.
