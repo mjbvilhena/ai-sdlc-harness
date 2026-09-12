@@ -51,3 +51,10 @@ Every Pull Request automatically executes the following CI checks:
    - `shellcheck` ensures all `.sh` installer scripts follow Bash safety best practices.
    - `markdownlint` ensures standard formatting across documentation and prompt stubs.
 3. **Metadata Validation**: Ensures no malformed or undocumented skills are merged into the library.
+
+## Security Scanning
+
+This repository is protected by automated security workflows (`.github/workflows/security.yaml`):
+
+1. **Gitleaks (Secret Scanning)**: Automatically scans all commits in a PR to ensure no API keys, passwords, or tokens are accidentally merged into the repository.
+2. **Bandit (Python SAST)**: Statically analyzes the Python code in the `mcp-server/` directory to identify common security vulnerabilities before they reach production.
