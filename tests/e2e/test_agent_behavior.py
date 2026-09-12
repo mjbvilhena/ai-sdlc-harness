@@ -61,7 +61,12 @@ def test_agent_obeys_domain_constraint(mock_repo, client):
     )
     
     # 4. Invoke the agent
+    print("\n--- Sending Prompt to Gemini ---")
     response = chat.send_message("Please refine this user story: As a user, I want to login so I can see my dashboard. The domain is 'auth'.")
+    
+    print("\n--- Gemini Output ---")
+    print(response.text)
+    print("----------------------\n")
     
     # 5. Assert the LLM actually obeyed the constraint served by the tool
     assert "TokenService" in response.text, "The agent failed to apply the Domain Consultant constraint (TokenService)."
