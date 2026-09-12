@@ -61,3 +61,19 @@
 - **Task 6.3**: Author `ci-debugger` skill — parses raw GitHub Actions or Jenkins logs to identify the root cause of pipeline failures.
 - **Task 6.4**: Author `postmortem-writer` skill — drafts a blameless post-mortem document from incident timelines and chat logs.
 - **Task 6.5**: Author `a11y-auditor` rule — enforces WCAG accessibility checks on frontend code.
+
+## Epic 7: Dynamic Consultants & MCP Enhancements
+
+> Goal: Fulfill the Tri-Dimensional Framework requirements for dynamic Domain and Layer Consultants via the MCP server.
+
+- **Task 7.1**: Implement dynamic Consultant discovery in the MCP server (automatically discovering and serving Domain and Layer knowledge payloads based on the workspace structure).
+- **Task 7.2**: Add MCP tests to verify dynamic Consultant generation as the mock repository evolves.
+
+## Epic 8: Quality Assurance, Linting & E2E Testing
+
+> Goal: Meet all automated testing and static validation requirements outlined in the product specification (Section 6).
+
+- **Task 8.1**: Implement BATS (Bash Automated Testing System) tests for all shell installer scripts to verify idempotency, file copying, and flag handling.
+- **Task 8.2**: Update GitHub Actions CI to include `shellcheck` (for bash scripts) and `markdownlint` (for prompts and docs).
+- **Task 8.3**: Scaffold an E2E agent evaluation framework (e.g., using `promptfoo` or `pytest`) to programmatically test agents against a sandboxed mock repository.
+- **Task 8.4**: Update `install_claude` and `install_agy` scripts (Bash and PS1) to fully support the `--workspace` flag for workspace-scoped installations, ensuring parity across all installers as mandated by the spec.
