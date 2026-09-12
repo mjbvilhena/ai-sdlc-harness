@@ -1,9 +1,0 @@
-name: a11y-auditor
-description: Enforces WCAG accessibility checks on frontend code.
-version: 1.0.0
-author: ai-sdlc-harness-team
-targets:
-  - agy
-  - claude
-  - ghcp
-  - cursor

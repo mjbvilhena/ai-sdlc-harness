@@ -42,7 +42,7 @@ def test_agent_obeys_domain_constraint(mock_repo, client):
 
     # 2. Load the System Instruction (the prompt we actually scaffolded in Epic 5)
     # We use the Antigravity skill format as our test prompt
-    prompt_path = os.path.join(os.path.dirname(__file__), "../../skills/user-story-refiner/agy/SKILL.md")
+    prompt_path = os.path.join(os.path.dirname(__file__), "../../skills/sdlc-user-story-refiner/agy/SKILL.md")
     with open(prompt_path, "r") as f:
         system_instruction = f.read()
         

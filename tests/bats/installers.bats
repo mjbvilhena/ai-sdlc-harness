@@ -26,14 +26,14 @@ teardown() {
     run ./install/install_claude.sh
     [ "$status" -eq 0 ]
     [ -d "$MOCK_HOME/.claude/commands" ]
-    [ -f "$MOCK_HOME/.claude/commands/code-reviewer.md" ]
+    [ -f "$MOCK_HOME/.claude/commands/sdlc-code-reviewer.md" ]
 }
 
 @test "install_claude.sh workspace install works" {
     run ./install/install_claude.sh --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
     [ -d "$MOCK_WORKSPACE/.claude/commands" ]
-    [ -f "$MOCK_WORKSPACE/.claude/commands/code-reviewer.md" ]
+    [ -f "$MOCK_WORKSPACE/.claude/commands/sdlc-code-reviewer.md" ]
     # Ensure it didn't install globally
     [ ! -d "$MOCK_HOME/.claude/commands" ]
 }
@@ -41,20 +41,20 @@ teardown() {
 @test "install_agy.sh workspace install works" {
     run ./install/install_agy.sh --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
-    [ -d "$MOCK_WORKSPACE/.agents/skills/code-reviewer" ]
-    [ -f "$MOCK_WORKSPACE/.agents/skills/code-reviewer/SKILL.md" ]
+    [ -d "$MOCK_WORKSPACE/.agents/skills/sdlc-code-reviewer" ]
+    [ -f "$MOCK_WORKSPACE/.agents/skills/sdlc-code-reviewer/SKILL.md" ]
 }
 
 @test "install_ghcp.sh workspace install works" {
     run ./install/install_ghcp.sh --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
     [ -d "$MOCK_WORKSPACE/.github/instructions" ]
-    [ -f "$MOCK_WORKSPACE/.github/instructions/code-reviewer.instructions.md" ]
+    [ -f "$MOCK_WORKSPACE/.github/instructions/sdlc-code-reviewer.instructions.md" ]
 }
 
 @test "install_cursor.sh workspace install works" {
     run ./install/install_cursor.sh --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
     [ -d "$MOCK_WORKSPACE/.cursor/rules" ]
-    [ -f "$MOCK_WORKSPACE/.cursor/rules/code-reviewer.mdc" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-code-reviewer.mdc" ]
 }

@@ -1,0 +1,12 @@
+name: sdlc-test-writer
+description: Generates test stubs and comprehensive test cases for a given function or module.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - /test
+  - "write tests"

@@ -1,0 +1,12 @@
+name: sdlc-e2e-scripter
+description: Scaffolds Playwright or Cypress tests from user story acceptance criteria.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - "/e2e"
+  - "write e2e"

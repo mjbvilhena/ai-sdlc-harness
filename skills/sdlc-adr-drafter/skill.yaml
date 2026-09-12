@@ -1,0 +1,12 @@
+name: sdlc-adr-drafter
+description: Writes an Architectural Decision Record from a technical discussion context.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - "/adr"
+  - "draft adr"

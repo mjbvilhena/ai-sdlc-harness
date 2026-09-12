@@ -1,0 +1,10 @@
+name: sdlc-example-rule
+description: A template rule demonstrating the ai-sdlc-harness directory layout for passive rules.
+version: 0.1.0
+author: your-github-handle
+
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
