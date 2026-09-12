@@ -1,12 +1,12 @@
 # Metadata Schemas
 
-`skill.yaml` and `agent.yaml` are **metadata-only** files. They are not parsed or executed by the installer scripts. Their purpose is:
+`skill.yaml`, `agent.yaml`, and `rule.yaml` are **metadata-only** files. They are not parsed or executed by the installer scripts. Their purpose is:
 
-- Human documentation (what does this skill do, who wrote it, what version is it)
+- Human documentation (what does this capability do, who wrote it, what version is it)
 - CI validation (check that required fields are present on every PR)
-- Future tooling (e.g. a skill registry, a README generator)
+- Future tooling (e.g. a registry, a README generator)
 
-The installers copy files based purely on directory conventions (the presence of `agy/`, `claude/`, `ghcp/` subdirectories). `skill.yaml` is never read at install time.
+The installers copy files based purely on directory conventions (the presence of `agy/`, `claude/`, `ghcp/` subdirectories). `skill.yaml` (and others) are never read at install time.
 
 ---
 
@@ -71,6 +71,26 @@ triggers:
 
 ---
 
+## `rule.yaml` Schema
+
+Rules are for passive, ambient context (e.g., guidelines, styles, templates) rather than active workflows. They follow the same structure but typically don't have triggers:
+
+```yaml
+# Required fields
+name: string           # Unique identifier (kebab-case, matches directory name)
+description: string    # One-sentence description of the rule or context
+version: string        # Semantic version
+author: string         # Author name or GitHub handle
+
+# Optional fields
+targets:
+  - claude
+  - cursor
+  - ghcp
+```
+
+---
+
 ## Valid Target Values
 
 | Value | Harness |
@@ -78,9 +98,10 @@ triggers:
 | `agy` | Antigravity (AGY) |
 | `claude` | Claude Code |
 | `ghcp` | GitHub Copilot |
+| `cursor` | Cursor |
 
 ---
 
 ## CI Validation
 
-A GitHub Actions workflow (planned, see backlog) will validate that every `skill.yaml` and `agent.yaml` in a PR contains all required fields and that the `targets` list matches the subdirectories present in the skill directory.
+A GitHub Actions workflow (planned, see backlog) will validate that every `skill.yaml`, `agent.yaml`, and `rule.yaml` in a PR contains all required fields and that the `targets` list matches the subdirectories present in the directory.

@@ -164,6 +164,24 @@ else
 fi
 
 echo ""
+
+# Install rules
+if [[ -d "${SCRIPT_DIR}/rules" ]]; then
+  echo "Installing rules..."
+  for rule_dir in "${SCRIPT_DIR}/rules"/*/; do
+    [[ -d "$rule_dir" ]] || continue
+    install_item "$rule_dir"
+    if [[ -f "${rule_dir}/${HARNESS}/${INSTRUCTIONS_FILE}" ]]; then
+      (( install_count++ )) || true
+    else
+      (( skip_count++ )) || true
+    fi
+  done
+else
+  echo "  [info] No rules/ directory found — skipping rules."
+fi
+
+echo ""
 echo "-------------------------------------------------------"
 if [[ "$DRY_RUN" == true ]]; then
   echo " Dry-run complete. ${install_count} item(s) would be installed, ${skip_count} skipped."

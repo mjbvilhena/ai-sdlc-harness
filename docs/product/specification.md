@@ -60,25 +60,33 @@ There is no CLI tool to install, no Python package, and no compilation step. The
   - **Lifecycle Drivers**: Authored as native skills/prompts/agents in the `agents/<agent-name>/<harness>/` directories using the harness's specific primitives.
   - **Domain/Layer Consultants**: Maintained as dynamic knowledge payloads served securely and structurally via the MCP Server.
 - Installers deploy the Lifecycle Drivers to the user's local workspace or configuration (e.g., `.claude/commands/`, `.cursor/rules/`, `.github/instructions/`, `.antigravity/`) depending on the target.
-- Each agent directory MUST contain a `.yaml` manifest outlining its role.
+- Each agent directory MUST contain a `agent.yaml` manifest outlining its role.
 
-### F3. Installer Scripts
+### F3. Rule Directory Convention
 
-- `install_claude.sh`: Iterates over `skills/*/claude/` and `agents/*/claude/`. Copies `.md` files to `~/.claude/commands/`.
-- `install_cursor.sh`: Iterates over `skills/*/cursor/` and `agents/*/cursor/`. Copies rules to a target workspace directory `.cursor/rules/`.
-- `install_ghcp.sh`: Iterates over `skills/*/ghcp/` and `agents/*/ghcp/`. Copies instruction files to a target workspace directory `.github/instructions/`.
-- `install_agy.sh`: Iterates over `skills/*/agy/` and `agents/*/agy/`. Copies skills to `~/.gemini/antigravity-cli/builtin/skills/<name>/` and agents to the local workspace `.antigravity/`.
+- Rules are used for passive, ambient context (e.g., style guidelines, format templates) rather than active workflows.
+- Each rule lives in `rules/<rule-name>/`.
+- Each rule directory MUST contain a `rule.yaml` metadata file.
+- Each rule directory MAY contain one or more harness-specific subdirectories (e.g., `claude/`, `cursor/`, `ghcp/`).
+- Rules are copied verbatim to the target harness's configuration directory by the installers.
+
+### F4. Installer Scripts
+
+- `install_claude.sh`: Iterates over `skills/*/claude/`, `agents/*/claude/`, and `rules/*/claude/`. Copies `.md` files to `~/.claude/commands/`.
+- `install_cursor.sh`: Iterates over `skills/*/cursor/`, `agents/*/cursor/`, and `rules/*/cursor/`. Copies rules to a target workspace directory `.cursor/rules/`.
+- `install_ghcp.sh`: Iterates over `skills/*/ghcp/`, `agents/*/ghcp/`, and `rules/*/ghcp/`. Copies instruction files to a target workspace directory `.github/instructions/`.
+- `install_agy.sh`: Iterates over `skills/*/agy/`, `agents/*/agy/`, and `rules/*/agy/`. Copies to `~/.gemini/antigravity-cli/builtin/skills/<name>/` and the local workspace `.antigravity/`.
 - All installers accept an optional `--workspace <path>` flag (defaults to `$PWD`) to determine where workspace-specific agents should be installed.
 
-### F4. Installer Behaviour
+### F5. Installer Behaviour
 
 - Installers MUST be idempotent: running the script multiple times must produce the same result.
 - Installers MUST print a summary of what was installed and where.
-- Installers MUST skip any skill directory that does not have the relevant harness subdirectory (e.g., `install_claude.sh` skips skills with no `claude/` directory).
+- Installers MUST skip any directory that does not have the relevant harness subdirectory (e.g., `install_claude.sh` skips items with no `claude/` directory).
 - Installers SHOULD create destination directories if they do not already exist.
 - Installers MUST NOT require any runtime dependency beyond `bash`, `cp`, `mkdir`, and `ln`.
 
-### F5. MCP Knowledge Retrieval Server
+### F6. MCP Knowledge Retrieval Server
 
 - A standalone MCP server (Python or TypeScript) will be scaffolded alongside the `skills/` and installers.
 - It exposes a precise JSON API contract (e.g., `get_sdlc_template(doc_type)`, `get_definition_of_done(phase)`) to serve SDLC standards.
