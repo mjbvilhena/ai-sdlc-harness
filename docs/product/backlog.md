@@ -16,11 +16,11 @@
 
 > Goal: Ship a useful, high-quality set of skills and rules ready to install.
 
-- **Task 2.1**: Author `code-reviewer` skill — reviews PR diffs, highlights issues. Author for `claude`, `cursor`, `ghcp`, `agy`.
-- **Task 2.2**: Author `pr-summarizer` skill — generates a PR description from staged changes. Author for `claude`, `cursor`, `ghcp`, `agy`.
-- **Task 2.3**: Author `commit-message` rule — passive format guideline for conventional commits. Author for `claude`, `cursor`, `ghcp`, `agy`.
-- **Task 2.4**: Author `test-writer` skill — generates test stubs for a given function or module. Author for `claude`, `cursor`, `ghcp`, `agy`.
-- **Task 2.5**: Author `docs-updater` skill — updates inline documentation and README sections. Author for `claude`, `cursor`, `ghcp`, `agy`.
+- **Task 2.1**: Author `sdlc-code-reviewer` skill — reviews PR diffs, highlights issues. Author for `claude`, `cursor`, `ghcp`, `agy`.
+- **Task 2.2**: Author `sdlc-pr-summarizer` skill — generates a PR description from staged changes. Author for `claude`, `cursor`, `ghcp`, `agy`.
+- **Task 2.3**: Author `sdlc-commit-message` rule — passive format guideline for conventional commits. Author for `claude`, `cursor`, `ghcp`, `agy`.
+- **Task 2.4**: Author `sdlc-test-writer` skill — generates test stubs for a given function or module. Author for `claude`, `cursor`, `ghcp`, `agy`.
+- **Task 2.5**: Author `sdlc-docs-updater` skill — updates inline documentation and README sections. Author for `claude`, `cursor`, `ghcp`, `agy`.
 - **Task 2.6**: Review and quality-gate all bundled skills and rules for accuracy and safety before first public release.
 
 ## Epic 3: Contributor Experience
@@ -47,20 +47,20 @@
 
 > Goal: Equip the harness to assist in the early stages of the SDLC, before code is even written.
 
-- **Task 5.1**: Author `user-story-refiner` skill — expands rough feature ideas into BDD-style user stories and acceptance criteria.
-- **Task 5.2**: Author `dod-checker` rule — checks if staged changes or proposed PRs meet the project's Definition of Done (fetching from MCP).
-- **Task 5.3**: Author `adr-drafter` skill — writes an Architectural Decision Record from a technical discussion context.
-- **Task 5.4**: Author `threat-modeler` skill — performs a high-level STRIDE security review of proposed changes.
+- **Task 5.1**: Author `sdlc-user-story-refiner` skill — expands rough feature ideas into BDD-style user stories and acceptance criteria.
+- **Task 5.2**: Author `sdlc-dod-checker` rule — checks if staged changes or proposed PRs meet the project's Definition of Done (fetching from MCP).
+- **Task 5.3**: Author `sdlc-adr-drafter` skill — writes an Architectural Decision Record from a technical discussion context.
+- **Task 5.4**: Author `sdlc-threat-modeler` skill — performs a high-level STRIDE security review of proposed changes.
 
 ## Epic 6: Delivery & Operations Phase Skills
 
 > Goal: Ensure the agent can help with deploying, monitoring, and resolving production issues.
 
-- **Task 6.1**: Author `release-notes-generator` skill — generates user-facing release notes by analyzing git history or merged PRs.
-- **Task 6.2**: Author `e2e-scripter` skill — scaffolds Playwright or Cypress tests from user story acceptance criteria.
-- **Task 6.3**: Author `ci-debugger` skill — parses raw GitHub Actions or Jenkins logs to identify the root cause of pipeline failures.
-- **Task 6.4**: Author `postmortem-writer` skill — drafts a blameless post-mortem document from incident timelines and chat logs.
-- **Task 6.5**: Author `a11y-auditor` rule — enforces WCAG accessibility checks on frontend code.
+- **Task 6.1**: Author `sdlc-release-notes-generator` skill — generates user-facing release notes by analyzing git history or merged PRs.
+- **Task 6.2**: Author `sdlc-e2e-scripter` skill — scaffolds Playwright or Cypress tests from user story acceptance criteria.
+- **Task 6.3**: Author `sdlc-ci-debugger` skill — parses raw GitHub Actions or Jenkins logs to identify the root cause of pipeline failures.
+- **Task 6.4**: Author `sdlc-postmortem-writer` skill — drafts a blameless post-mortem document from incident timelines and chat logs.
+- **Task 6.5**: Author `sdlc-a11y-auditor` rule — enforces WCAG accessibility checks on frontend code.
 
 ## Epic 7: Dynamic Consultants & MCP Enhancements
 

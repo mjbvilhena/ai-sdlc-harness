@@ -93,4 +93,4 @@ The MCP server acts as an intelligent knowledge retrieval layer for the AI agent
 - **SDLC Templates**: Tools like `get_sdlc_template` and `get_definition_of_done` serve foundational project standards (ADRs, PR checklists).
 - **Dynamic Consultant Discovery**: Tools like `get_domain_consultant` and `get_layer_consultant` dynamically scan the user's `WORKSPACE_ROOT` for `DOMAIN.md` and `LAYER.md` files. This allows the MCP server to dynamically construct constraints and knowledge payloads that reflect the real-time architectural state of the user's repository without any hardcoded mappings.
 
-The skills we install (e.g., `user-story-refiner` or `dod-checker`) explicitly instruct the agent to query this MCP server to fetch constraints before generating artifacts.
+The skills we install (e.g., `sdlc-user-story-refiner` or `sdlc-dod-checker`) explicitly instruct the agent to query this MCP server to fetch constraints before generating artifacts.

@@ -33,7 +33,7 @@ triggers:              # Natural-language or slash-command names that activate t
 ### Example
 
 ```yaml
-name: code-reviewer
+name: sdlc-code-reviewer
 description: Reviews a PR diff and suggests improvements focused on correctness, performance, and security.
 version: 1.0.0
 author: mjbvilhena

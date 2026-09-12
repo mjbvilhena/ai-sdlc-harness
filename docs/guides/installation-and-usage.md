@@ -31,10 +31,10 @@ Open your real project using your chosen AI IDE (e.g., Antigravity, Cursor, or C
 
 Simply invoke a command in the AI chat:
 
-> `Please run the /review skill on my current branch.`
+> `Please run the /sdlc-code-reviewer skill on my current branch.`
 
 **The AI will:**
-1. Recognize the `/review` command.
+1. Recognize the `/sdlc-code-reviewer` command.
 2. Read the review instructions.
 3. Automatically pause to query the MCP server.
 4. Fetch your custom `DOMAIN.md` and `LAYER.md` rules.
