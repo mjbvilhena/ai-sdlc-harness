@@ -78,3 +78,14 @@ install_<harness>.sh | .ps1
 - **No parsing**: Metadata files (`skill.yaml`, `rule.yaml`, etc.) are read by humans and CI validators only; installer scripts do not parse them.
 - **Idempotency**: Copying files with `cp -r` is naturally idempotent. Running installers multiple times is safe.
 - **Isolation**: Each harness installer is independent. Running `install_claude.sh` does not affect Cursor or Antigravity configuration, and vice versa.
+
+## MCP Knowledge Server & Dynamic Consultants
+
+In addition to static skills, this project includes a standalone Model Context Protocol (MCP) server in the `mcp-server/` directory.
+
+The MCP server acts as an intelligent knowledge retrieval layer for the AI agents (the "Lifecycle Drivers"), fulfilling the role of "Consultants" in the Tri-Dimensional Framework:
+
+- **SDLC Templates**: Tools like `get_sdlc_template` and `get_definition_of_done` serve foundational project standards (ADRs, PR checklists).
+- **Dynamic Consultant Discovery**: Tools like `get_domain_consultant` and `get_layer_consultant` dynamically scan the user's `WORKSPACE_ROOT` for `DOMAIN.md` and `LAYER.md` files. This allows the MCP server to dynamically construct constraints and knowledge payloads that reflect the real-time architectural state of the user's repository without any hardcoded mappings.
+
+The skills we install (e.g., `user-story-refiner` or `dod-checker`) explicitly instruct the agent to query this MCP server to fetch constraints before generating artifacts.

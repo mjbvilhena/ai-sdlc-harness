@@ -1,0 +1,53 @@
+# Testing Guide
+
+The AI SDLC Harness project contains multiple testing suites to ensure the integrity of its shell installers, metadata, and the underlying AI agent behavior.
+
+## Running Tests Locally
+
+You can run all local testing suites simultaneously using the unified runner script at the root of the repository:
+
+```bash
+./run_tests.sh
+```
+
+This script will automatically set up a Python virtual environment and run the following three suites:
+
+### 1. Metadata Validation
+A custom Python script (`.github/scripts/validate_metadata.py`) that strictly validates all `skill.yaml`, `agent.yaml`, and `rule.yaml` files against the schema (requiring Name, Description, Version, Author, and checking directory matching).
+
+### 2. MCP Server Unit Tests
+Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files.
+
+### 3. BATS (Bash Automated Testing System)
+BATS (`tests/bats/installers.bats`) evaluates the shell installer scripts (`install_claude.sh`, `install_cursor.sh`, etc.). The BATS script sets up a transient mock `$HOME` and `$WORKSPACE` directory in `/tmp` to safely verify that skills copy correctly and the `--dry-run` and `--workspace` flags work properly without modifying your actual system.
+
+---
+
+## End-to-End (E2E) LLM Testing
+
+To ensure that the Tri-Dimensional Framework functions correctly, we have an E2E testing framework (`tests/e2e/test_agent_behavior.py`). This framework actively invokes a real LLM (Gemini) headlessly to verify that the agent properly reaches out to the MCP Server tools and applies architectural constraints to its output.
+
+Because this test executes a real LLM, it requires an API key. **If you do not provide an API key, this test will gracefully skip itself** (both locally and in CI).
+
+### Running E2E Tests Locally
+
+1. Export your Gemini API Key in your terminal:
+   ```bash
+   export GEMINI_API_KEY="your-api-key-here"
+   ```
+
+2. Run the `run_tests.sh` script again. It will automatically detect the environment variable and append the E2E tests to the end of the suite:
+   ```bash
+   ./run_tests.sh
+   ```
+
+*(Note: Linux environment variables are case-sensitive. The test runner accepts either `GEMINI_API_KEY` or `gemini_api_key`).*
+
+## CI Pipelines (GitHub Actions)
+
+Every Pull Request automatically executes the following CI checks:
+1. **BATS Tests**: Runs the installer evaluation matrix.
+2. **Linting**:
+   - `shellcheck` ensures all `.sh` installer scripts follow Bash safety best practices.
+   - `markdownlint` ensures standard formatting across documentation and prompt stubs.
+3. **Metadata Validation**: Ensures no malformed or undocumented skills are merged into the library.
