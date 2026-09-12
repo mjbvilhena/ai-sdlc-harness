@@ -90,6 +90,7 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 
 - A standalone MCP server (Python or TypeScript) will be scaffolded alongside the `skills/` and installers.
 - It exposes a precise JSON API contract (e.g., `get_sdlc_template(doc_type)`, `get_definition_of_done(phase)`) to serve SDLC standards.
+- **Fuzzy Matching & Resilience**: The server MUST implement fuzzy string matching or robust alias mapping for input parameters (e.g., gracefully mapping "story", "user story", and "stories" to the same template). If a requested term cannot be resolved, the server MUST return a list of available valid options to help the LLM auto-correct.
 - Skill and agent prompts are designed to be lean, explicitly instructing the agent to call the MCP server for specific templates rather than hardcoding them in the prompt.
 
 ## 5. Non-Functional Requirements

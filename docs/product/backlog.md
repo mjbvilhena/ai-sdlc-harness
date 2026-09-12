@@ -31,3 +31,13 @@
 - **Task 3.3**: Write per-harness authoring guides under `docs/guides/` (e.g., `authoring-for-claude.md`, `authoring-for-cursor.md`, `authoring-for-ghcp.md`, `authoring-for-agy.md`).
 - **Task 3.4**: Add `skill.yaml`, `agent.yaml`, and `rule.yaml` schema documentation to `docs/technical_design/schemas.md`.
 - **Task 3.5**: Add a GitHub Actions CI workflow that validates all metadata files for required fields on every PR.
+
+## Epic 4: MCP Knowledge Retrieval Server
+
+> Goal: Build the standalone MCP server to deliver SDLC knowledge (DoD, templates, architecture rules) with high resilience to LLM tool-calling quirks.
+
+- **Task 4.1**: Scaffold a basic Python or TypeScript MCP server with tool definitions for `get_sdlc_template` and `get_definition_of_done`.
+- **Task 4.2**: Implement fuzzy matching and alias resolution for parameters (e.g., mapping "user story" and "stories" to "story").
+- **Task 4.3**: Implement graceful degradation so that unrecognized queries return a helpful list of valid options instead of failing blindly.
+- **Task 4.4**: Populate the initial database/directory of SDLC standards (ADR templates, PR checklists, etc.).
+- **Task 4.5**: Add tests for the MCP server ensuring robust LLM interaction flows.
