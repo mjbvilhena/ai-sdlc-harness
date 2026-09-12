@@ -52,7 +52,7 @@ def test_agent_obeys_domain_constraint(mock_repo, client):
 
     # 3. Create the chat session with automatic function calling enabled
     chat = client.chats.create(
-        model="gemini-2.5-flash",
+        model="gemini-3.6-flash",
         config=types.GenerateContentConfig(
             system_instruction=system_instruction,
             tools=[get_domain_consultant],
