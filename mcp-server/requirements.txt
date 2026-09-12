@@ -2,3 +2,4 @@ mcp
 pytest
 thefuzz
 python-Levenshtein
+google-genai
