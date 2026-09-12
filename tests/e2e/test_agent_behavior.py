@@ -6,7 +6,7 @@ from google.genai import types
 # Real LLM testing setup
 @pytest.fixture
 def client():
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("gemini_api_key")
     if not api_key:
         pytest.fail("GEMINI_API_KEY is not set in the environment. Please export it or prepend it to the command.")
     return genai.Client(api_key=api_key)
