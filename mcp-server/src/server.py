@@ -24,9 +24,18 @@ def get_available_files(directory: str) -> dict[str, str]:
 ALIASES = {
     "pull request": "pr",
     "pull requests": "pr",
+    "pull request template": "pr",
     "stories": "user story",
     "stories template": "user story",
-    "pull request template": "pr"
+    "story": "user story",
+    "bug": "bug report",
+    "issue": "bug report",
+    "postmortem": "incident postmortem",
+    "incident": "incident postmortem",
+    "request for comments": "rfc",
+    "request for comment": "rfc",
+    "bug fix": "bugfix",
+    "hot fix": "hotfix",
 }
 
 def fuzzy_match(query: str, options: list[str]) -> str | None:
