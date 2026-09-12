@@ -1,0 +1,11 @@
+name: domain-architect
+description: "Drafts or updates a DOMAIN.md file to codify the constraints, business rules, and bounded contexts of a specific domain, allowing the MCP server to dynamically serve this knowledge to other agents."
+version: 1.0.0
+author: ai-sdlc-harness
+targets:
+  - agy
+  - claude
+  - cursor
+  - ghcp
+triggers:
+  - /domain-architect
