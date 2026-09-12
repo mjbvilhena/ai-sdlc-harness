@@ -75,11 +75,8 @@ echo ""
 echo "--- 6. Gitleaks Secret Scan ---"
 if command -v gitleaks >/dev/null 2>&1; then
     gitleaks detect -v
-elif command -v docker >/dev/null 2>&1; then
-    echo "Running Gitleaks via Docker..."
-    docker run --rm -v "$PWD":/src ghcr.io/gitleaks/gitleaks:latest detect --source="/src" -v
 else
-    echo "Notice: Neither 'gitleaks' nor 'docker' command found. Skipping local secret scan."
+    echo "Notice: 'gitleaks' command not found. Skipping local secret scan."
     echo "This will still run in GitHub Actions, but you can install it locally to verify before pushing."
     echo "See: https://github.com/gitleaks/gitleaks"
 fi
