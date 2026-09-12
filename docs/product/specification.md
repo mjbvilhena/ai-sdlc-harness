@@ -14,19 +14,19 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 
 ## 3. Core User Journeys
 
-### Journey 1: Install skills into Antigravity
+### Journey 1: Install skills into a target harness (e.g., Claude Code, Cursor, GHCP, Antigravity)
 
 1. The user clones this repository.
-2. The user runs `./install_agy.sh` from the repo root.
-3. The script discovers all skill directories under `skills/` that contain an `agy/` subdirectory.
-4. For each skill, the script copies the `agy/` contents into `~/.gemini/antigravity-cli/builtin/skills/<skill-name>/`.
-5. The user restarts (or reloads) Antigravity and the skills are immediately available.
+2. The user runs the installer script for their preferred harness (e.g., `./install_claude.sh`, `./install_cursor.sh`, `./install_ghcp.sh`, or `./install_agy.sh`) from the repo root.
+3. The script discovers all skill directories under `skills/` that contain the corresponding harness subdirectory (e.g., `claude/`, `cursor/`, `ghcp/`, `agy/`).
+4. For each skill, the script copies the contents into the target harness's expected local configuration directory.
+5. The user opens or reloads their AI tool and the skills are immediately available.
 
 ### Journey 2: Author a new skill
 
 1. The author creates a directory under `skills/<skill-name>/`.
 2. The author creates `skill.yaml` with metadata (name, description, version, author, targets, triggers).
-3. The author creates one or more target-specific subdirectories (`agy/`, `claude/`, `ghcp/`) and writes the native skill files inside them.
+3. The author creates one or more target-specific subdirectories (`claude/`, `cursor/`, `ghcp/`, `agy/`) and writes the native skill files inside them.
 4. The author tests locally by running the relevant installer script.
 5. The author opens a Pull Request to contribute the skill back to the library.
 
@@ -39,7 +39,7 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 
 ### Journey 4: Execute a task using the Tri-Dimensional Framework
 
-1. The user initiates a software task via their preferred harness (Claude Code, Cursor, Antigravity).
+1. The user initiates a software task via their preferred harness (e.g., Claude Code, Cursor, GitHub Copilot, Antigravity).
 2. The harness invokes the native Lifecycle Driver prompt (e.g., the `code_implementer` skill).
 3. The Driver prompt explicitly instructs the AI to query the local MCP Knowledge Server to fetch SDLC standards and Domain/Layer constraints (the Consultants).
 4. The AI synthesizes the retrieved constraints to generate the final code artifact, maintaining strict context isolation.
@@ -50,31 +50,31 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 
 - Each skill lives in `skills/<skill-name>/`.
 - Each skill directory MUST contain a `skill.yaml` metadata file.
-- Each skill directory MAY contain one or more harness-specific subdirectories: `agy/`, `claude/`, `ghcp/`, `cursor/`.
+- Each skill directory MAY contain one or more harness-specific subdirectories: `claude/`, `cursor/`, `ghcp/`, `agy/`.
 - A harness subdirectory contains the files that are copied verbatim to the target harness's configuration directory.
 
 ### F2. Agent Directory Convention & Framework (Multi-Harness)
 
 - Agents are structured according to the **Tri-Dimensional Agent Framework** (Lifecycle, Domain, Layer).
-- To support functional parity across modern harnesses (Claude, Cursor, AGY, GHCP), this framework is decoupled:
+- To support functional parity across modern harnesses (e.g., Claude Code, Cursor, GitHub Copilot, Antigravity), this framework is decoupled:
   - **Lifecycle Drivers**: Authored as native skills/prompts/agents in the `agents/<agent-name>/<harness>/` directories using the harness's specific primitives.
   - **Domain/Layer Consultants**: Maintained as dynamic knowledge payloads served securely and structurally via the MCP Server.
-- Installers deploy the Lifecycle Drivers to the user's local workspace (`.antigravity/`, `.cursor/rules/`, `.github/instructions/`, `.claude/commands/`) depending on the target.
+- Installers deploy the Lifecycle Drivers to the user's local workspace or configuration (e.g., `.claude/commands/`, `.cursor/rules/`, `.github/instructions/`, `.antigravity/`) depending on the target.
 - Each agent directory MUST contain a `.yaml` manifest outlining its role.
 
 ### F3. Installer Scripts
 
-- `install_agy.sh`: Iterates over `skills/*/agy/` and `agents/*/agy/`. Copies skills to `~/.gemini/antigravity-cli/builtin/skills/<name>/` and agents to the local workspace `.antigravity/`.
 - `install_claude.sh`: Iterates over `skills/*/claude/` and `agents/*/claude/`. Copies `.md` files to `~/.claude/commands/`.
-- `install_ghcp.sh`: Iterates over `skills/*/ghcp/` and `agents/*/ghcp/`. Copies instruction files to a target workspace directory `.github/instructions/`.
 - `install_cursor.sh`: Iterates over `skills/*/cursor/` and `agents/*/cursor/`. Copies rules to a target workspace directory `.cursor/rules/`.
+- `install_ghcp.sh`: Iterates over `skills/*/ghcp/` and `agents/*/ghcp/`. Copies instruction files to a target workspace directory `.github/instructions/`.
+- `install_agy.sh`: Iterates over `skills/*/agy/` and `agents/*/agy/`. Copies skills to `~/.gemini/antigravity-cli/builtin/skills/<name>/` and agents to the local workspace `.antigravity/`.
 - All installers accept an optional `--workspace <path>` flag (defaults to `$PWD`) to determine where workspace-specific agents should be installed.
 
 ### F4. Installer Behaviour
 
 - Installers MUST be idempotent: running the script multiple times must produce the same result.
 - Installers MUST print a summary of what was installed and where.
-- Installers MUST skip any skill directory that does not have the relevant harness subdirectory (i.e. `install_agy.sh` skips skills with no `agy/` directory).
+- Installers MUST skip any skill directory that does not have the relevant harness subdirectory (e.g., `install_claude.sh` skips skills with no `claude/` directory).
 - Installers SHOULD create destination directories if they do not already exist.
 - Installers MUST NOT require any runtime dependency beyond `bash`, `cp`, `mkdir`, and `ln`.
 
@@ -96,7 +96,7 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 Given the shell-based nature of the installers and the modular nature of the skill library and MCP server, automated testing will be broken down into the following strategies:
 
 ### 6.1 Shell Script Testing
-- **Framework**: BATS (Bash Automated Testing System) will be used to test the installer scripts (`install_agy.sh`, `install_claude.sh`, etc.).
+- **Framework**: BATS (Bash Automated Testing System) will be used to test the installer scripts (`install_claude.sh`, `install_cursor.sh`, `install_ghcp.sh`, `install_agy.sh`, etc.).
 - **Test Cases**: 
   - Verify correct file copying to target directories based on mock skill structures.
   - Verify idempotency (multiple runs produce the same safe result).
