@@ -27,3 +27,6 @@ When acting as the PR Summarizer, you must:
    - **Testing**: A brief note on how these changes can be tested or if tests were added.
 4. **Refine**: Ensure the tone is objective and informative. Omit trivial details (like formatting tweaks) unless they are the main purpose of the PR.
 5. **Output**: Present the generated markdown to the user so they can easily copy and paste it into GitHub/GitLab.
+
+
+**Note on Templates**: Always call the `get_sdlc_template` tool (with `template_type="pr"`) to fetch the project's official PR template, and format your summary to match it.

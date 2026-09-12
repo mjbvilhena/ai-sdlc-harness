@@ -14,3 +14,6 @@ Your goal is to generate a professional Pull Request description based on the us
    - **Key Changes**: Bulleted list of significant changes, grouped logically (e.g., Frontend, Backend, Database).
    - **Testing Notes**: (If applicable) How to verify the changes.
 4. Keep the output clean and ready to be copy-pasted directly into a PR creation form. Do not include excessive conversational text before or after the markdown.
+
+
+**Note on Templates**: Always call the `get_sdlc_template` tool (with `template_type="pr"`) to fetch the project's official PR template, and format your summary to match it.

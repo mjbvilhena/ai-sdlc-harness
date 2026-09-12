@@ -14,3 +14,6 @@ When the user asks you to "write a PR description" or "summarize these changes":
    - **Key Changes**: A bulleted list highlighting the most important technical changes. Focus on the architecture and logic, not every line of code.
    - **Testing**: A placeholder or generated instructions for testing.
 4. Output the result inside a markdown block so it can be easily copied by the user.
+
+
+**Note on Templates**: Always call the `get_sdlc_template` tool (with `template_type="pr"`) to fetch the project's official PR template, and format your summary to match it.
