@@ -44,6 +44,7 @@ $ErrorActionPreference = "Stop"
 # ---------------------------------------------------------------------------
 
 $ScriptDir = $PSScriptRoot
+$ProjectRoot = Split-Path -Path $ScriptDir -Parent
 
 # Resolve workspace to absolute path
 $Workspace = (Resolve-Path $Workspace).Path
@@ -119,7 +120,7 @@ $SkipCount = 0
 function Process-Category {
     param([string]$Category)
     
-    $CategoryDir = Join-Path $ScriptDir $Category
+    $CategoryDir = Join-Path $ProjectRoot $Category
     if (Test-Path -Path $CategoryDir -PathType Container) {
         Write-Host "Installing $Category..."
         $Dirs = Get-ChildItem -Path $CategoryDir -Directory

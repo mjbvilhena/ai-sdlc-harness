@@ -30,6 +30,7 @@ $ErrorActionPreference = "Stop"
 # ---------------------------------------------------------------------------
 
 $ScriptDir = $PSScriptRoot
+$ProjectRoot = Split-Path -Path $ScriptDir -Parent
 $AgySkillsDir = Join-Path $HOME ".gemini\antigravity-cli\builtin\skills"
 $Harness = "agy"
 
@@ -87,7 +88,7 @@ $SkipCount = 0
 function Process-Category {
     param([string]$Category)
     
-    $CategoryDir = Join-Path $ScriptDir $Category
+    $CategoryDir = Join-Path $ProjectRoot $Category
     if (Test-Path -Path $CategoryDir -PathType Container) {
         Write-Host "Installing $Category..."
         $Dirs = Get-ChildItem -Path $CategoryDir -Directory
