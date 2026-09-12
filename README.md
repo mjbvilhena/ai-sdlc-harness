@@ -95,6 +95,10 @@ See `skills/example-skill/` for a complete example.
 
 Pull requests for new skills, improved instructions, or additional harness installers are welcome. See `docs/` for detailed specification, architecture, and contribution guidelines.
 
+## Installation & Usage
+
+To learn how to deploy this harness into a real project using the automated installer scripts (and how to trigger the dynamic MCP consultants), read the [Installation and Usage Guide](docs/guides/installation-and-usage.md).
+
 ## Testing
 
 To run the local test suites (Metadata validation, MCP unit tests, and BATS shell tests), run the unified helper script:

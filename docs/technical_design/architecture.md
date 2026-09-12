@@ -69,7 +69,12 @@ install_<harness>.sh | .ps1
     │       c. cp -r "<item>/<harness>/." "${DEST}/<name>/"
     │       d. Print: "Installed <name> → ${DEST}/<name>/"
     │
-    └─ 4. Print summary: N items installed.
+    ├─ 4. Print summary: N items installed.
+    │
+    └─ 5. Configure MCP Server
+            Generates or updates the corresponding `mcp.json` / `claude.json` 
+            configuration file so the host IDE immediately knows how to 
+            communicate with the AI SDLC Knowledge Server.
 ```
 
 ## Design Principles

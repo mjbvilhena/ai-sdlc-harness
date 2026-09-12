@@ -140,3 +140,6 @@ Given the shell-based nature of the installers and the modular nature of the ski
 - **Universal format / compilation**: Writing a skill in one format and auto-generating the others is out of scope. Each target is authored directly.
 - **Cloud registry**: No hosted skill registry or auto-update mechanism.
 - **Bidirectional sync**: Importing a skill from an installed location back into this repo format is out of scope.
+
+### 6.4 Zero-Touch Workspace Integration
+The installer scripts MUST seamlessly configure the host IDE (via `mcp.json` or `claude.json`) to communicate with the MCP Knowledge Server without requiring the user to manually edit JSON configuration files.
