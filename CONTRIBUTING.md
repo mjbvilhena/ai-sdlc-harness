@@ -59,3 +59,32 @@ Before submitting a Pull Request, please ensure:
 3. [ ] A valid `*.yaml` metadata file is present and accurately reflects the supported targets.
 4. [ ] You have implemented the skill/rule/agent for at least one harness (preferably all four).
 5. [ ] The tone of the prompts is professional, objective, and clear.
+
+## Testing
+
+This repository includes a unified testing script `run_tests.sh` at the root, which executes Metadata Validation, MCP Server unit tests, and BATS installer tests.
+
+### Running the Tests Locally
+Simply execute the helper script:
+```bash
+./run_tests.sh
+```
+
+### End-to-End (E2E) LLM Testing
+We have an E2E testing framework in `tests/e2e/test_agent_behavior.py` that executes a real LLM (Gemini) to verify that agents properly invoke the MCP server tools and respect constraints. 
+
+Because this runs a real LLM, it requires an API key and is automatically skipped in standard CI runs if the key is missing.
+
+To run the E2E tests locally:
+```bash
+# 1. Enter the MCP server directory and set up the virtual environment
+cd mcp-server
+source venv/bin/activate
+pip install -r requirements.txt
+
+# 2. Export your Gemini API key
+export GEMINI_API_KEY="your-api-key-here"
+
+# 3. Run the pytest suite against the e2e directory
+PYTHONPATH=. pytest ../tests/e2e/test_agent_behavior.py -s
+```

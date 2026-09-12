@@ -94,3 +94,13 @@ See `skills/example-skill/` for a complete example.
 ## Contributing
 
 Pull requests for new skills, improved instructions, or additional harness installers are welcome. See `docs/` for detailed specification, architecture, and contribution guidelines.
+
+## Testing
+
+To run the local test suites (Metadata validation, MCP unit tests, and BATS shell tests), run the unified helper script:
+
+```bash
+./run_tests.sh
+```
+
+For instructions on running the End-to-End LLM evaluations using a Gemini API key, please see the Testing section in [`CONTRIBUTING.md`](CONTRIBUTING.md).
