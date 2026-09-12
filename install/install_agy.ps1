@@ -34,7 +34,7 @@ $ScriptDir = $PSScriptRoot
 $ProjectRoot = Split-Path -Path $ScriptDir -Parent
 if ($Workspace) {
     $Workspace = (Resolve-Path $Workspace).Path
-    $AgySkillsDir = Join-Path $Workspace ".antigravity\skills"
+    $AgySkillsDir = Join-Path $Workspace ".agents\skills"
 } else {
     $AgySkillsDir = Join-Path $HOME ".gemini\antigravity-cli\builtin\skills"
 }
@@ -121,13 +121,13 @@ Process-Category "rules"
 # Configure MCP Server
 # ---------------------------------------------------------------------------
 if ($DryRun) {
-    Write-Host "[dry-run] Would configure MCP Server in mcp.json"
+    Write-Host "[dry-run] Would configure MCP Server in mcp_config.json"
 } else {
     Write-Host "Configuring MCP Server..."
     
     $McpConfigDir = ""
     if ($Workspace) {
-        $McpConfigDir = Join-Path $Workspace ".antigravity"
+        $McpConfigDir = Join-Path $Workspace ".agents"
     } else {
         $McpConfigDir = Join-Path $HOME ".gemini\config"
     }
@@ -136,7 +136,7 @@ if ($DryRun) {
         New-Item -ItemType Directory -Force -Path $McpConfigDir | Out-Null
     }
     
-    $McpConfigFile = Join-Path $McpConfigDir "mcp.json"
+    $McpConfigFile = Join-Path $McpConfigDir "mcp_config.json"
     $McpServerPath = Join-Path $ProjectRoot "mcp-server\src\server.py"
     
     if (-not (Test-Path -Path $McpConfigFile)) {

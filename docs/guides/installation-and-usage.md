@@ -14,8 +14,8 @@ For example, to configure a project for both Antigravity and Claude Code:
 ```
 
 ### What these installers do automatically:
-1. **Inject Skills**: They copy all the prompts and skills from this library directly into the hidden directories of your workspace (e.g., `.antigravity/skills/` and `.claude/commands/`).
-2. **Attach MCP Server**: They automatically generate the `mcp.json` or `claude.json` configuration files in your workspace, securely wiring your AI IDE to the Python MCP Knowledge Server hosted in this repository. You do not need to configure anything manually!
+1. **Inject Skills**: They copy all the prompts and skills from this library directly into the hidden directories of your workspace (e.g., `.agents/skills/` and `.claude/commands/`).
+2. **Attach MCP Server**: They automatically generate the `mcp_config.json` or `claude.json` configuration files in your workspace, securely wiring your AI IDE to the Python MCP Knowledge Server hosted in this repository. You do not need to configure anything manually!
 
 ## Step 2: Define Your Project Constraints
 

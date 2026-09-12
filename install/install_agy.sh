@@ -46,7 +46,7 @@ while [[ $# -gt 0 ]]; do
       fi
       WORKSPACE="$2"
       WORKSPACE="$(cd "$WORKSPACE" && pwd)"
-      AGY_SKILLS_DIR="${WORKSPACE}/.antigravity/skills"
+      AGY_SKILLS_DIR="${WORKSPACE}/.agents/skills"
       shift 2
       ;;
     --dry-run)
@@ -170,13 +170,13 @@ if [[ "$DRY_RUN" == true ]]; then
 else
   echo "Configuring MCP Server..."
   if [[ -n "$WORKSPACE" ]]; then
-    MCP_CONFIG_DIR="${WORKSPACE}/.antigravity"
+    MCP_CONFIG_DIR="${WORKSPACE}/.agents"
   else
     MCP_CONFIG_DIR="${HOME}/.gemini/config"
   fi
   
   mkdir -p "$MCP_CONFIG_DIR"
-  MCP_CONFIG_FILE="${MCP_CONFIG_DIR}/mcp.json"
+  MCP_CONFIG_FILE="${MCP_CONFIG_DIR}/mcp_config.json"
   
   # Note: jq is typically required for safe JSON manipulation, but for 
   # zero-dependency we will construct a basic config if it doesn't exist,

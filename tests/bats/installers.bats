@@ -41,8 +41,8 @@ teardown() {
 @test "install_agy.sh workspace install works" {
     run ./install/install_agy.sh --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
-    [ -d "$MOCK_WORKSPACE/.antigravity/skills/code-reviewer" ]
-    [ -f "$MOCK_WORKSPACE/.antigravity/skills/code-reviewer/SKILL.md" ]
+    [ -d "$MOCK_WORKSPACE/.agents/skills/code-reviewer" ]
+    [ -f "$MOCK_WORKSPACE/.agents/skills/code-reviewer/SKILL.md" ]
 }
 
 @test "install_ghcp.sh workspace install works" {
