@@ -1,0 +1,16 @@
+# Authoring for Claude Code
+
+Claude Code supports custom slash commands by placing Markdown files in `~/.claude/commands/`.
+
+## File Convention
+In this repository, Claude Code files are stored in the `claude/` subdirectory of a skill or agent and must be named `command.md`.
+
+## Structure of a `command.md`
+A good Claude Code command should include:
+1. **Trigger**: Specify what slash command activates it (e.g., `/review`).
+2. **Instructions**: Clear, numbered steps for Claude to follow.
+3. **Context**: What tools Claude should use (e.g., `git diff`).
+
+## Tips
+- Claude Code excels at using tools. Tell it explicitly to check `git diff` or `cat` a file if needed.
+- Keep instructions direct and imperative.

@@ -10,6 +10,7 @@ targets:
   - agy
   - claude
   - ghcp
+  - cursor
 
 # One or more trigger phrases or slash commands that activate this skill.
 # The exact format depends on the target harness, but this field documents

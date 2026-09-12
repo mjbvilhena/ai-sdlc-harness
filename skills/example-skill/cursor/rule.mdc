@@ -1,0 +1,12 @@
+---
+description: An example rule stub for Cursor.
+globs: *
+---
+# Example Skill (Cursor)
+
+> **This is a stub.** Replace this file with your actual Cursor rule.
+
+When the user asks you to "run example" or uses `/example`:
+
+1. Do step one.
+2. Do step two.
