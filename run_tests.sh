@@ -51,6 +51,21 @@ else
 fi
 echo ""
 
+# 4. E2E Agent Behavior Tests
+echo "--- 4. E2E Agent Behavior Tests ---"
+if [ -n "$GEMINI_API_KEY" ] || [ -n "$gemini_api_key" ]; then
+    echo "API key detected. Running E2E Agent tests..."
+    cd mcp-server
+    source venv/bin/activate
+    PYTHONPATH=. python3 -m pytest ../tests/e2e/ -s
+    deactivate
+    cd ..
+else
+    echo "Notice: GEMINI_API_KEY is not set. Skipping E2E Agent tests."
+    echo "To run these tests, export GEMINI_API_KEY and run this script again."
+fi
+echo ""
+
 echo "======================================"
 echo " All tests completed successfully! 🎉"
 echo "======================================"
