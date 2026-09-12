@@ -4,22 +4,25 @@
 
 The AI SDLC Harness is a simple, dependency-free installer that deploys a curated library of AI skills and agents into the local configuration directories of popular AI developer tools.
 
-The core philosophy is **simplicity over abstraction**. Rather than compiling a universal format into multiple targets, skills are **authored directly in the native format of each target harness**. A skill is a directory of hand-crafted, target-specific files. Installing it means copying those files to the right place.
-
-There is no Python package to install, no compilation step, no YAML-to-format translation engine. Just shell scripts and file operations.
+The core philosophy is built on three pillars:
+1. **Multi-Harness Native Authoring**: Rather than compiling a universal format into multiple targets, skills are **authored directly in the native format of each target harness**. Installing them means copying those files to the right place.
+2. **Tri-Dimensional Agent Framework (Multi-Harness)**: We structure AI tasks across three orthogonal dimensions: Lifecycle (The Driver), Domain (The Consultant), and Layer (The Consultant). While each harness (AGY, Claude, Cursor, GHCP) has its own native mechanisms for managing prompts or background agents, this conceptual framework ensures they all follow the same strict separation of concerns.
+3. **Decoupled Knowledge via JIT Retrieval (MCP)**: To prevent prompt bloat, we extract heavy domain and layer knowledge (the "Consultants") into a standalone Model Context Protocol (MCP) server. Instead of stuffing prompts with static SDLC standards or building fragile CLI scripts, agents across all harnesses use standardized MCP tools to dynamically retrieve context just-in-time. 
 
 ## Goals
 
-1. **Zero friction installation**: A single `./install_agy.sh` command is all a developer needs to get the full skill library into Antigravity.
-2. **Author-native skills**: Skill authors write directly in the format that each AI tool understands — no intermediate abstraction layer. The skill works exactly as authored.
-3. **Multi-harness support from one repo**: The same repo houses skills for Antigravity, Claude Code, and GitHub Copilot. Authors write separate files per target but manage them in one place.
-4. **Easy contribution**: Adding a new skill is as simple as creating a directory, dropping in files, and opening a PR.
+1. **Frictionless Installation**: Simple shell scripts (`./install_agy.sh`, etc.) deploy the right prompts to the right places without complex build steps.
+2. **Author-native skills**: Skill authors write directly in the format that each AI tool understands — no intermediate abstraction layer.
+3. **Universal "Consultants"**: By shifting Domain and Layer knowledge into an MCP server, all harnesses (Claude, Cursor, Antigravity) share the exact same business rules and framework idioms.
+4. **Lean Skill Payloads**: Harness-specific prompts (the "Drivers") are stripped down to focus exclusively on execution sequence, relying on MCP for detailed knowledge.
+5. **Easy contribution**: Adding a new skill is as simple as creating a directory, dropping in files, and opening a PR.
 
 ## Target Harnesses (v1)
 
-- **Antigravity (agy)**: Skills installed to `~/.gemini/antigravity-cli/builtin/skills/<skill-name>/`
+- **Antigravity (agy)**: Skills installed to `~/.gemini/antigravity-cli/builtin/skills/` and workspace agents to `.antigravity/`
 - **Claude Code**: Skills installed as custom slash commands to `~/.claude/commands/`
-- **GitHub Copilot (ghcp)**: Instructions installed to `.github/instructions/` in the user's workspace
+- **GitHub Copilot (ghcp)**: Instructions installed to `.github/instructions/`
+- **Cursor**: Rules installed to `.cursor/rules/`
 
 ## Non-Goals
 
