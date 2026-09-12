@@ -1,0 +1,4 @@
+mcp
+pytest
+thefuzz
+python-Levenshtein
