@@ -117,10 +117,11 @@ Given the shell-based nature of the installers and the modular nature of the ski
 - **Test Cases**:
   - Unit tests for API contracts (e.g., `get_sdlc_template(doc_type)`).
   - Mocked integration tests to verify the MCP server correctly parses and serves the underlying knowledge documents.
+  - **Dynamic Consultant Creation**: Verify that as a mock repository evolves (e.g., new domains or architectural layers are built), the MCP Server automatically discovers and generates the corresponding Domain and Layer Consultant knowledge payloads without manual reconfiguration.
 
 ### 6.3 Linting and Static Validation
 - **Shell Scripts**: `shellcheck` will be used in CI to ensure bash scripts are safe and follow best practices.
-- **YAML Validation**: A CI step to validate that all `skill.yaml` and agent manifest files conform to a defined structural schema.
+- **YAML Validation**: A CI step to validate that all `skill.yaml`, `agent.yaml`, and `rule.yaml` manifest files conform to a defined structural schema.
 - **Markdown**: `markdownlint` to ensure consistency in prompt files and documentation.
 
 ### 6.4 Agent Behavioral & E2E Testing
@@ -128,6 +129,7 @@ Given the shell-based nature of the installers and the modular nature of the ski
 - **Test Cases (Mock Projects)**:
   - Maintain sandboxed mock repositories (e.g., a simple API or frontend app) with predefined feature requests, bugs, or refactoring tasks.
   - Programmatically invoke the AI agent/skill (e.g., "Review this PR" or "Implement feature X") against the mock repository.
+  - **Evolution Adaptability**: Introduce a new architectural layer or business domain to the mock repo mid-test, and verify that the Lifecycle Agent seamlessly discovers and utilizes the newly auto-created Domain/Layer Consultants via the MCP server.
 - **Validation Criteria**:
   - **Functional correctness**: Run the mock project's test suite post-execution to verify the agent's code changes compile and pass tests.
   - **Structural correctness**: Assert that the agent generated the expected files and adhered to standard directory structures.
