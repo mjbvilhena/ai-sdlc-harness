@@ -1,0 +1,7 @@
+---
+description: Drafts a blameless post-mortem document from incident timelines and chat logs.
+globs: *
+---
+# Postmortem Writer (Cursor)
+
+Create a blameless incident post-mortem document. Extract the timeline, root cause, and action items from the provided context.

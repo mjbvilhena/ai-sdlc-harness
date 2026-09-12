@@ -1,0 +1,12 @@
+name: threat-modeler
+description: Performs a high-level STRIDE security review of proposed changes.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - "/threat"
+  - "security review"

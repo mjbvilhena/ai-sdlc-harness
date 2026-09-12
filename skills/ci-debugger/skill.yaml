@@ -1,0 +1,12 @@
+name: ci-debugger
+description: Parses raw GitHub Actions or Jenkins logs to identify the root cause of pipeline failures.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - "/ci"
+  - "debug pipeline"

@@ -1,0 +1,10 @@
+---
+name: dod-checker
+description: |
+  Checks if staged changes or proposed PRs meet the project's Definition of Done.
+---
+
+# Dod Checker
+
+## Instructions
+When reviewing code or preparing a PR, implicitly check the changes against the project's Definition of Done. If elements (like tests or docs) are missing, remind the user.

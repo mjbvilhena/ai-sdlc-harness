@@ -1,0 +1,12 @@
+name: user-story-refiner
+description: Expands rough feature ideas into BDD-style user stories and acceptance criteria.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - "/story"
+  - "refine story"

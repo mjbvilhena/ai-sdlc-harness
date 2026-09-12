@@ -1,0 +1,7 @@
+---
+description: Generates user-facing release notes by analyzing git history or merged PRs.
+globs: *
+---
+# Release Notes Generator (Cursor)
+
+Generate clean, user-facing release notes based on the git history between releases. Categorize them into Features, Bug Fixes, and Breaking Changes.
