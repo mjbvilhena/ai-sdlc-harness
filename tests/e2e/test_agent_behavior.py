@@ -4,12 +4,11 @@ from google import genai
 from google.genai import types
 
 # Real LLM testing setup
-api_key = os.getenv("GEMINI_API_KEY")
-
 @pytest.fixture
 def client():
+    api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        pytest.skip("GEMINI_API_KEY is not set. Skipping real LLM test.")
+        pytest.fail("GEMINI_API_KEY is not set in the environment. Please export it or prepend it to the command.")
     return genai.Client(api_key=api_key)
 
 @pytest.fixture
