@@ -37,6 +37,8 @@ ALIASES = {
     "request for comment": "rfc",
     "bug fix": "bugfix",
     "hot fix": "hotfix",
+    "domain template": "domain",
+    "layer template": "layer",
 }
 
 def fuzzy_match(query: str, options: list[str]) -> str | None:
