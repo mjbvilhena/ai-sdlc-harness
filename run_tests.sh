@@ -57,7 +57,7 @@ if [ -n "$GEMINI_API_KEY" ] || [ -n "$gemini_api_key" ]; then
     echo "API key detected. Running E2E Agent tests..."
     cd mcp-server
     source venv/bin/activate
-    PYTHONPATH=. python3 -m pytest ../tests/e2e/ -s
+    PYTHONPATH=. python3 -m pytest ../tests/e2e/
     deactivate
     cd ..
 else
