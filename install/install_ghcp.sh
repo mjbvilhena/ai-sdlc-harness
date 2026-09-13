@@ -183,6 +183,42 @@ else
 fi
 
 echo ""
+
+# ---------------------------------------------------------------------------
+# Configure MCP Server (VS Code / GitHub Copilot workspace)
+# ---------------------------------------------------------------------------
+# GitHub Copilot Chat in VS Code reads workspace MCP servers from
+# `.vscode/mcp.json` using a top-level `servers` key (not `mcpServers`).
+# See: https://docs.github.com/en/copilot/how-tos/provide-context/use-mcp-in-your-ide/extend-copilot-chat-with-mcp
+# and https://code.visualstudio.com/docs/copilot/chat/mcp-servers
+if [[ "$DRY_RUN" == true ]]; then
+  echo "[dry-run] Would configure MCP Server in .vscode/mcp.json"
+else
+  echo "Configuring MCP Server..."
+  MCP_CONFIG_DIR="${WORKSPACE}/.vscode"
+  mkdir -p "$MCP_CONFIG_DIR"
+  MCP_CONFIG_FILE="${MCP_CONFIG_DIR}/mcp.json"
+  MCP_SERVER_PATH="${PROJECT_ROOT}/mcp-server/src/server.py"
+
+  if [[ ! -f "$MCP_CONFIG_FILE" ]]; then
+    cat <<EOF > "$MCP_CONFIG_FILE"
+{
+  "servers": {
+    "sdlc-knowledge": {
+      "command": "python3",
+      "args": ["${MCP_SERVER_PATH}"]
+    }
+  }
+}
+EOF
+    echo "  [ok] Created MCP configuration: ${MCP_CONFIG_FILE}"
+  else
+    echo "  [info] MCP configuration already exists at ${MCP_CONFIG_FILE}."
+    echo "  [info] Please ensure 'sdlc-knowledge' server is registered pointing to ${MCP_SERVER_PATH}."
+  fi
+fi
+
+echo ""
 echo "-------------------------------------------------------"
 if [[ "$DRY_RUN" == true ]]; then
   echo " Dry-run complete. ${install_count} item(s) would be installed, ${skip_count} skipped."
@@ -190,7 +226,7 @@ else
   echo " Done. ${install_count} item(s) installed to: ${GHCP_INSTRUCTIONS_DIR}"
   echo " ${skip_count} item(s) skipped (no ${HARNESS}/${INSTRUCTIONS_FILE})."
   echo ""
-  echo " NOTE: Remember to commit .github/instructions/ to your workspace repo"
-  echo "       so that GitHub Copilot can read the instruction files."
+  echo " NOTE: Remember to commit .github/instructions/ and .vscode/mcp.json"
+  echo "       to your workspace repo so GitHub Copilot can read them."
 fi
 echo "======================================================="
