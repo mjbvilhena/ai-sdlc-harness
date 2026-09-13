@@ -220,7 +220,7 @@ else
 {
   "servers": {
     "sdlc-knowledge": {
-      "command": "python3",
+      "command": sys.argv[3],
       "args": ["${MCP_SERVER_PATH}"]
     }
   }

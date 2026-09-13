@@ -224,14 +224,14 @@ if "mcpServers" not in data:
     data["mcpServers"] = {}
 
 data["mcpServers"]["sdlc-knowledge"] = {
-    "command": "python3",
+    "command": sys.argv[3],
     "args": [server_path]
 }
 
 with open(config_path, "w") as f:
     json.dump(data, f, indent=2)
 print("  [ok] Registered sdlc-knowledge MCP server in " + config_path)
-' "$MCP_CONFIG_FILE" "$MCP_SERVER_PATH"
+' "$MCP_CONFIG_FILE" "$MCP_SERVER_PATH" "${PROJECT_ROOT}/mcp-server/venv/bin/python"
   else
     echo "  [info] Global MCP config must be managed manually in this environment."
   fi
