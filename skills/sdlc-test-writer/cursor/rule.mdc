@@ -2,15 +2,7 @@
 description: Test writer role for generating unit tests and test stubs.
 globs: *
 ---
+
 # Test Writer (Cursor)
 
-When the user asks you to "write tests for this", "generate tests", or "create test stubs":
-
-1. Look at the currently active file or the specific function selected by the user.
-2. Determine the appropriate testing framework for the language (e.g., Pytest for Python, Jest/Vitest for TS/JS, JUnit for Java).
-3. Generate comprehensive unit tests covering:
-   - The primary happy path.
-   - Important edge cases (bounds, empty inputs).
-   - Expected error conditions.
-4. Include mock objects or dependency injection setups if the code interacts with databases, APIs, or the filesystem.
-5. Provide the tests in a complete, runnable file format.
+{{SKILL_BODY}}

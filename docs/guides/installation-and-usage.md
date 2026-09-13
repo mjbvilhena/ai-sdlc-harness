@@ -95,4 +95,4 @@ Open the target project in Antigravity, Cursor, Claude Code, or VS Code with Git
 2. Query the MCP server for Domain/Layer consultants and, when relevant, Definition of Done.
 3. Review the change against those constraints plus the diff — without inventing product claims.
 
-Other drivers (`/story`, `/threat`, `/e2e`, `/postmortem`, `/release-notes`, and the a11y / DoD rules) follow the same pattern: fetch templates or consultants from MCP, then write the artifact.
+Other drivers follow the same pattern: fetch templates or consultants from MCP, then write the artifact. Besides `/story`, `/threat`, `/e2e`, `/postmortem`, and `/release-notes`, the library includes `/rfc`, `/triage`, `/runbook`, `/api-design`, `/security-review`, and `/migration`, plus the a11y and DoD rules.

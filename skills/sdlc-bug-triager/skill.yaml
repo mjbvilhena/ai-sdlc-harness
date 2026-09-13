@@ -1,0 +1,12 @@
+name: sdlc-bug-triager
+description: Turns a vague defect report into a diagnosable bug ticket and a bugfix DoD gap list.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - "/triage"
+  - "triage bug"

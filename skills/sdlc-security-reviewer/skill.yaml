@@ -1,0 +1,12 @@
+name: sdlc-security-reviewer
+description: Performs a defensive security review of a change using the security_review template. Complements STRIDE threat modeling.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - "/security-review"
+  - "security review"

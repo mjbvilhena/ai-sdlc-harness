@@ -2,7 +2,7 @@
 
 A shell-script-based installer that deploys a curated library of AI skills and rules into your local AI tooling environments.
 
-Skill installation is zero-dependency: just shell or PowerShell scripts and file copies. An optional MCP knowledge server under `mcp-server/` needs a local Python runtime if you want Just-In-Time SDLC templates and Domain/Layer consultants.
+Skill installation is zero-dependency: just shell or PowerShell scripts and file copies. An optional MCP knowledge server under `mcp-server/` needs a local Python runtime if you want Just-In-Time SDLC templates, Definitions of Done, and Domain/Layer consultants. Payloads live in `mcp-server/data/templates/` and `mcp-server/data/dod/` (ADR, RFC, PR, threat model, API design, runbook, migration, and change-type DoD such as `security change` / `api change`). Skills instruct the model to fetch those documents rather than hardcoding them.
 
 ## How It Works
 
@@ -61,7 +61,8 @@ ai-sdlc-harness/
 ├── skills/                  # Lifecycle Driver skill definitions
 │   └── sdlc-example-skill/
 │       ├── skill.yaml
-│       ├── agy/SKILL.md
+│       ├── CONTENT.md           # Canonical body; installers expand into harness files
+│       ├── agy/SKILL.md         # Thin shell with {{SKILL_BODY}}
 │       ├── claude/command.md
 │       ├── cursor/rule.mdc
 │       └── ghcp/instructions.md
@@ -95,11 +96,14 @@ ai-sdlc-harness/
      - /sdlc-my-skill
    ```
 
-3. Author the target-specific files:
-   - `skills/sdlc-my-skill/agy/SKILL.md` — Antigravity skill
-   - `skills/sdlc-my-skill/claude/command.md` — Claude Code slash command
-   - `skills/sdlc-my-skill/cursor/rule.mdc` — Cursor rule
-   - `skills/sdlc-my-skill/ghcp/instructions.md` — GitHub Copilot instructions
+3. Author `CONTENT.md` (the shared instructions) and thin harness shells that contain `{{SKILL_BODY}}` on its own line:
+   - `skills/sdlc-my-skill/CONTENT.md` — canonical body
+   - `skills/sdlc-my-skill/agy/SKILL.md` — Antigravity frontmatter + title
+   - `skills/sdlc-my-skill/claude/command.md` — Claude trigger + title
+   - `skills/sdlc-my-skill/cursor/rule.mdc` — Cursor frontmatter + title
+   - `skills/sdlc-my-skill/ghcp/instructions.md` — GitHub Copilot title
+
+   Rules use `{{RULE_BODY}}` the same way. Installers expand the placeholder from `CONTENT.md`; they fail if either the file or the placeholder is missing.
 
 4. Re-run the relevant installer(s).
 

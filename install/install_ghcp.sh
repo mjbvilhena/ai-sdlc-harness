@@ -17,7 +17,8 @@
 #   ./install_ghcp.sh --workspace /path/to/repo  # Install to specific workspace
 #   ./install_ghcp.sh --dry-run                  # Preview only (no changes)
 #
-# Requirements: bash >= 3.2, cp, mkdir (standard Unix utilities only)
+# Requirements: bash >= 3.2, cp, mkdir, cat, grep, mktemp (standard Unix utilities)
+# Expands {{SKILL_BODY}} / {{RULE_BODY}} from sibling CONTENT.md at install time.
 # =============================================================================
 
 set -euo pipefail
@@ -41,6 +42,10 @@ INSTRUCTIONS_FILE="instructions.md"
 
 # Dry-run mode flag
 DRY_RUN=false
+
+# shellcheck source-path=SCRIPTDIR
+# shellcheck source=lib/expand_content.sh
+. "${SCRIPT_DIR}/lib/expand_content.sh"
 
 # ---------------------------------------------------------------------------
 # Argument parsing
@@ -102,16 +107,13 @@ install_item() {
 
   if [[ "$DRY_RUN" == true ]]; then
     echo "  [dry-run] Would install: ${item_name}"
-    echo "            Source:      ${source_file}"
+    echo "            Source:      ${source_file} + CONTENT.md"
     echo "            Destination: ${dest_file}"
+    validate_item_content "$item_dir" "$item_name" "$source_file"
     return
   fi
 
-  # Create destination directory if it doesn't exist
-  mkdir -p "$GHCP_INSTRUCTIONS_DIR"
-
-  # Copy the instructions file to the destination
-  cp "${source_file}" "${dest_file}"
+  expand_harness_file "$item_dir" "$source_file" "$dest_file" "$item_name"
 
   echo "  [ok] Installed: ${item_name} → ${dest_file}"
 }

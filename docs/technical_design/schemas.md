@@ -6,7 +6,9 @@
 - CI validation (check that required fields are present on every PR)
 - Future tooling (e.g. a registry, a README generator)
 
-The installers copy files based purely on directory conventions (the presence of `agy/`, `claude/`, `cursor/`, `ghcp/` subdirectories). `skill.yaml` (and others) are never read at install time.
+The installers select files based purely on directory conventions (the presence of `agy/`, `claude/`, `cursor/`, `ghcp/` subdirectories). `skill.yaml` (and others) are never read at install time.
+
+Each skill or rule directory also has a canonical `CONTENT.md`. Harness files are thin shells that contain `{{SKILL_BODY}}` (skills/agents) or `{{RULE_BODY}}` (rules) on its own line. At install time the installer substitutes `CONTENT.md` into that placeholder and writes the expanded file. Missing `CONTENT.md`, a missing placeholder, or an unresolved placeholder after expansion is a hard error. CI (`validate_metadata.py`) checks that `CONTENT.md` exists and that each harness primary file contains the correct placeholder.
 
 ---
 

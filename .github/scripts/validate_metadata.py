@@ -5,6 +5,12 @@ from pathlib import Path
 
 REQUIRED_FIELDS = {'name', 'description', 'version', 'author'}
 VALID_TARGETS = {'agy', 'claude', 'ghcp', 'cursor'}
+HARNESS_PRIMARY_FILE = {
+    'agy': {'skill': 'SKILL.md', 'agent': 'SKILL.md', 'rule': 'RULE.md'},
+    'claude': {'skill': 'command.md', 'agent': 'command.md', 'rule': 'command.md'},
+    'cursor': {'skill': 'rule.mdc', 'agent': 'rule.mdc', 'rule': 'rule.mdc'},
+    'ghcp': {'skill': 'instructions.md', 'agent': 'instructions.md', 'rule': 'instructions.md'},
+}
 
 def validate_file(filepath):
     errors = []
@@ -39,7 +45,28 @@ def validate_file(filepath):
     expected_name = dir_path.name
     if data.get('name') != expected_name:
         errors.append(f"Name field '{data.get('name')}' does not match directory name '{expected_name}'")
-        
+
+    kind = Path(filepath).name.split('.')[0]  # skill / agent / rule
+    placeholder = '{{RULE_BODY}}' if kind == 'rule' else '{{SKILL_BODY}}'
+    other = '{{SKILL_BODY}}' if kind == 'rule' else '{{RULE_BODY}}'
+
+    if actual_dirs and not (dir_path / 'CONTENT.md').is_file():
+        errors.append("Missing CONTENT.md (canonical body for harness shells)")
+
+    for harness in actual_dirs:
+        fname = HARNESS_PRIMARY_FILE.get(harness, {}).get(kind)
+        if not fname:
+            continue
+        harness_file = dir_path / harness / fname
+        if not harness_file.is_file():
+            errors.append(f"Missing {harness}/{fname}")
+            continue
+        text = harness_file.read_text(encoding='utf-8')
+        if placeholder not in text:
+            errors.append(f"{harness}/{fname} is missing {placeholder}")
+        if other in text:
+            errors.append(f"{harness}/{fname} has the wrong placeholder {other}")
+
     return errors
 
 def main():

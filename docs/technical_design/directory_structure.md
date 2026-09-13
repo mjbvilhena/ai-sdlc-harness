@@ -16,13 +16,17 @@ ai-sdlc-harness/
 │   ├── install_cursor.sh
 │   ├── install_cursor.ps1
 │   ├── install_ghcp.sh
-│   └── install_ghcp.ps1
+│   ├── install_ghcp.ps1
+│   └── lib/
+│       ├── expand_content.sh    # Bash: expand CONTENT.md into harness shells
+│       └── Expand-Content.ps1   # PowerShell twin
 │
 ├── skills/                      # Lifecycle Driver skill definitions
 │   └── <skill-name>/            # e.g. sdlc-code-reviewer, sdlc-example-skill
 │       ├── skill.yaml           # Metadata only (not parsed by installers)
+│       ├── CONTENT.md           # Canonical body ({{SKILL_BODY}})
 │       ├── agy/
-│       │   └── SKILL.md
+│       │   └── SKILL.md         # Thin shell
 │       ├── claude/
 │       │   └── command.md
 │       ├── cursor/
@@ -33,6 +37,7 @@ ai-sdlc-harness/
 ├── rules/                       # Ambient / passive prompts
 │   └── <rule-name>/
 │       ├── rule.yaml
+│       ├── CONTENT.md           # Canonical body ({{RULE_BODY}})
 │       ├── agy/RULE.md
 │       ├── claude/command.md
 │       ├── cursor/rule.mdc

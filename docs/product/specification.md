@@ -69,16 +69,16 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 - Each rule lives in `rules/<rule-name>/`.
 - Each rule directory MUST contain a `rule.yaml` metadata file.
 - Each rule directory MAY contain one or more harness-specific subdirectories (e.g., `claude/`, `cursor/`, `ghcp/`).
-- Rules are copied verbatim to the target harness's configuration directory by the installers.
+- Rules (and skills) are installed by expanding `CONTENT.md` into `{{RULE_BODY}}` / `{{SKILL_BODY}}` in the harness shell. Destinations never contain unresolved placeholders.
 
 ### F4. Installer Scripts
 
 Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
 
-- `install/install_claude.sh`: Iterates over `skills/*/claude/`, `agents/*/claude/` (if present), and `rules/*/claude/`. Copies `.md` files to `~/.claude/commands/`, or `<ws>/.claude/commands/` when `--workspace` is set.
-- `install/install_cursor.sh`: Iterates over `skills/*/cursor/`, `agents/*/cursor/` (if present), and `rules/*/cursor/`. Copies rules to `<ws>/.cursor/rules/`. Workspace defaults to `$PWD`.
-- `install/install_ghcp.sh`: Iterates over `skills/*/ghcp/`, `agents/*/ghcp/` (if present), and `rules/*/ghcp/`. Copies instruction files to `<ws>/.github/instructions/`. Workspace defaults to `$PWD`.
-- `install/install_agy.sh`: Iterates over `skills/*/agy/`, `agents/*/agy/` (if present), and `rules/*/agy/`. Global install copies to `~/.gemini/antigravity-cli/builtin/skills/<name>/`. Workspace install (`--workspace`) copies to `<ws>/.agents/skills/<name>/`.
+- `install/install_claude.sh`: Iterates over `skills/*/claude/`, `agents/*/claude/` (if present), and `rules/*/claude/`. Expands each `command.md` + sibling `CONTENT.md` to `~/.claude/commands/<name>.md`, or `<ws>/.claude/commands/` when `--workspace` is set.
+- `install/install_cursor.sh`: Same pattern for `cursor/rule.mdc` → `<ws>/.cursor/rules/<name>.mdc`. Workspace defaults to `$PWD`.
+- `install/install_ghcp.sh`: Same pattern for `ghcp/instructions.md` → `<ws>/.github/instructions/<name>.instructions.md`. Workspace defaults to `$PWD`.
+- `install/install_agy.sh`: Expands `agy/` files (typically `SKILL.md` / `RULE.md`) into `~/.gemini/antigravity-cli/builtin/skills/<name>/` or `<ws>/.agents/skills/<name>/`.
 - `--workspace <path>` is optional for Claude and AGY (omit for user-global install). Cursor and GHCP are always workspace-scoped; omitting the flag uses `$PWD`.
 
 ### F5. Installer Behaviour
@@ -87,7 +87,8 @@ Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
 - Installers MUST print a summary of what was installed and where.
 - Installers MUST skip any directory that does not have the relevant harness subdirectory (e.g., `install_claude.sh` skips items with no `claude/` directory).
 - Installers SHOULD create destination directories if they do not already exist.
-- Installers MUST NOT require any runtime dependency beyond `bash`, `cp`, `mkdir`, and `ln`.
+- Installers MUST NOT require any runtime dependency beyond standard Unix utilities (`bash`, `cp`, `mkdir`, `cat`, `grep`, `mktemp`) or native PowerShell.
+- Installers MUST expand `CONTENT.md` into `{{SKILL_BODY}}` (skills/agents) or `{{RULE_BODY}}` (rules) and MUST fail if `CONTENT.md` or the placeholder is missing. They MUST NOT write unresolved placeholders.
 
 ### F6. MCP Knowledge Retrieval Server
 

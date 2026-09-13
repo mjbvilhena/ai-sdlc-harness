@@ -1,0 +1,12 @@
+name: sdlc-migration-planner
+description: Writes an expand/migrate/contract data or schema migration plan with verification and rollback.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - "/migration"
+  - "plan migration"

@@ -50,7 +50,7 @@ skills/
 
 *(The `rules/` directory follows this same layout. `agents/` would follow it too when introduced.)*
 
-Each target-specific file is authored natively — it contains exactly what the target harness expects to read. The installer scripts do not transform, template, or parse these files. They are copied as-is.
+Each harness file is a thin shell (frontmatter, title, optional Claude Trigger) plus `{{SKILL_BODY}}` or `{{RULE_BODY}}`. The shared instructions live in sibling `CONTENT.md`. Installers expand the placeholder at install time and write a fully resolved file to the destination — never an unresolved token.
 
 ## Installer Script Structure
 
@@ -82,7 +82,7 @@ install/install_<harness>.sh | .ps1
 ## Design Principles
 
 - **No runtime dependencies for install**: Installers use only native system shell utilities (POSIX `bash`, `cp`, `mkdir` for Unix systems, and native PowerShell for Windows).
-- **No parsing**: Metadata files (`skill.yaml`, `rule.yaml`, etc.) are read by humans and CI validators only; installer scripts do not parse them.
+- **No metadata parsing**: `skill.yaml` / `rule.yaml` are read by humans and CI validators only. Installers do not parse them. They do expand `CONTENT.md` into `{{SKILL_BODY}}` / `{{RULE_BODY}}`.
 - **Idempotency**: Copying files with `cp` / `Copy-Item` is naturally idempotent. Running installers multiple times is safe. Existing MCP JSON is left untouched.
 - **Isolation**: Each harness installer is independent. Running `install/install_claude.sh` does not affect Cursor or Antigravity configuration, and vice versa.
 
@@ -92,7 +92,8 @@ In addition to static skills, this project includes a standalone Model Context P
 
 The MCP server acts as an intelligent knowledge retrieval layer for the Lifecycle Drivers (the installed skills/rules), fulfilling the role of "Consultants" in the Tri-Dimensional Framework:
 
-- **SDLC Templates**: Tools like `get_sdlc_template` and `get_definition_of_done` serve foundational project standards (ADRs, PR checklists, user stories, incident post-mortems).
+- **SDLC Templates**: `get_sdlc_template` serves markdown under `mcp-server/data/templates/`. The catalog covers the original set (ADR, bug report, domain, layer, PR, RFC, user story, incident postmortem) plus threat model, code review, test / e2e plans, release notes, runbook, API design & contract, security review, accessibility audit, migration plan, onboarding guide, and rollout plan. Natural-language aliases (`stride`, `changelog`, `playbook`, `openapi`, …) resolve via longest-match in `server.py`.
+- **Definitions of Done**: `get_definition_of_done` serves `mcp-server/data/dod/` for `bugfix`, `epic`, `feature`, `hotfix`, `release`, `pr`, `user story`, `security change`, `ui change`, `api change`, and `data migration`.
 - **Dynamic Consultant Discovery**: Tools like `get_domain_consultant` and `get_layer_consultant` dynamically scan the user's `WORKSPACE_ROOT` for `DOMAIN.md` and `LAYER.md` files. This allows the MCP server to construct constraints that reflect the real-time architectural state of the user's repository without hardcoded mappings.
 
-Lifecycle Driver prompts (e.g., `sdlc-user-story-refiner`, `sdlc-code-reviewer`, `sdlc-dod-checker`) explicitly instruct the model to query this MCP server for templates and constraints before generating artifacts.
+Lifecycle Driver prompts (e.g., `sdlc-user-story-refiner`, `sdlc-code-reviewer`, `sdlc-rfc-drafter`, `sdlc-security-reviewer`, `sdlc-dod-checker`) explicitly instruct the model to query this MCP server for templates and constraints before generating artifacts. Tool names stay stable; only payloads, aliases, and tests expand.

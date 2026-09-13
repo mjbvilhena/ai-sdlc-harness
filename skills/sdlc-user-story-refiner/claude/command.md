@@ -4,22 +4,4 @@
 /story
 refine story
 
-## Purpose
-
-Turn a rough feature idea into BDD-style user stories and acceptance criteria. Stay inside what the user actually asked for.
-
-## MCP tools (required)
-
-When MCP is available:
-
-1. **CRITICAL**: Call `get_sdlc_template` with `template_type="user story"` (aliases such as `story` also resolve). Follow the returned structure, headings, and sections. If the tool lists other template names, pick the user-story option — do not invent a template.
-2. If the request names or clearly maps to a business domain, call `get_domain_consultant` for that domain and reflect its constraints in the stories (for example forbidden integrations or required actors). If the lookup fails, use only the domains the tool lists.
-
-If MCP is unavailable, say so and use a standard "As a / I want / So that" story plus Given/When/Then criteria.
-
-## Instructions
-
-1. Clarify actor, goal, and value. Ask a short question only when a story would otherwise be ambiguous.
-2. Split large asks into independently valuable stories. Do not add features, personas, or metrics the user did not provide.
-3. Write acceptance criteria as testable Given/When/Then scenarios, including one unhappy path when it is implied.
-4. Call out open questions and out-of-scope items instead of filling gaps with fiction.
+{{SKILL_BODY}}

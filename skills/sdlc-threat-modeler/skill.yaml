@@ -9,4 +9,4 @@ targets:
   - cursor
 triggers:
   - "/threat"
-  - "security review"
+  - "threat model"
