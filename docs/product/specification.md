@@ -17,7 +17,7 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 ### Journey 1: Install skills into a target harness (e.g., Claude Code, Cursor, GHCP, Antigravity)
 
 1. The user clones this repository.
-2. The user runs the installer script for their preferred harness (e.g., `./install_claude.sh`, `./install_cursor.sh`, `./install_ghcp.sh`, or `./install_agy.sh`) from the repo root.
+2. The user runs the installer script for their preferred harness from the repo root (e.g., `./install/install_claude.sh`, `./install/install_cursor.sh`, `./install/install_ghcp.sh`, or `./install/install_agy.sh`).
 3. The script discovers all skill directories under `skills/` that contain the corresponding harness subdirectory (e.g., `claude/`, `cursor/`, `ghcp/`, `agy/`).
 4. For each skill, the script copies the contents into the target harness's expected local configuration directory.
 5. The user opens or reloads their AI tool and the skills are immediately available.
@@ -40,7 +40,7 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 ### Journey 4: Execute a task using the Tri-Dimensional Framework
 
 1. The user initiates a software task via their preferred harness (e.g., Claude Code, Cursor, GitHub Copilot, Antigravity).
-2. The harness invokes the native Lifecycle Driver prompt (e.g., the `code_implementer` skill).
+2. The harness invokes the native Lifecycle Driver prompt (today: a skill under `skills/`, e.g. `sdlc-code-reviewer`). Dedicated `agents/` packages are deferred.
 3. The Driver prompt explicitly instructs the AI to query the local MCP Knowledge Server to fetch SDLC standards and Domain/Layer constraints (the Consultants).
 4. The AI synthesizes the retrieved constraints to generate the final code artifact, maintaining strict context isolation.
 
@@ -53,14 +53,15 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 - Each skill directory MAY contain one or more harness-specific subdirectories: `claude/`, `cursor/`, `ghcp/`, `agy/`.
 - A harness subdirectory contains the files that are copied verbatim to the target harness's configuration directory.
 
-### F2. Agent Directory Convention & Framework (Multi-Harness)
+### F2. Lifecycle Drivers, Consultants, and deferred `agents/`
 
-- Agents are structured according to the **Tri-Dimensional Agent Framework** (Lifecycle, Domain, Layer).
-- To support functional parity across modern harnesses (e.g., Claude Code, Cursor, GitHub Copilot, Antigravity), this framework is decoupled:
-  - **Lifecycle Drivers**: Authored as native skills/prompts/agents in the `agents/<agent-name>/<harness>/` directories using the harness's specific primitives.
-  - **Domain/Layer Consultants**: Maintained as dynamic knowledge payloads served securely and structurally via the MCP Server.
-- Installers deploy the Lifecycle Drivers to the user's local workspace or configuration (e.g., `.claude/commands/`, `.cursor/rules/`, `.github/instructions/`, `.antigravity/`) depending on the target.
-- Each agent directory MUST contain a `agent.yaml` manifest outlining its role.
+- Work is structured according to the **Tri-Dimensional Agent Framework** (Lifecycle, Domain, Layer).
+- To support functional parity across modern harnesses (Claude Code, Cursor, GitHub Copilot, Antigravity), this framework is decoupled:
+  - **Lifecycle Drivers (current)**: Authored as native skills and rules under `skills/<name>/<harness>/` and `rules/<name>/<harness>/` using each harness's primitives. These are what the installers deploy today.
+  - **Domain/Layer Consultants**: Dynamic knowledge payloads served by the MCP Server (`get_domain_consultant`, `get_layer_consultant`), sourced from workspace `DOMAIN.md` / `LAYER.md` files.
+  - **`agents/` (deferred)**: A separate agent-package tree is **not populated**. Installers already iterate `agents/` when present and skip it when absent. Do not invent full agent packages until that product decision is revisited.
+- Installers deploy Lifecycle Drivers to the target harness location (e.g., `.claude/commands/`, `.cursor/rules/`, `.github/instructions/`, global AGY `~/.gemini/antigravity-cli/builtin/skills/` or workspace `.agents/skills/`).
+- If `agents/` is introduced later, each agent directory MUST contain an `agent.yaml` manifest.
 
 ### F3. Rule Directory Convention
 
@@ -72,11 +73,13 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 
 ### F4. Installer Scripts
 
-- `install_claude.sh`: Iterates over `skills/*/claude/`, `agents/*/claude/`, and `rules/*/claude/`. Copies `.md` files to `~/.claude/commands/`.
-- `install_cursor.sh`: Iterates over `skills/*/cursor/`, `agents/*/cursor/`, and `rules/*/cursor/`. Copies rules to a target workspace directory `.cursor/rules/`.
-- `install_ghcp.sh`: Iterates over `skills/*/ghcp/`, `agents/*/ghcp/`, and `rules/*/ghcp/`. Copies instruction files to a target workspace directory `.github/instructions/`.
-- `install_agy.sh`: Iterates over `skills/*/agy/`, `agents/*/agy/`, and `rules/*/agy/`. Copies to `~/.gemini/antigravity-cli/builtin/skills/<name>/` and the local workspace `.antigravity/`.
-- All installers accept an optional `--workspace <path>` flag (defaults to `$PWD`) to determine where workspace-specific agents should be installed.
+Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
+
+- `install/install_claude.sh`: Iterates over `skills/*/claude/`, `agents/*/claude/` (if present), and `rules/*/claude/`. Copies `.md` files to `~/.claude/commands/`, or `<ws>/.claude/commands/` when `--workspace` is set.
+- `install/install_cursor.sh`: Iterates over `skills/*/cursor/`, `agents/*/cursor/` (if present), and `rules/*/cursor/`. Copies rules to `<ws>/.cursor/rules/`. Workspace defaults to `$PWD`.
+- `install/install_ghcp.sh`: Iterates over `skills/*/ghcp/`, `agents/*/ghcp/` (if present), and `rules/*/ghcp/`. Copies instruction files to `<ws>/.github/instructions/`. Workspace defaults to `$PWD`.
+- `install/install_agy.sh`: Iterates over `skills/*/agy/`, `agents/*/agy/` (if present), and `rules/*/agy/`. Global install copies to `~/.gemini/antigravity-cli/builtin/skills/<name>/`. Workspace install (`--workspace`) copies to `<ws>/.agents/skills/<name>/`.
+- `--workspace <path>` is optional for Claude and AGY (omit for user-global install). Cursor and GHCP are always workspace-scoped; omitting the flag uses `$PWD`.
 
 ### F5. Installer Behaviour
 
@@ -105,7 +108,7 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 Given the shell-based nature of the installers and the modular nature of the skill library and MCP server, automated testing will be broken down into the following strategies:
 
 ### 6.1 Shell Script Testing
-- **Framework**: BATS (Bash Automated Testing System) will be used to test the installer scripts (`install_claude.sh`, `install_cursor.sh`, `install_ghcp.sh`, `install_agy.sh`, etc.).
+- **Framework**: BATS (Bash Automated Testing System) is used to test the installer scripts (`install/install_claude.sh`, `install/install_cursor.sh`, `install/install_ghcp.sh`, `install/install_agy.sh`, etc.).
 - **Test Cases**:
   - Verify correct file copying to target directories based on mock skill structures.
   - Verify idempotency (multiple runs produce the same safe result).
@@ -142,4 +145,9 @@ Given the shell-based nature of the installers and the modular nature of the ski
 - **Bidirectional sync**: Importing a skill from an installed location back into this repo format is out of scope.
 
 ### 6.4 Zero-Touch Workspace Integration
-The installer scripts MUST seamlessly configure the host IDE (via `mcp.json` or `claude.json`) to communicate with the MCP Knowledge Server without requiring the user to manually edit JSON configuration files.
+The installer scripts MUST seamlessly configure the host IDE to communicate with the MCP Knowledge Server without requiring the user to manually edit JSON configuration files. Implemented locations:
+
+- Claude: `<ws>/claude.json` (workspace) or `~/.claude/claude.json` (global)
+- Cursor: `<ws>/.cursor/mcp.json` (`mcpServers`)
+- Antigravity: `<ws>/.agents/mcp_config.json` (workspace) or `~/.gemini/config/mcp_config.json` (global)
+- GitHub Copilot / VS Code: `<ws>/.vscode/mcp.json` (`servers` key — VS Code / Copilot workspace schema)

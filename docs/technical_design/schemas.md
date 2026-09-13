@@ -6,7 +6,7 @@
 - CI validation (check that required fields are present on every PR)
 - Future tooling (e.g. a registry, a README generator)
 
-The installers copy files based purely on directory conventions (the presence of `agy/`, `claude/`, `ghcp/` subdirectories). `skill.yaml` (and others) are never read at install time.
+The installers copy files based purely on directory conventions (the presence of `agy/`, `claude/`, `cursor/`, `ghcp/` subdirectories). `skill.yaml` (and others) are never read at install time.
 
 ---
 
@@ -23,6 +23,7 @@ author: string         # Author name or GitHub handle
 targets:               # List of harnesses this skill has been authored for
   - agy
   - claude
+  - cursor
   - ghcp
 
 triggers:              # Natural-language or slash-command names that activate the skill
@@ -40,6 +41,7 @@ author: mjbvilhena
 targets:
   - agy
   - claude
+  - cursor
   - ghcp
 triggers:
   - /review
@@ -50,7 +52,7 @@ triggers:
 
 ## `agent.yaml` Schema
 
-Agents follow the same metadata schema as skills, using `agent.yaml` instead:
+Agents follow the same metadata schema as skills, using `agent.yaml` instead. The `agents/` directory is **not populated** today (Lifecycle Drivers live under `skills/`); this schema applies if agent packages are added later.
 
 ```yaml
 # Required fields
@@ -63,6 +65,7 @@ author: string         # Author name or GitHub handle
 targets:
   - agy
   - claude
+  - cursor
   - ghcp
 
 triggers:
@@ -84,6 +87,7 @@ author: string         # Author name or GitHub handle
 
 # Optional fields
 targets:
+  - agy
   - claude
   - cursor
   - ghcp
@@ -97,11 +101,11 @@ targets:
 |-------|---------|
 | `agy` | Antigravity (AGY) |
 | `claude` | Claude Code |
-| `ghcp` | GitHub Copilot |
 | `cursor` | Cursor |
+| `ghcp` | GitHub Copilot |
 
 ---
 
 ## CI Validation
 
-A GitHub Actions workflow (planned, see backlog) will validate that every `skill.yaml`, `agent.yaml`, and `rule.yaml` in a PR contains all required fields and that the `targets` list matches the subdirectories present in the directory.
+A GitHub Actions workflow (`.github/workflows/validate-metadata.yaml`, script `.github/scripts/validate_metadata.py`) validates that every `skill.yaml`, `agent.yaml`, and `rule.yaml` in a PR contains all required fields and that the `targets` list matches the harness subdirectories present in the directory.

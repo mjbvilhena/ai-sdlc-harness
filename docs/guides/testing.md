@@ -19,7 +19,7 @@ A custom Python script (`.github/scripts/validate_metadata.py`) that strictly va
 Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files.
 
 ### 3. BATS (Bash Automated Testing System)
-BATS (`tests/bats/installers.bats`) evaluates the shell installer scripts (`install_claude.sh`, `install_cursor.sh`, etc.). The BATS script sets up a transient mock `$HOME` and `$WORKSPACE` directory in `/tmp` to safely verify that skills copy correctly and the `--dry-run` and `--workspace` flags work properly without modifying your actual system.
+BATS (`tests/bats/installers.bats`) evaluates the shell installer scripts under `install/` (`install_claude.sh`, `install_cursor.sh`, `install_ghcp.sh`, `install_agy.sh`). The suite covers dry-run (no files written), global vs `--workspace` paths, PWD default for Cursor/GHCP, idempotent re-runs, MCP create-once, flag/path errors, and a missing `agents/` directory. It uses a transient mock `$HOME` and workspace so your real machine config is not touched.
 
 ---
 

@@ -142,6 +142,42 @@ Process-Category "skills"
 Process-Category "agents"
 Process-Category "rules"
 
+# ---------------------------------------------------------------------------
+# Configure MCP Server (VS Code / GitHub Copilot workspace)
+# ---------------------------------------------------------------------------
+# GitHub Copilot Chat in VS Code reads workspace MCP servers from
+# `.vscode\mcp.json` using a top-level `servers` key (not `mcpServers`).
+# See: https://docs.github.com/en/copilot/how-tos/provide-context/use-mcp-in-your-ide/extend-copilot-chat-with-mcp
+if ($DryRun) {
+    Write-Host "[dry-run] Would configure MCP Server in .vscode\mcp.json"
+} else {
+    Write-Host "Configuring MCP Server..."
+    $McpConfigDir = Join-Path $Workspace ".vscode"
+    if (-not (Test-Path -Path $McpConfigDir)) {
+        New-Item -ItemType Directory -Force -Path $McpConfigDir | Out-Null
+    }
+    $McpConfigFile = Join-Path $McpConfigDir "mcp.json"
+    $McpServerPath = Join-Path $ProjectRoot "mcp-server\src\server.py"
+
+    if (-not (Test-Path -Path $McpConfigFile)) {
+        $JsonContent = @"
+{
+  "servers": {
+    "sdlc-knowledge": {
+      "command": "python3",
+      "args": ["$($McpServerPath -replace '\', '\\')"]
+    }
+  }
+}
+"@
+        Set-Content -Path $McpConfigFile -Value $JsonContent
+        Write-Host "  [ok] Created MCP configuration: $McpConfigFile"
+    } else {
+        Write-Host "  [info] MCP configuration already exists at $McpConfigFile."
+        Write-Host "  [info] Please ensure 'sdlc-knowledge' server is registered pointing to $McpServerPath."
+    }
+}
+Write-Host ""
 Write-Host "-------------------------------------------------------"
 if ($DryRun) {
     Write-Host " Dry-run complete. $InstallCount item(s) would be installed, $SkipCount skipped."
@@ -149,7 +185,7 @@ if ($DryRun) {
     Write-Host " Done. $InstallCount item(s) installed to: $GhcpInstructionsDir"
     Write-Host " $SkipCount item(s) skipped (no ${Harness}\${InstructionsFile})."
     Write-Host ""
-    Write-Host " NOTE: Remember to commit .github\instructions\ to your workspace repo"
-    Write-Host "       so that GitHub Copilot can read the instruction files."
+    Write-Host " NOTE: Remember to commit .github\instructions\ and .vscode\mcp.json"
+    Write-Host "       to your workspace repo so GitHub Copilot can read them."
 }
 Write-Host "======================================================="

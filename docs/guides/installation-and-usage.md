@@ -2,40 +2,97 @@
 
 This guide explains how to deploy the AI SDLC Harness to a real repository and begin using it with your AI IDE of choice.
 
-## Step 1: Install Skills & Configure MCP
+## Installer locations
 
-To deploy the harness into a target repository, run the installer script corresponding to your AI tool. You MUST provide the `--workspace` flag pointing to your project's root directory.
+All installers live under `install/`, not the repo root:
 
-For example, to configure a project for both Antigravity and Claude Code:
+| Harness | Bash | PowerShell | Scope |
+|---|---|---|---|
+| Antigravity (agy) | `install/install_agy.sh` | `install/install_agy.ps1` | Global **or** workspace |
+| Claude Code | `install/install_claude.sh` | `install/install_claude.ps1` | Global **or** workspace |
+| Cursor | `install/install_cursor.sh` | `install/install_cursor.ps1` | Workspace only |
+| GitHub Copilot (ghcp) | `install/install_ghcp.sh` | `install/install_ghcp.ps1` | Workspace only |
+
+On Windows, run the `.ps1` scripts from PowerShell (`-Workspace` / `-DryRun` instead of `--workspace` / `--dry-run`).
+
+## `--workspace` vs global
+
+- **Cursor and GitHub Copilot** always install into a workspace. Pass `--workspace /path/to/your/project`. If you omit the flag, the installer uses `$PWD` (the directory you ran the script from).
+- **Claude Code and Antigravity** install **globally** when you omit `--workspace` (`~/.claude/commands/` and `~/.gemini/antigravity-cli/builtin/skills/` respectively). Pass `--workspace` to keep skills inside the project instead (`<ws>/.claude/commands/` or `<ws>/.agents/skills/`).
+
+`--dry-run` / `-DryRun` prints what would be copied and which MCP file would be written, without creating files.
+
+## Step 1: Install skills and configure MCP
+
+From a clone of this repository:
 
 ```bash
+git clone https://github.com/mjbvilhena/ai-sdlc-harness.git
+cd ai-sdlc-harness
+
+# Example: configure a real project for every harness
 ./install/install_agy.sh --workspace /path/to/your/real-project
 ./install/install_claude.sh --workspace /path/to/your/real-project
+./install/install_cursor.sh --workspace /path/to/your/real-project
+./install/install_ghcp.sh --workspace /path/to/your/real-project
 ```
 
-### What these installers do automatically:
-1. **Inject Skills**: They copy all the prompts and skills from this library directly into the hidden directories of your workspace (e.g., `.agents/skills/` and `.claude/commands/`).
-2. **Attach MCP Server**: They automatically generate the `mcp_config.json` or `claude.json` configuration files in your workspace, securely wiring your AI IDE to the Python MCP Knowledge Server hosted in this repository. You do not need to configure anything manually!
+PowerShell (from the same clone):
 
-## Step 2: Define Your Project Constraints
+```powershell
+.\install\install_agy.ps1 -Workspace C:\path\to\your\real-project
+.\install\install_claude.ps1 -Workspace C:\path\to\your\real-project
+.\install\install_cursor.ps1 -Workspace C:\path\to\your\real-project
+.\install\install_ghcp.ps1 -Workspace C:\path\to\your\real-project
+```
 
-The AI SDLC Harness uses a "Tri-Dimensional Framework" powered by Dynamic Consultants. This means the AI will dynamically enforce *your* project's rules without you having to copy-paste them into every prompt.
+### What the installers do automatically
 
-In your real project workspace, create markdown files detailing your architecture:
-- **Domains**: `src/domains/auth/DOMAIN.md` (e.g., "All authentication must use the AuthService singleton.")
-- **Layers**: `src/ui/LAYER.md` (e.g., "All UI components must be purely functional React components.")
+1. **Inject skills and rules**: Copy library prompts into the hidden directories of the target:
+   - AGY workspace: `.agents/skills/`
+   - Claude workspace: `.claude/commands/`
+   - Cursor: `.cursor/rules/`
+   - GitHub Copilot: `.github/instructions/`
+2. **Attach the MCP server** if the config file does not already exist (existing files are left untouched):
 
-## Step 3: Trigger the AI
+   | Harness | MCP config written | JSON shape |
+   |---|---|---|
+   | Claude (workspace) | `<ws>/claude.json` | `mcpServers` |
+   | Claude (global) | `~/.claude/claude.json` | `mcpServers` |
+   | Cursor | `<ws>/.cursor/mcp.json` | `mcpServers` |
+   | AGY (workspace) | `<ws>/.agents/mcp_config.json` | `mcpServers` |
+   | AGY (global) | `~/.gemini/config/mcp_config.json` | `mcpServers` |
+   | GitHub Copilot | `<ws>/.vscode/mcp.json` | `servers` (VS Code / Copilot schema) |
 
-Open your real project using your chosen AI IDE (e.g., Antigravity, Cursor, or Claude Code). The IDE will automatically detect the skills and the MCP server you injected in Step 1.
+   GitHub Copilot Chat in VS Code documents workspace MCP servers in [`.vscode/mcp.json`](https://docs.github.com/en/copilot/how-tos/provide-context/use-mcp-in-your-ide/extend-copilot-chat-with-mcp) with a top-level `servers` key (not `mcpServers`). After install, start the server from that file (VS Code shows a Start control) so Copilot can discover `sdlc-knowledge` tools.
 
-Simply invoke a command in the AI chat:
+   The MCP process is `python3 mcp-server/src/server.py` from this clone. Skill *installation* does not require Python; *running* the knowledge server does.
+
+3. **`agents/`**: If the directory is missing (the current default), installers print that they are skipping agents and continue. Skills are the Lifecycle Drivers.
+
+Commit the workspace-scoped files (`.cursor/`, `.github/instructions/`, `.vscode/mcp.json`, `.agents/`, `.claude/`) in the **target** project so teammates get the same prompts and MCP wiring.
+
+## Step 2: Define your project constraints
+
+The harness uses a Tri-Dimensional Framework powered by dynamic consultants. The model can enforce *your* project's rules without pasting them into every prompt.
+
+In the target workspace, add markdown files such as:
+
+- **Domains**: `src/domains/auth/DOMAIN.md` (for example, "Authentication must go through AuthService.")
+- **Layers**: `src/ui/LAYER.md` (for example, "UI components must be purely functional.")
+
+The MCP tools `get_domain_consultant` and `get_layer_consultant` discover these files by walking the workspace.
+
+## Step 3: Trigger a Lifecycle Driver
+
+Open the target project in Antigravity, Cursor, Claude Code, or VS Code with GitHub Copilot. Invoke a skill, for example:
 
 > `Please run the /sdlc-code-reviewer skill on my current branch.`
 
-**The AI will:**
-1. Recognize the `/sdlc-code-reviewer` command.
-2. Read the review instructions.
-3. Automatically pause to query the MCP server.
-4. Fetch your custom `DOMAIN.md` and `LAYER.md` rules.
-5. Review your code strictly against your custom architectural constraints!
+**The model should:**
+
+1. Recognize the `/sdlc-code-reviewer` (or equivalent) instructions.
+2. Query the MCP server for Domain/Layer consultants and, when relevant, Definition of Done.
+3. Review the change against those constraints plus the diff — without inventing product claims.
+
+Other drivers (`/story`, `/threat`, `/e2e`, `/postmortem`, `/release-notes`, and the a11y / DoD rules) follow the same pattern: fetch templates or consultants from MCP, then write the artifact.

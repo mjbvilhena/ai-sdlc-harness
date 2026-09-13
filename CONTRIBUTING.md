@@ -1,14 +1,14 @@
 # Contributing to AI SDLC Harness
 
-Thank you for contributing! This guide will help you understand how to author and publish skills, rules, and agents for this repository.
+Thank you for contributing! This guide will help you understand how to author and publish skills and rules for this repository.
 
 ## Directory Layout
 
-The repository is organized by category, then by item name, and finally by harness target:
+The repository is organized by category, then by item name, and finally by harness target. New skills use the `sdlc-` prefix:
 
 ```text
 skills/
-  code-reviewer/            # The name of the skill (kebab-case)
+  sdlc-code-reviewer/       # The name of the skill (kebab-case, sdlc- prefix)
     skill.yaml              # Metadata file (required)
     agy/                    # Antigravity implementation
       SKILL.md
@@ -20,13 +20,17 @@ skills/
       instructions.md
 ```
 
+See [`skills/sdlc-example-skill/`](skills/sdlc-example-skill/) and [`rules/sdlc-example-rule/`](rules/sdlc-example-rule/) for complete stubs.
+
+Installers also accept an `agents/` tree with the same layout, but **`agents/` is not populated**. Lifecycle Drivers currently live as `skills/` (and ambient `rules/`). Do not add empty agent packages unless a later product decision asks for them.
+
 ## Metadata Schemas
 
-Every skill must have a `skill.yaml`, every rule a `rule.yaml`, and every agent an `agent.yaml`. These files are used for validation and documentation.
+Every skill must have a `skill.yaml` and every rule a `rule.yaml`. If `agents/` is introduced later, each agent needs an `agent.yaml`. These files are used for validation and documentation.
 
 Example `skill.yaml`:
 ```yaml
-name: code-reviewer
+name: sdlc-code-reviewer
 description: Reviews a PR diff.
 version: 1.0.0
 author: your-github-handle
@@ -54,11 +58,11 @@ We support four harnesses. For detailed guides on how to write prompts for each,
 
 Before submitting a Pull Request, please ensure:
 
-1. [ ] Your item is located in the correct top-level directory (`skills/`, `rules/`, or `agents/`).
-2. [ ] The directory name is `kebab-case`.
+1. [ ] Your item is located in the correct top-level directory (`skills/` or `rules/`). `agents/` is deferred.
+2. [ ] The directory name is `kebab-case` and uses the `sdlc-` prefix for library items.
 3. [ ] A valid `*.yaml` metadata file is present and accurately reflects the supported targets.
-4. [ ] You have implemented the skill/rule/agent for at least one harness (preferably all four).
-5. [ ] The tone of the prompts is professional, objective, and clear.
+4. [ ] You have implemented the skill/rule for at least one harness (preferably all four).
+5. [ ] The tone of the prompts is professional, objective, and clear. Do not invent product claims. Lifecycle skills that need project standards should instruct the model to call MCP tools (`get_sdlc_template`, `get_definition_of_done`, `get_domain_consultant`, `get_layer_consultant`) rather than hardcoding those documents.
 
 ## Testing
 
@@ -71,7 +75,7 @@ Simply execute the helper script:
 ```
 
 ### End-to-End (E2E) LLM Testing
-We have an E2E testing framework in `tests/e2e/test_agent_behavior.py` that executes a real LLM (Gemini) to verify that agents properly invoke the MCP server tools and respect constraints.
+We have an E2E testing framework in `tests/e2e/test_agent_behavior.py` that executes a real LLM (Gemini) to verify that installed skills properly invoke the MCP server tools and respect constraints.
 
 Because this runs a real LLM, it requires an API key and is automatically skipped in standard CI runs if the key is missing.
 
