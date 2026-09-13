@@ -54,6 +54,7 @@ DRY_RUN=false
 . "${SCRIPT_DIR}/lib/expand_content.sh"
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=lib/sdlc_names.sh
+# shellcheck disable=SC1091
 . "${SCRIPT_DIR}/lib/sdlc_names.sh"
 
 # ---------------------------------------------------------------------------
@@ -214,23 +215,34 @@ else
   mkdir -p "$MCP_CONFIG_DIR"
   MCP_CONFIG_FILE="${MCP_CONFIG_DIR}/mcp.json"
   MCP_SERVER_PATH="${PROJECT_ROOT}/mcp-server/src/server.py"
+    python3 -c '
+import sys, json, os
+config_path = sys.argv[1]
+server_path = sys.argv[2]
+python_path = sys.argv[3]
 
-  if [[ ! -f "$MCP_CONFIG_FILE" ]]; then
-    cat <<EOF > "$MCP_CONFIG_FILE"
-{
-  "servers": {
-    "sdlc-knowledge": {
-      "command": "python3",
-      "args": ["${MCP_SERVER_PATH}"]
-    }
-  }
+if os.path.exists(config_path):
+    try:
+        with open(config_path, "r") as f:
+            data = json.load(f)
+    except Exception:
+        data = {}
+else:
+    data = {}
+
+if "servers" not in data:
+    data["servers"] = {}
+
+data["servers"]["sdlc-knowledge"] = {
+    "command": python_path,
+    "args": [server_path]
 }
-EOF
-    echo "  [ok] Created MCP configuration: ${MCP_CONFIG_FILE}"
-  else
-    echo "  [info] MCP configuration already exists at ${MCP_CONFIG_FILE}."
-    echo "  [info] Please ensure 'sdlc-knowledge' server is registered pointing to ${MCP_SERVER_PATH}."
-  fi
+
+with open(config_path, "w") as f:
+    json.dump(data, f, indent=2)
+print("  [ok] Registered sdlc-knowledge MCP server in " + config_path)
+' "$MCP_CONFIG_FILE" "$MCP_SERVER_PATH" "${PROJECT_ROOT}/mcp-server/venv/bin/python"
+
 fi
 
 echo ""

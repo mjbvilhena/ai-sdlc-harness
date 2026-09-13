@@ -2,18 +2,18 @@
 # =============================================================================
 # install_cursor.sh — AI SDLC Harness installer for Cursor
 #
-# Installs all skills and agents from this repo as Cursor rule
-# files into the target workspace's .cursor/rules/ directory.
+# Installs all skills and agents from this repo as Cursor Custom Prompt
+# files into the target workspace's .cursor/prompts/ directory.
 #
-# Each skill's cursor/rule.mdc is installed as:
-#   <workspace>/.cursor/rules/sdlc-<skill-name>.mdc
+# Each skill's cursor/prompt.md is installed as:
+#   <workspace>/.cursor/prompts/sdlc-<skill-name>.mdc
 #
 # Naming: destination filenames are always sdlc- prefixed (source folder
 # basename is used as-is when it already starts with sdlc-).
-# Cleanup: before installing, existing sdlc-*.mdc files in .cursor/rules/
+# Cleanup: before installing, existing sdlc-*.md files in .cursor/prompts/
 # are removed (dry-run prints them only). Non-sdlc-* files are left alone.
 #
-# Note: Cursor rules are WORKSPACE-SCOPED. You must specify the
+# Note: Cursor Custom Prompts are WORKSPACE-SCOPED. You must specify the
 # workspace you want to install into. If no --workspace flag is given, the
 # current working directory ($PWD) is used as the workspace root.
 #
@@ -43,7 +43,7 @@ WORKSPACE="${PWD}"
 HARNESS="cursor"
 
 # The filename inside each cursor/ subdirectory to install
-RULE_FILE="rule.mdc"
+RULE_FILE="prompt.md"
 
 # Dry-run mode flag
 DRY_RUN=false
@@ -53,6 +53,7 @@ DRY_RUN=false
 . "${SCRIPT_DIR}/lib/expand_content.sh"
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=lib/sdlc_names.sh
+# shellcheck disable=SC1091
 . "${SCRIPT_DIR}/lib/sdlc_names.sh"
 
 # ---------------------------------------------------------------------------
@@ -85,8 +86,8 @@ done
 # Resolve workspace to absolute path
 WORKSPACE="$(cd "$WORKSPACE" && pwd)"
 
-# Cursor rules destination directory (inside the workspace)
-CURSOR_RULES_DIR="${WORKSPACE}/.cursor/rules"
+# Cursor Custom Prompts destination directory (inside the workspace)
+CURSOR_RULES_DIR="${WORKSPACE}/.cursor/prompts"
 
 # ---------------------------------------------------------------------------
 # Helper functions
@@ -98,8 +99,8 @@ install_item() {
   item_name="$(sdlc_prefixed_name "$(basename "$item_dir")")"
   local harness_dir="${item_dir}/${HARNESS}"
   local source_file="${harness_dir}/${RULE_FILE}"
-  # Cursor rule files use the .mdc suffix convention
-  local dest_file="${CURSOR_RULES_DIR}/${item_name}.mdc"
+  # Cursor Custom Prompt files use the .mdc suffix convention
+  local dest_file="${CURSOR_RULES_DIR}/${item_name}.md"
 
   # Skip if this skill/agent has no cursor/ subdirectory
   if [[ ! -d "$harness_dir" ]]; then
@@ -138,7 +139,7 @@ echo " Workspace: ${WORKSPACE}"
 echo " Destination: ${CURSOR_RULES_DIR}"
 echo ""
 
-remove_sdlc_files "${CURSOR_RULES_DIR}" "sdlc-*.mdc" "${DRY_RUN}"
+remove_sdlc_files "${CURSOR_RULES_DIR}" "sdlc-*.md" "${DRY_RUN}"
 echo ""
 
 install_count=0
@@ -208,39 +209,45 @@ else
   if [[ -n "$WORKSPACE" ]]; then
     MCP_CONFIG_DIR="${WORKSPACE}/.cursor"
   else
-    # Cursor globally stores MCP config in its internal AppData, but we can't easily guess it on Linux/Mac/Win identically without jq.
-    # For global installs, we'll skip or just put it in a known Cursor config path. 
-    # For now, we only automatically configure for workspace.
     MCP_CONFIG_DIR=""
   fi
-  
+
+  echo "Configuring MCP Server..."
   if [[ -n "$MCP_CONFIG_DIR" ]]; then
     mkdir -p "$MCP_CONFIG_DIR"
     MCP_CONFIG_FILE="${MCP_CONFIG_DIR}/mcp.json"
-    
     MCP_SERVER_PATH="${PROJECT_ROOT}/mcp-server/src/server.py"
-    
-    if [[ ! -f "$MCP_CONFIG_FILE" ]]; then
-      cat <<EOF > "$MCP_CONFIG_FILE"
-{
-  "mcpServers": {
-    "sdlc-knowledge": {
-      "command": "python3",
-      "args": ["${MCP_SERVER_PATH}"]
-    }
-  }
+
+    python3 -c '
+import sys, json, os
+config_path = sys.argv[1]
+server_path = sys.argv[2]
+
+if os.path.exists(config_path):
+    try:
+        with open(config_path, "r") as f:
+            data = json.load(f)
+    except Exception:
+        data = {}
+else:
+    data = {}
+
+if "mcpServers" not in data:
+    data["mcpServers"] = {}
+
+data["mcpServers"]["sdlc-knowledge"] = {
+    "command": sys.argv[3],
+    "args": [server_path]
 }
-EOF
-      echo "  [ok] Created MCP configuration: ${MCP_CONFIG_FILE}"
-    else
-      echo "  [info] MCP configuration already exists at ${MCP_CONFIG_FILE}."
-      echo "  [info] Please ensure 'sdlc-knowledge' server is registered pointing to ${MCP_SERVER_PATH}."
-    fi
+
+with open(config_path, "w") as f:
+    json.dump(data, f, indent=2)
+print("  [ok] Registered sdlc-knowledge MCP server in " + config_path)
+' "$MCP_CONFIG_FILE" "$MCP_SERVER_PATH" "${PROJECT_ROOT}/mcp-server/venv/bin/python"
   else
-    echo "  [info] Global Cursor MCP config is managed in Cursor UI. Please manually add the MCP server:"
-    echo "         Command: python3"
-    echo "         Args:    ${PROJECT_ROOT}/mcp-server/src/server.py"
+    echo "  [info] Global MCP config must be managed manually in this environment."
   fi
+
 fi
 
 echo ""
@@ -251,7 +258,7 @@ else
   echo " Done. ${install_count} item(s) installed to: ${CURSOR_RULES_DIR}"
   echo " ${skip_count} item(s) skipped (no ${HARNESS}/${RULE_FILE})."
   echo ""
-  echo " NOTE: Remember to commit .cursor/rules/ to your workspace repo"
-  echo "       so that Cursor can read the rule files."
+  echo " NOTE: Remember to commit .cursor/prompts/ to your workspace repo"
+  echo "       so that Cursor can read the Custom Prompt files."
 fi
 echo "======================================================="
