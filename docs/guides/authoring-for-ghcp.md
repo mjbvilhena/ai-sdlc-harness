@@ -6,7 +6,7 @@ GitHub Copilot supports workspace-level custom instructions via files placed in 
 In this repository, GitHub Copilot instructions are stored in the `ghcp/` subdirectory and must be named `instructions.md`.
 
 ## Structure of an `instructions.md`
-GHCP instructions are simple Markdown files. 
+GHCP instructions are simple Markdown files.
 - Use headers to define the scope.
 - Use numbered lists for execution steps.
 

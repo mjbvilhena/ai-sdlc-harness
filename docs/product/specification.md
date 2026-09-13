@@ -106,7 +106,7 @@ Given the shell-based nature of the installers and the modular nature of the ski
 
 ### 6.1 Shell Script Testing
 - **Framework**: BATS (Bash Automated Testing System) will be used to test the installer scripts (`install_claude.sh`, `install_cursor.sh`, `install_ghcp.sh`, `install_agy.sh`, etc.).
-- **Test Cases**: 
+- **Test Cases**:
   - Verify correct file copying to target directories based on mock skill structures.
   - Verify idempotency (multiple runs produce the same safe result).
   - Verify skipping of skills/agents that lack the target harness subdirectory.

@@ -24,7 +24,7 @@ When acting as the Code Reviewer, you must:
    - **Performance**: Are there obvious inefficiencies (e.g., N+1 queries, unnecessary loops)?
    - **Security**: Are there vulnerabilities like SQL injection, XSS, or hardcoded secrets?
    - **Readability**: Is the code easy to read and maintain? Are variables named well?
-3. **Provide actionable feedback**: 
+3. **Provide actionable feedback**:
    - Group feedback by file or logical component.
    - Use code blocks to suggest specific improvements.
    - Be constructive and polite. Explain *why* a change is suggested.

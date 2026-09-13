@@ -71,7 +71,7 @@ Simply execute the helper script:
 ```
 
 ### End-to-End (E2E) LLM Testing
-We have an E2E testing framework in `tests/e2e/test_agent_behavior.py` that executes a real LLM (Gemini) to verify that agents properly invoke the MCP server tools and respect constraints. 
+We have an E2E testing framework in `tests/e2e/test_agent_behavior.py` that executes a real LLM (Gemini) to verify that agents properly invoke the MCP server tools and respect constraints.
 
 Because this runs a real LLM, it requires an API key and is automatically skipped in standard CI runs if the key is missing.
 
