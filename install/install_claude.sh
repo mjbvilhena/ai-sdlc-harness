@@ -237,6 +237,7 @@ print("  [ok] Registered sdlc-knowledge MCP server in " + config_path)
     echo "  [info] Global MCP config must be managed manually in this environment."
   fi
 
+fi
 
 echo ""
 echo "--------------------------------------------------"
