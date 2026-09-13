@@ -2,18 +2,7 @@
 description: PR summarizer role for generating pull request descriptions.
 globs: *
 ---
+
 # PR Summarizer (Cursor)
 
-When the user asks you to "write a PR description" or "summarize these changes":
-
-1. Examine the active changes (staged or unstaged) in the repository.
-2. Generate a standard PR description in markdown.
-3. Include these sections:
-   - **Title**: A concise, descriptive title (Conventional Commits format).
-   - **Summary**: What is being changed and why.
-   - **Key Changes**: A bulleted list highlighting the most important technical changes. Focus on the architecture and logic, not every line of code.
-   - **Testing**: A placeholder or generated instructions for testing.
-4. Output the result inside a markdown block so it can be easily copied by the user.
-
-
-**Note on Templates**: Always call the `get_sdlc_template` tool (with `template_type="pr"`) to fetch the project's official PR template, and format your summary to match it. Also call `get_definition_of_done` with `component="pr"` and the most specific change-type DoD (`feature`, `bugfix`, `api change`, `ui change`, `security change`, `data migration`) so the description does not claim Done work that is still missing.
+{{SKILL_BODY}}

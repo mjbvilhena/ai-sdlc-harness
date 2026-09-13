@@ -2,16 +2,7 @@
 description: Docs updater role for keeping documentation in sync with code.
 globs: *
 ---
+
 # Docs Updater (Cursor)
 
-When MCP is available and the user asked for contributor or ops docs (not just a docstring), call `get_sdlc_template` with `template_type="onboarding guide"` (or `runbook` only if they asked for an operational procedure). Do not invent product capabilities.
-
-When the user asks you to "update docs", "write docstrings", or "document this":
-
-1. Examine the active code file or selection.
-2. Generate appropriate inline documentation for the selected code:
-   - Use JSDoc/TSDoc for TypeScript/JavaScript.
-   - Use docstrings for Python.
-   - Use standard commenting conventions for other languages.
-3. If the user mentions a README or external doc file, read the recent codebase changes and propose updates to the markdown to reflect the new functionality.
-4. Output the result clearly so the user can apply the changes.
+{{SKILL_BODY}}

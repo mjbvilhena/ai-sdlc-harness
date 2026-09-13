@@ -61,7 +61,8 @@ ai-sdlc-harness/
 ├── skills/                  # Lifecycle Driver skill definitions
 │   └── sdlc-example-skill/
 │       ├── skill.yaml
-│       ├── agy/SKILL.md
+│       ├── CONTENT.md           # Canonical body; installers expand into harness files
+│       ├── agy/SKILL.md         # Thin shell with {{SKILL_BODY}}
 │       ├── claude/command.md
 │       ├── cursor/rule.mdc
 │       └── ghcp/instructions.md
@@ -95,11 +96,14 @@ ai-sdlc-harness/
      - /sdlc-my-skill
    ```
 
-3. Author the target-specific files:
-   - `skills/sdlc-my-skill/agy/SKILL.md` — Antigravity skill
-   - `skills/sdlc-my-skill/claude/command.md` — Claude Code slash command
-   - `skills/sdlc-my-skill/cursor/rule.mdc` — Cursor rule
-   - `skills/sdlc-my-skill/ghcp/instructions.md` — GitHub Copilot instructions
+3. Author `CONTENT.md` (the shared instructions) and thin harness shells that contain `{{SKILL_BODY}}` on its own line:
+   - `skills/sdlc-my-skill/CONTENT.md` — canonical body
+   - `skills/sdlc-my-skill/agy/SKILL.md` — Antigravity frontmatter + title
+   - `skills/sdlc-my-skill/claude/command.md` — Claude trigger + title
+   - `skills/sdlc-my-skill/cursor/rule.mdc` — Cursor frontmatter + title
+   - `skills/sdlc-my-skill/ghcp/instructions.md` — GitHub Copilot title
+
+   Rules use `{{RULE_BODY}}` the same way. Installers expand the placeholder from `CONTENT.md`; they fail if either the file or the placeholder is missing.
 
 4. Re-run the relevant installer(s).
 

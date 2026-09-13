@@ -10,7 +10,8 @@
 #   ./install_agy.sh           # Install all skills and agents
 #   ./install_agy.sh --dry-run # Preview what would be installed (no changes)
 #
-# Requirements: bash >= 3.2, cp, mkdir (standard Unix utilities only)
+# Requirements: bash >= 3.2, cp, mkdir, cat, grep, mktemp (standard Unix utilities)
+# Expands {{SKILL_BODY}} / {{RULE_BODY}} from sibling CONTENT.md at install time.
 # =============================================================================
 
 set -euo pipefail
@@ -32,6 +33,9 @@ HARNESS="agy"
 
 # Dry-run mode flag
 DRY_RUN=false
+
+# shellcheck source=lib/expand_content.sh
+. "${SCRIPT_DIR}/lib/expand_content.sh"
 
 # ---------------------------------------------------------------------------
 # Argument parsing
@@ -81,17 +85,13 @@ install_item() {
 
   if [[ "$DRY_RUN" == true ]]; then
     echo "  [dry-run] Would install: ${item_name}"
-    echo "            Source:      ${harness_dir}/"
+    echo "            Source:      ${harness_dir}/ + CONTENT.md"
     echo "            Destination: ${dest}/"
+    validate_item_content "$item_dir" "$item_name" "$harness_dir"
     return
   fi
 
-  # Create destination directory if it doesn't exist
-  mkdir -p "$dest"
-
-  # Copy all files from the harness subdirectory into the destination.
-  # The trailing /. on the source ensures directory contents (not the dir itself) are copied.
-  cp -r "${harness_dir}/." "${dest}/"
+  expand_harness_dir "$item_dir" "$harness_dir" "$dest" "$item_name"
 
   echo "  [ok] Installed: ${item_name} → ${dest}/"
 }

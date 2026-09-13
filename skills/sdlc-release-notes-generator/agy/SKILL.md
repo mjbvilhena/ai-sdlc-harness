@@ -6,28 +6,4 @@ description: |
 
 # Release Notes Generator
 
-## Purpose
-
-Write user-facing release notes from git history or merged PR titles the user provides. Categorize into Features, Bug Fixes, and Breaking Changes.
-
-## MCP tools (required)
-
-When MCP is available:
-
-1. **CRITICAL**: Call `get_sdlc_template` with `template_type="release notes"` (alias `changelog` also resolve). Follow its sections (breaking changes first). Do not invent extra product claims.
-2. Call `get_definition_of_done` with `component="release"` and treat returned criteria as the bar for what "ready to ship" means. Do not invent extra release process.
-3. If the user wants PR-shaped notes instead, you may also fetch `template_type="pr"` and reuse only its user-facing sections.
-
-If MCP is unavailable, say so and use Highlights, Breaking changes, Features, Fixes, and Deprecations.
-
-## Instructions
-
-1. Source changes from the user-specified range (`git log`, tags, or PR list). If the range is missing, ask. Do not invent commits.
-2. Translate engineer-facing messages into user-facing language. Drop chore/internal-only items unless the user wants a full changelog.
-3. Never list a feature, fix, or breaking change that is not in the source history.
-4. Group clearly; call out breaking changes and required user action first when present.
-
-## Safety
-
-- Do not invent product capabilities or marketing claims.
-- Do not include secrets, internal hostnames, or unreleased customer names.
+{{SKILL_BODY}}

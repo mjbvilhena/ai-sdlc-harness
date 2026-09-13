@@ -44,6 +44,8 @@ if ($Workspace) {
 $Harness = "claude"
 $CommandFile = "command.md"
 
+. (Join-Path $ScriptDir "lib\Expand-Content.ps1")
+
 # ---------------------------------------------------------------------------
 # Helper functions
 # ---------------------------------------------------------------------------
@@ -68,18 +70,19 @@ function Install-Item {
         return $false
     }
 
+    $contentFile = Join-Path $ItemDir "CONTENT.md"
+    if (-not (Test-Path -Path $contentFile -PathType Leaf)) {
+        throw "Error: $ItemName is missing CONTENT.md (expected $contentFile)."
+    }
+
     if ($DryRun) {
         Write-Host "  [dry-run] Would install: $ItemName"
-        Write-Host "            Source:      $SourceFile"
+        Write-Host "            Source:      $SourceFile + CONTENT.md"
         Write-Host "            Destination: $DestFile"
         return $true
     }
 
-    if (-not (Test-Path -Path $ClaudeCommandsDir)) {
-        $null = New-Item -ItemType Directory -Force -Path $ClaudeCommandsDir
-    }
-
-    Copy-Item -Path $SourceFile -Destination $DestFile -Force
+    Expand-HarnessFile -ItemDir $ItemDir -SourceFile $SourceFile -DestFile $DestFile -ItemName $ItemName
 
     Write-Host "  [ok] Installed: $ItemName → $DestFile"
     return $true

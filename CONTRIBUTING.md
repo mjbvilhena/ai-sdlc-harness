@@ -10,15 +10,20 @@ The repository is organized by category, then by item name, and finally by harne
 skills/
   sdlc-code-reviewer/       # The name of the skill (kebab-case, sdlc- prefix)
     skill.yaml              # Metadata file (required)
-    agy/                    # Antigravity implementation
+    CONTENT.md              # Canonical body. Installers expand this into each harness file.
+    agy/                    # Thin shell + {{SKILL_BODY}}
       SKILL.md
-    claude/                 # Claude Code implementation
+    claude/
       command.md
-    cursor/                 # Cursor implementation
+    cursor/
       rule.mdc
-    ghcp/                   # GitHub Copilot implementation
+    ghcp/
       instructions.md
 ```
+
+Rules use the same layout with `rule.yaml`, `CONTENT.md`, and `{{RULE_BODY}}` in the harness shells.
+
+Author shared instructions once in `CONTENT.md`. Harness files keep only frontmatter, title, and (for Claude) a Trigger block, plus the placeholder on its own line. Installers substitute the body at install time and **refuse** to write a destination that still contains `{{SKILL_BODY}}` or `{{RULE_BODY}}`.
 
 See [`skills/sdlc-example-skill/`](skills/sdlc-example-skill/) and [`rules/sdlc-example-rule/`](rules/sdlc-example-rule/) for complete stubs.
 
@@ -61,8 +66,9 @@ Before submitting a Pull Request, please ensure:
 1. [ ] Your item is located in the correct top-level directory (`skills/` or `rules/`). `agents/` is deferred.
 2. [ ] The directory name is `kebab-case` and uses the `sdlc-` prefix for library items.
 3. [ ] A valid `*.yaml` metadata file is present and accurately reflects the supported targets.
-4. [ ] You have implemented the skill/rule for at least one harness (preferably all four).
-5. [ ] The tone of the prompts is professional, objective, and clear. Do not invent product claims. Lifecycle skills that need project standards should instruct the model to call MCP tools (`get_sdlc_template`, `get_definition_of_done`, `get_domain_consultant`, `get_layer_consultant`) rather than hardcoding those documents.
+4. [ ] `CONTENT.md` holds the canonical body; each harness file is a thin shell containing `{{SKILL_BODY}}` (skills) or `{{RULE_BODY}}` (rules) on its own line.
+5. [ ] You have implemented the skill/rule for at least one harness (preferably all four).
+6. [ ] The tone of the prompts is professional, objective, and clear. Do not invent product claims. Lifecycle skills that need project standards should instruct the model to call MCP tools (`get_sdlc_template`, `get_definition_of_done`, `get_domain_consultant`, `get_layer_consultant`) rather than hardcoding those documents.
 
 ## Testing
 

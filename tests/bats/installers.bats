@@ -140,8 +140,13 @@ teardown() {
     run "$REPO_ROOT/install/install_agy.sh" --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
     [ -f "$MOCK_WORKSPACE/.agents/skills/sdlc-code-reviewer/SKILL.md" ]
-    cmp -s "$REPO_ROOT/skills/sdlc-code-reviewer/agy/SKILL.md" \
-           "$MOCK_WORKSPACE/.agents/skills/sdlc-code-reviewer/SKILL.md"
+    expected="$(mktemp)"
+    # shellcheck source=../../install/lib/expand_content.sh
+    . "$REPO_ROOT/install/lib/expand_content.sh"
+    expand_harness_file "$REPO_ROOT/skills/sdlc-code-reviewer" \
+        "$REPO_ROOT/skills/sdlc-code-reviewer/agy/SKILL.md" \
+        "$expected" "sdlc-code-reviewer"
+    cmp -s "$expected" "$MOCK_WORKSPACE/.agents/skills/sdlc-code-reviewer/SKILL.md"
 }
 
 @test "install_ghcp.sh workspace install is idempotent" {
@@ -150,8 +155,12 @@ teardown() {
     run "$REPO_ROOT/install/install_ghcp.sh" --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
     [ -f "$MOCK_WORKSPACE/.github/instructions/sdlc-code-reviewer.instructions.md" ]
-    cmp -s "$REPO_ROOT/skills/sdlc-code-reviewer/ghcp/instructions.md" \
-           "$MOCK_WORKSPACE/.github/instructions/sdlc-code-reviewer.instructions.md"
+    expected="$(mktemp)"
+    . "$REPO_ROOT/install/lib/expand_content.sh"
+    expand_harness_file "$REPO_ROOT/skills/sdlc-code-reviewer" \
+        "$REPO_ROOT/skills/sdlc-code-reviewer/ghcp/instructions.md" \
+        "$expected" "sdlc-code-reviewer"
+    cmp -s "$expected" "$MOCK_WORKSPACE/.github/instructions/sdlc-code-reviewer.instructions.md"
 }
 
 @test "install_cursor.sh workspace install is idempotent" {
@@ -160,8 +169,12 @@ teardown() {
     run "$REPO_ROOT/install/install_cursor.sh" --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
     [ -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-code-reviewer.mdc" ]
-    cmp -s "$REPO_ROOT/skills/sdlc-code-reviewer/cursor/rule.mdc" \
-           "$MOCK_WORKSPACE/.cursor/rules/sdlc-code-reviewer.mdc"
+    expected="$(mktemp)"
+    . "$REPO_ROOT/install/lib/expand_content.sh"
+    expand_harness_file "$REPO_ROOT/skills/sdlc-code-reviewer" \
+        "$REPO_ROOT/skills/sdlc-code-reviewer/cursor/rule.mdc" \
+        "$expected" "sdlc-code-reviewer"
+    cmp -s "$expected" "$MOCK_WORKSPACE/.cursor/rules/sdlc-code-reviewer.mdc"
 }
 
 @test "install_claude.sh global install is idempotent" {
@@ -170,8 +183,12 @@ teardown() {
     run "$REPO_ROOT/install/install_claude.sh"
     [ "$status" -eq 0 ]
     [ -f "$MOCK_HOME/.claude/commands/sdlc-code-reviewer.md" ]
-    cmp -s "$REPO_ROOT/skills/sdlc-code-reviewer/claude/command.md" \
-           "$MOCK_HOME/.claude/commands/sdlc-code-reviewer.md"
+    expected="$(mktemp)"
+    . "$REPO_ROOT/install/lib/expand_content.sh"
+    expand_harness_file "$REPO_ROOT/skills/sdlc-code-reviewer" \
+        "$REPO_ROOT/skills/sdlc-code-reviewer/claude/command.md" \
+        "$expected" "sdlc-code-reviewer"
+    cmp -s "$expected" "$MOCK_HOME/.claude/commands/sdlc-code-reviewer.md"
 }
 
 # ---------------------------------------------------------------------------
@@ -228,6 +245,51 @@ teardown() {
 # ---------------------------------------------------------------------------
 # Missing agents/ is tolerated (directory is deferred)
 # ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# CONTENT.md expansion
+# ---------------------------------------------------------------------------
+
+@test "installed files are expanded from CONTENT.md and contain no placeholders" {
+    run "$REPO_ROOT/install/install_claude.sh"
+    [ "$status" -eq 0 ]
+    installed="$MOCK_HOME/.claude/commands/sdlc-code-reviewer.md"
+    grep -q 'get_sdlc_template' "$installed"
+    grep -q 'code review' "$installed"
+    ! grep -q '{{SKILL_BODY}}' "$installed"
+    ! grep -q '{{RULE_BODY}}' "$installed"
+}
+
+@test "installed rules expand {{RULE_BODY}}" {
+    run "$REPO_ROOT/install/install_claude.sh"
+    [ "$status" -eq 0 ]
+    installed="$MOCK_HOME/.claude/commands/sdlc-dod-checker.md"
+    grep -q 'get_definition_of_done' "$installed"
+    ! grep -q '{{RULE_BODY}}' "$installed"
+}
+
+@test "expand_harness_file fails when CONTENT.md is missing" {
+    . "$REPO_ROOT/install/lib/expand_content.sh"
+    tmp="$(mktemp -d)"
+    mkdir -p "$tmp/skills/broken/agy"
+    printf '%s\n' '{{SKILL_BODY}}' > "$tmp/skills/broken/agy/SKILL.md"
+    run expand_harness_file "$tmp/skills/broken" "$tmp/skills/broken/agy/SKILL.md" "$tmp/out.md" "broken"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"CONTENT.md"* ]]
+    [ ! -f "$tmp/out.md" ]
+}
+
+@test "expand_harness_file fails when the placeholder is missing" {
+    . "$REPO_ROOT/install/lib/expand_content.sh"
+    tmp="$(mktemp -d)"
+    mkdir -p "$tmp/skills/broken/agy"
+    printf '%s\n' '# No placeholder' > "$tmp/skills/broken/agy/SKILL.md"
+    printf '%s\n' 'body' > "$tmp/skills/broken/CONTENT.md"
+    run expand_harness_file "$tmp/skills/broken" "$tmp/skills/broken/agy/SKILL.md" "$tmp/out.md" "broken"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"{{SKILL_BODY}}"* ]]
+    [ ! -f "$tmp/out.md" ]
+}
 
 @test "installers skip agents/ when the directory is absent" {
     run "$REPO_ROOT/install/install_claude.sh" --dry-run

@@ -6,34 +6,4 @@ description: |
 
 # Security Reviewer
 
-## Purpose
-
-Perform a **defensive** security review of a design or diff that affects trust boundaries, identity, data class, or abuse surface. This complements `sdlc-threat-modeler` (STRIDE / `threat_model`). It is not a penetration test and not a certification.
-
-If the user asked for a STRIDE threat model rather than a change review, defer to `sdlc-threat-modeler` or run both: threat model for design, this skill for the control checklist.
-
-## MCP tools (required)
-
-When MCP is available:
-
-1. **CRITICAL**: Call `get_sdlc_template` with `template_type="security review"` (aliases `sec review` also resolve). Follow its control table, findings, and verdict language.
-2. Call `get_definition_of_done` with `component="security change"` and evaluate gaps.
-3. Call `get_domain_consultant` and `get_layer_consultant` for surfaces in the change. Apply MUST/NEVER.
-4. Optionally fetch `threat model` if the user wants STRIDE findings in the same response — still no exploit steps.
-
-If MCP is unavailable, say so and use the control list: authn, authz, secrets handling, validation, data minimization, limits, audit logs.
-
-## Instructions
-
-1. Identify the change and trust-boundary delta from the diff or design. Do not invent architecture.
-2. For each control in the template, mark present / missing / not applicable with evidence.
-3. Findings: severity, surface, evidence, **defensive** recommendation, observed vs hypothesis.
-4. Verdict is `Request changes`, `Comment`, or `No blocking issues found` — never "approved as secure" or "compliant".
-5. If a secret appears in the diff: report **path only**, recommend rotation, do not repeat the value.
-
-## Safety
-
-- Do not write exploit payloads, proof-of-concept attacks, or step-by-step abuse procedures.
-- Do not claim the product is secure, STRIDE-compliant, SOC/ISO certified, or legally compliant.
-- Do not invent CVEs, product security features, or threats with no basis in the change.
-- Do not repeat secret values.
+{{SKILL_BODY}}

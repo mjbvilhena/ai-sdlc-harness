@@ -13,7 +13,8 @@
 #   ./install_claude.sh           # Install all skills and agents
 #   ./install_claude.sh --dry-run # Preview what would be installed (no changes)
 #
-# Requirements: bash >= 3.2, cp, mkdir (standard Unix utilities only)
+# Requirements: bash >= 3.2, cp, mkdir, cat, grep, mktemp (standard Unix utilities)
+# Expands {{SKILL_BODY}} / {{RULE_BODY}} from sibling CONTENT.md at install time.
 # =============================================================================
 
 set -euo pipefail
@@ -38,6 +39,9 @@ COMMAND_FILE="command.md"
 
 # Dry-run mode flag
 DRY_RUN=false
+
+# shellcheck source=lib/expand_content.sh
+. "${SCRIPT_DIR}/lib/expand_content.sh"
 
 # ---------------------------------------------------------------------------
 # Argument parsing
@@ -94,16 +98,13 @@ install_item() {
 
   if [[ "$DRY_RUN" == true ]]; then
     echo "  [dry-run] Would install: ${item_name}"
-    echo "            Source:      ${source_file}"
+    echo "            Source:      ${source_file} + CONTENT.md"
     echo "            Destination: ${dest_file}"
+    validate_item_content "$item_dir" "$item_name" "$source_file"
     return
   fi
 
-  # Create destination directory if it doesn't exist
-  mkdir -p "$CLAUDE_COMMANDS_DIR"
-
-  # Copy the command file to the destination as <skill-name>.md
-  cp "${source_file}" "${dest_file}"
+  expand_harness_file "$item_dir" "$source_file" "$dest_file" "$item_name"
 
   echo "  [ok] Installed: ${item_name} → ${dest_file}"
 }

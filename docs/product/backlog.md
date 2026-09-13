@@ -109,3 +109,12 @@
 - **Task 10.6** *(Done)*: Extend `mcp-server/tests/test_server.py` for catalog completeness, new names, aliases, longest-match, and exact-over-short-alias (`bugfix` vs `bug`). *(Evidence: `test_catalog_templates_and_dod`, parametrized alias tests.)*
 - **Task 10.7** *(Done)*: Minimal discoverability docs — architecture catalog, README pointer, installation driver list. *(Evidence: `docs/technical_design/architecture.md`, `README.md`, `docs/guides/installation-and-usage.md`.)*
 
+## Epic 11: DRY Skill/Rule Content Model
+
+> Goal: Author each skill and rule once in `CONTENT.md` and expand thin harness shells at install time.
+
+- **Task 11.1** *(Done)*: Add `CONTENT.md` and `{{SKILL_BODY}}` / `{{RULE_BODY}}` shells for every skill and rule (including Epic 10 additions). *(Evidence: `skills/*/CONTENT.md`, `rules/*/CONTENT.md`.)*
+- **Task 11.2** *(Done)*: Update all eight installers (`.sh` / `.ps1`) plus `install/lib/expand_content.sh` and `install/lib/Expand-Content.ps1` to expand placeholders, fail on missing `CONTENT.md` or placeholder, and never write unresolved tokens. *(Evidence: `install/`.)*
+- **Task 11.3** *(Done)*: Extend BATS for expanded destinations, idempotent expand, and helper failure cases; update E2E prompt loader to substitute `CONTENT.md`. *(Evidence: `tests/bats/installers.bats`, `tests/e2e/test_agent_behavior.py`.)*
+- **Task 11.4** *(Done)*: Document the convention in CONTRIBUTING, schemas, authoring guides, architecture, directory structure, README, and specification. CI metadata validation requires `CONTENT.md` and the correct placeholder. *(Evidence: those docs; `.github/scripts/validate_metadata.py`.)*
+
