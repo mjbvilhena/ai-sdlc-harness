@@ -5,7 +5,13 @@ install_agy.ps1 — AI SDLC Harness installer for Antigravity (agy)
 .DESCRIPTION
 Installs all skills and agents from this repo into the local Antigravity
 configuration directory at:
-  ~\.gemini\antigravity-cli\builtin\skills\<skill-name>\
+  ~\.gemini\antigravity-cli\builtin\skills\sdlc-<skill-name>\
+
+Destination directory names (and YAML frontmatter name:) are always sdlc-
+prefixed (source folder basename is used as-is when it already starts with
+sdlc-). Before installing, existing sdlc-* skill directories under the
+chosen skills root are removed (DryRun prints them only). Non-sdlc-*
+neighbors are left alone.
 
 .PARAMETER DryRun
 Preview what would be installed (no changes)
@@ -41,6 +47,7 @@ if ($Workspace) {
 $Harness = "agy"
 
 . (Join-Path $ScriptDir "lib\Expand-Content.ps1")
+. (Join-Path $ScriptDir "lib\Sdlc-Names.ps1")
 
 # ---------------------------------------------------------------------------
 # Helper functions
@@ -51,7 +58,7 @@ function Install-Item {
         [string]$ItemDir
     )
 
-    $ItemName = Split-Path -Leaf $ItemDir
+    $ItemName = Get-SdlcPrefixedName -Name (Split-Path -Leaf $ItemDir)
     $HarnessDir = Join-Path $ItemDir $Harness
     $Dest = Join-Path $AgySkillsDir $ItemName
 
@@ -73,6 +80,7 @@ function Install-Item {
     }
 
     Expand-HarnessDir -ItemDir $ItemDir -HarnessDir $HarnessDir -DestDir $Dest -ItemName $ItemName
+    Set-SdlcFrontmatterNamesInDir -DestDir $Dest -DestName $ItemName
 
     Write-Host "  [ok] Installed: $ItemName → ${Dest}\"
     return $true
@@ -90,6 +98,9 @@ Write-Host ""
 if ($DryRun) {
     Write-Host "[dry-run] No files will be modified."
 }
+
+Remove-SdlcDirectories -DestDir $AgySkillsDir -DryRun ([bool]$DryRun)
+Write-Host ""
 
 $InstallCount = 0
 $SkipCount = 0

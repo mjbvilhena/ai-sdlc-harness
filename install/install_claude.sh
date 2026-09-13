@@ -7,7 +7,12 @@
 #   ~/.claude/commands/
 #
 # Each skill's claude/command.md is installed as:
-#   ~/.claude/commands/<skill-name>.md
+#   ~/.claude/commands/sdlc-<skill-name>.md
+#
+# Naming: destination filenames are always sdlc- prefixed (source folder
+# basename is used as-is when it already starts with sdlc-).
+# Cleanup: before installing, existing sdlc-*.md files in the commands dir
+# are removed (dry-run prints them only). Non-sdlc-* files are left alone.
 #
 # Usage:
 #   ./install_claude.sh           # Install all skills and agents
@@ -43,6 +48,9 @@ DRY_RUN=false
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=lib/expand_content.sh
 . "${SCRIPT_DIR}/lib/expand_content.sh"
+# shellcheck source-path=SCRIPTDIR
+# shellcheck source=lib/sdlc_names.sh
+. "${SCRIPT_DIR}/lib/sdlc_names.sh"
 
 # ---------------------------------------------------------------------------
 # Argument parsing
@@ -78,9 +86,9 @@ done
 # ---------------------------------------------------------------------------
 
 install_item() {
-  local item_dir="$1"   # e.g. skills/code-reviewer or agents/my-agent
+  local item_dir="$1"   # e.g. skills/sdlc-code-reviewer or agents/my-agent
   local item_name
-  item_name="$(basename "$item_dir")"
+  item_name="$(sdlc_prefixed_name "$(basename "$item_dir")")"
   local harness_dir="${item_dir}/${HARNESS}"
   local source_file="${harness_dir}/${COMMAND_FILE}"
   local dest_file="${CLAUDE_COMMANDS_DIR}/${item_name}.md"
@@ -106,6 +114,7 @@ install_item() {
   fi
 
   expand_harness_file "$item_dir" "$source_file" "$dest_file" "$item_name"
+  ensure_sdlc_frontmatter_name "$dest_file" "$item_name"
 
   echo "  [ok] Installed: ${item_name} → ${dest_file}"
 }
@@ -117,6 +126,9 @@ install_item() {
 echo "=================================================="
 echo " AI SDLC Harness — Claude Code Installer"
 echo "=================================================="
+echo ""
+
+remove_sdlc_files "${CLAUDE_COMMANDS_DIR}" "sdlc-*.md" "${DRY_RUN}"
 echo ""
 
 install_count=0

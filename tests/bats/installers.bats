@@ -300,3 +300,157 @@ teardown() {
     [ "$status" -eq 0 ]
     [[ "$output" == *"No agents/ directory found"* ]]
 }
+
+# ---------------------------------------------------------------------------
+# sdlc- naming helpers
+# ---------------------------------------------------------------------------
+
+@test "sdlc_prefixed_name keeps or adds the sdlc- prefix" {
+    # shellcheck source=../../install/lib/sdlc_names.sh
+    . "$REPO_ROOT/install/lib/sdlc_names.sh"
+    [ "$(sdlc_prefixed_name "sdlc-code-reviewer")" = "sdlc-code-reviewer" ]
+    [ "$(sdlc_prefixed_name "code-reviewer")" = "sdlc-code-reviewer" ]
+    [ "$(sdlc_prefixed_name "dod-checker")" = "sdlc-dod-checker" ]
+}
+
+@test "ensure_sdlc_frontmatter_name rewrites a bare YAML name" {
+    # shellcheck source=../../install/lib/sdlc_names.sh
+    . "$REPO_ROOT/install/lib/sdlc_names.sh"
+    tmp="$(mktemp)"
+    cat > "$tmp" <<'EOF'
+---
+name: code-reviewer
+description: test
+---
+
+# Body
+EOF
+    ensure_sdlc_frontmatter_name "$tmp" "sdlc-code-reviewer"
+    grep -q '^name: sdlc-code-reviewer$' "$tmp"
+    ! grep -q '^name: code-reviewer$' "$tmp"
+    grep -q '^# Body$' "$tmp"
+}
+
+@test "ensure_sdlc_frontmatter_name leaves files without frontmatter unchanged" {
+    # shellcheck source=../../install/lib/sdlc_names.sh
+    . "$REPO_ROOT/install/lib/sdlc_names.sh"
+    tmp="$(mktemp)"
+    printf '%s\n' '# No frontmatter' 'name: leftover' > "$tmp"
+    ensure_sdlc_frontmatter_name "$tmp" "sdlc-code-reviewer"
+    grep -q '^name: leftover$' "$tmp"
+}
+
+# ---------------------------------------------------------------------------
+# Cleanup of previously installed sdlc-* artifacts
+# ---------------------------------------------------------------------------
+
+@test "install_claude.sh removes stale sdlc-* commands and keeps neighbors" {
+    mkdir -p "$MOCK_HOME/.claude/commands"
+    printf '%s\n' 'stale' > "$MOCK_HOME/.claude/commands/sdlc-stale-skill.md"
+    printf '%s\n' 'keep' > "$MOCK_HOME/.claude/commands/my-custom-command.md"
+    run "$REPO_ROOT/install/install_claude.sh"
+    [ "$status" -eq 0 ]
+    [ ! -f "$MOCK_HOME/.claude/commands/sdlc-stale-skill.md" ]
+    [ -f "$MOCK_HOME/.claude/commands/my-custom-command.md" ]
+    [ -f "$MOCK_HOME/.claude/commands/sdlc-code-reviewer.md" ]
+    [ -f "$MOCK_HOME/.claude/commands/sdlc-dod-checker.md" ]
+}
+
+@test "install_claude.sh dry-run reports cleanup without deleting" {
+    mkdir -p "$MOCK_HOME/.claude/commands"
+    printf '%s\n' 'stale' > "$MOCK_HOME/.claude/commands/sdlc-stale-skill.md"
+    printf '%s\n' 'keep' > "$MOCK_HOME/.claude/commands/my-custom-command.md"
+    run "$REPO_ROOT/install/install_claude.sh" --dry-run
+    [ "$status" -eq 0 ]
+    [ -f "$MOCK_HOME/.claude/commands/sdlc-stale-skill.md" ]
+    [ -f "$MOCK_HOME/.claude/commands/my-custom-command.md" ]
+    [[ "$output" == *"[dry-run] Would remove:"* ]]
+    [[ "$output" == *"sdlc-stale-skill.md"* ]]
+    [ ! -f "$MOCK_HOME/.claude/commands/sdlc-code-reviewer.md" ]
+}
+
+@test "install_cursor.sh removes stale sdlc-* rules and keeps neighbors" {
+    mkdir -p "$MOCK_WORKSPACE/.cursor/rules"
+    printf '%s\n' 'stale' > "$MOCK_WORKSPACE/.cursor/rules/sdlc-stale-skill.mdc"
+    printf '%s\n' 'keep' > "$MOCK_WORKSPACE/.cursor/rules/my-custom-rule.mdc"
+    run "$REPO_ROOT/install/install_cursor.sh" --workspace "$MOCK_WORKSPACE"
+    [ "$status" -eq 0 ]
+    [ ! -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-stale-skill.mdc" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/rules/my-custom-rule.mdc" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-code-reviewer.mdc" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-dod-checker.mdc" ]
+}
+
+@test "install_cursor.sh dry-run reports cleanup without deleting" {
+    mkdir -p "$MOCK_WORKSPACE/.cursor/rules"
+    printf '%s\n' 'stale' > "$MOCK_WORKSPACE/.cursor/rules/sdlc-stale-skill.mdc"
+    printf '%s\n' 'keep' > "$MOCK_WORKSPACE/.cursor/rules/my-custom-rule.mdc"
+    run "$REPO_ROOT/install/install_cursor.sh" --dry-run --workspace "$MOCK_WORKSPACE"
+    [ "$status" -eq 0 ]
+    [ -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-stale-skill.mdc" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/rules/my-custom-rule.mdc" ]
+    [[ "$output" == *"[dry-run] Would remove:"* ]]
+    [[ "$output" == *"sdlc-stale-skill.mdc"* ]]
+    [ ! -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-code-reviewer.mdc" ]
+}
+
+@test "install_agy.sh removes stale sdlc-* skill dirs and keeps neighbors" {
+    mkdir -p "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/sdlc-stale-skill"
+    printf '%s\n' 'stale' > "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/sdlc-stale-skill/SKILL.md"
+    mkdir -p "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/my-custom-skill"
+    printf '%s\n' 'keep' > "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/my-custom-skill/SKILL.md"
+    run "$REPO_ROOT/install/install_agy.sh"
+    [ "$status" -eq 0 ]
+    [ ! -d "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/sdlc-stale-skill" ]
+    [ -f "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/my-custom-skill/SKILL.md" ]
+    [ -f "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/sdlc-code-reviewer/SKILL.md" ]
+    [ -d "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/sdlc-dod-checker" ]
+}
+
+@test "install_agy.sh dry-run reports cleanup without deleting" {
+    mkdir -p "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/sdlc-stale-skill"
+    printf '%s\n' 'stale' > "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/sdlc-stale-skill/SKILL.md"
+    mkdir -p "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/my-custom-skill"
+    printf '%s\n' 'keep' > "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/my-custom-skill/SKILL.md"
+    run "$REPO_ROOT/install/install_agy.sh" --dry-run
+    [ "$status" -eq 0 ]
+    [ -f "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/sdlc-stale-skill/SKILL.md" ]
+    [ -f "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/my-custom-skill/SKILL.md" ]
+    [[ "$output" == *"[dry-run] Would remove:"* ]]
+    [[ "$output" == *"sdlc-stale-skill"* ]]
+    [ ! -d "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/sdlc-code-reviewer" ]
+}
+
+@test "install_agy.sh writes sdlc- prefixed frontmatter names" {
+    run "$REPO_ROOT/install/install_agy.sh"
+    [ "$status" -eq 0 ]
+    grep -q '^name: sdlc-code-reviewer$' \
+        "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/sdlc-code-reviewer/SKILL.md"
+    grep -q '^name: sdlc-dod-checker$' \
+        "$MOCK_HOME/.gemini/antigravity-cli/builtin/skills/sdlc-dod-checker/RULE.md"
+}
+
+@test "install_ghcp.sh removes stale sdlc-* instructions and keeps neighbors" {
+    mkdir -p "$MOCK_WORKSPACE/.github/instructions"
+    printf '%s\n' 'stale' > "$MOCK_WORKSPACE/.github/instructions/sdlc-stale-skill.instructions.md"
+    printf '%s\n' 'keep' > "$MOCK_WORKSPACE/.github/instructions/my-custom.instructions.md"
+    run "$REPO_ROOT/install/install_ghcp.sh" --workspace "$MOCK_WORKSPACE"
+    [ "$status" -eq 0 ]
+    [ ! -f "$MOCK_WORKSPACE/.github/instructions/sdlc-stale-skill.instructions.md" ]
+    [ -f "$MOCK_WORKSPACE/.github/instructions/my-custom.instructions.md" ]
+    [ -f "$MOCK_WORKSPACE/.github/instructions/sdlc-code-reviewer.instructions.md" ]
+    [ -f "$MOCK_WORKSPACE/.github/instructions/sdlc-dod-checker.instructions.md" ]
+}
+
+@test "install_ghcp.sh dry-run reports cleanup without deleting" {
+    mkdir -p "$MOCK_WORKSPACE/.github/instructions"
+    printf '%s\n' 'stale' > "$MOCK_WORKSPACE/.github/instructions/sdlc-stale-skill.instructions.md"
+    printf '%s\n' 'keep' > "$MOCK_WORKSPACE/.github/instructions/my-custom.instructions.md"
+    run "$REPO_ROOT/install/install_ghcp.sh" --dry-run --workspace "$MOCK_WORKSPACE"
+    [ "$status" -eq 0 ]
+    [ -f "$MOCK_WORKSPACE/.github/instructions/sdlc-stale-skill.instructions.md" ]
+    [ -f "$MOCK_WORKSPACE/.github/instructions/my-custom.instructions.md" ]
+    [[ "$output" == *"[dry-run] Would remove:"* ]]
+    [[ "$output" == *"sdlc-stale-skill.instructions.md"* ]]
+    [ ! -f "$MOCK_WORKSPACE/.github/instructions/sdlc-code-reviewer.instructions.md" ]
+}

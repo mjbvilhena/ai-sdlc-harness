@@ -19,7 +19,9 @@ ai-sdlc-harness/
 │   ├── install_ghcp.ps1
 │   └── lib/
 │       ├── expand_content.sh    # Bash: expand CONTENT.md into harness shells
-│       └── Expand-Content.ps1   # PowerShell twin
+│       ├── Expand-Content.ps1   # PowerShell twin
+│       ├── sdlc_names.sh        # Bash: sdlc- dest names + cleanup
+│       └── Sdlc-Names.ps1       # PowerShell twin
 │
 ├── skills/                      # Lifecycle Driver skill definitions
 │   └── <skill-name>/            # e.g. sdlc-code-reviewer, sdlc-example-skill

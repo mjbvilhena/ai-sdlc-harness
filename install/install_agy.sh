@@ -4,7 +4,14 @@
 #
 # Installs all skills and agents from this repo into the local Antigravity
 # configuration directory at:
-#   ~/.gemini/antigravity-cli/builtin/skills/<skill-name>/
+#   ~/.gemini/antigravity-cli/builtin/skills/sdlc-<skill-name>/
+#
+# Naming: destination directory names (and YAML frontmatter name:) are always
+# sdlc- prefixed (source folder basename is used as-is when it already
+# starts with sdlc-).
+# Cleanup: before installing, existing sdlc-* skill directories under the
+# chosen skills root are removed (dry-run prints them only). Non-sdlc-*
+# neighbors are left alone.
 #
 # Usage:
 #   ./install_agy.sh           # Install all skills and agents
@@ -37,6 +44,9 @@ DRY_RUN=false
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=lib/expand_content.sh
 . "${SCRIPT_DIR}/lib/expand_content.sh"
+# shellcheck source-path=SCRIPTDIR
+# shellcheck source=lib/sdlc_names.sh
+. "${SCRIPT_DIR}/lib/sdlc_names.sh"
 
 # ---------------------------------------------------------------------------
 # Argument parsing
@@ -72,9 +82,9 @@ done
 # ---------------------------------------------------------------------------
 
 install_item() {
-  local item_dir="$1"   # e.g. skills/code-reviewer or agents/my-agent
+  local item_dir="$1"   # e.g. skills/sdlc-code-reviewer or agents/my-agent
   local item_name
-  item_name="$(basename "$item_dir")"
+  item_name="$(sdlc_prefixed_name "$(basename "$item_dir")")"
   local harness_dir="${item_dir}/${HARNESS}"
   local dest="${AGY_SKILLS_DIR}/${item_name}"
 
@@ -93,6 +103,7 @@ install_item() {
   fi
 
   expand_harness_dir "$item_dir" "$harness_dir" "$dest" "$item_name"
+  ensure_sdlc_frontmatter_names_in_dir "$dest" "$item_name"
 
   echo "  [ok] Installed: ${item_name} → ${dest}/"
 }
@@ -104,6 +115,9 @@ install_item() {
 echo "============================================="
 echo " AI SDLC Harness — Antigravity (agy) Installer"
 echo "============================================="
+echo ""
+
+remove_sdlc_dirs "${AGY_SKILLS_DIR}" "${DRY_RUN}"
 echo ""
 
 install_count=0

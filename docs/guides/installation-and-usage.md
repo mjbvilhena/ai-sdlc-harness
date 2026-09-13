@@ -20,7 +20,7 @@ On Windows, run the `.ps1` scripts from PowerShell (`-Workspace` / `-DryRun` ins
 - **Cursor and GitHub Copilot** always install into a workspace. Pass `--workspace /path/to/your/project`. If you omit the flag, the installer uses `$PWD` (the directory you ran the script from).
 - **Claude Code and Antigravity** install **globally** when you omit `--workspace` (`~/.claude/commands/` and `~/.gemini/antigravity-cli/builtin/skills/` respectively). Pass `--workspace` to keep skills inside the project instead (`<ws>/.claude/commands/` or `<ws>/.agents/skills/`).
 
-`--dry-run` / `-DryRun` prints what would be copied and which MCP file would be written, without creating files.
+`--dry-run` / `-DryRun` prints what would be removed, copied, and which MCP file would be written, without creating or deleting files.
 
 ## Step 1: Install skills and configure MCP
 
@@ -48,7 +48,13 @@ PowerShell (from the same clone):
 
 ### What the installers do automatically
 
-1. **Inject skills and rules**: Copy library prompts into the hidden directories of the target:
+1. **Clean previous `sdlc-*` artifacts**, then **inject skills and rules** with `sdlc-` destination names (the prefix is added at install time if a source folder somehow lacks it). YAML frontmatter `name:` is rewritten to match. Only harness-owned `sdlc-*` files/dirs are removed; other user content in the same directory is preserved:
+   - Claude: `sdlc-*.md` under `~/.claude/commands/` or `<ws>/.claude/commands/`
+   - Cursor: `sdlc-*.mdc` under `<ws>/.cursor/rules/`
+   - AGY: `sdlc-*` directories under the chosen skills root
+   - GitHub Copilot: `sdlc-*.instructions.md` under `<ws>/.github/instructions/`
+
+   Library prompts are then copied into those same hidden directories:
    - AGY workspace: `.agents/skills/`
    - Claude workspace: `.claude/commands/`
    - Cursor: `.cursor/rules/`

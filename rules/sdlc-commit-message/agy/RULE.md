@@ -1,5 +1,5 @@
 ---
-name: commit-message
+name: sdlc-commit-message
 description: |
   Enforces Conventional Commits formatting for all generated commit messages.
 ---

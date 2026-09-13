@@ -8,7 +8,12 @@ the local Claude Code configuration directory at:
   ~\.claude\commands\
 
 Each skill's claude/command.md is installed as:
-  ~\.claude\commands\<skill-name>.md
+  ~\.claude\commands\sdlc-<skill-name>.md
+
+Destination names are always sdlc- prefixed (source folder basename is used
+as-is when it already starts with sdlc-). Before installing, existing
+sdlc-*.md files in the commands dir are removed (DryRun prints them only).
+Non-sdlc-* files are left alone.
 
 .PARAMETER DryRun
 Preview what would be installed (no changes)
@@ -45,6 +50,7 @@ $Harness = "claude"
 $CommandFile = "command.md"
 
 . (Join-Path $ScriptDir "lib\Expand-Content.ps1")
+. (Join-Path $ScriptDir "lib\Sdlc-Names.ps1")
 
 # ---------------------------------------------------------------------------
 # Helper functions
@@ -55,7 +61,7 @@ function Install-Item {
         [string]$ItemDir
     )
 
-    $ItemName = Split-Path -Leaf $ItemDir
+    $ItemName = Get-SdlcPrefixedName -Name (Split-Path -Leaf $ItemDir)
     $HarnessDir = Join-Path $ItemDir $Harness
     $SourceFile = Join-Path $HarnessDir $CommandFile
     $DestFile = Join-Path $ClaudeCommandsDir "${ItemName}.md"
@@ -83,6 +89,7 @@ function Install-Item {
     }
 
     Expand-HarnessFile -ItemDir $ItemDir -SourceFile $SourceFile -DestFile $DestFile -ItemName $ItemName
+    Set-SdlcFrontmatterName -File $DestFile -DestName $ItemName
 
     Write-Host "  [ok] Installed: $ItemName → $DestFile"
     return $true
@@ -100,6 +107,9 @@ Write-Host ""
 if ($DryRun) {
     Write-Host "[dry-run] No files will be modified."
 }
+
+Remove-SdlcFiles -DestDir $ClaudeCommandsDir -Filter "sdlc-*.md" -DryRun ([bool]$DryRun)
+Write-Host ""
 
 $InstallCount = 0
 $SkipCount = 0

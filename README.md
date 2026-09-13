@@ -44,6 +44,8 @@ cd ai-sdlc-harness
 
 `--workspace` is **required in practice** for Cursor and GitHub Copilot (they always install into a workspace; omitting the flag uses `$PWD`). For Claude and Antigravity it is optional: omit it for a user-global install, or pass it for a project-local install.
 
+Each installer first removes previously installed `sdlc-*` artifacts in its destination (leaving other user files alone), then writes skills and rules with `sdlc-` destination names — including YAML frontmatter `name:` where present. `--dry-run` prints the cleanup and copies without changing files.
+
 The installer scripts require no dependencies beyond standard Unix shell utilities (`bash`, `cp`, `mkdir`) or native PowerShell on Windows.
 
 ## Repository Structure
