@@ -24,19 +24,19 @@ Repeat per operation.
 - **Idempotency:** key header / natural key / not idempotent
 - **Headers:** required/optional (no API keys in examples)
 
-**Path/query parameters**
+#### Path/query parameters
 
 | Name | In | Type | Required | Constraints | Notes |
 |---|---|---|---|---|---|
 | id | path | string | yes | … | … |
 
-**Request body**
+#### Request body
 
 | Field | Type | Required | Constraints | Notes |
 |---|---|---|---|---|
 | … | … | … | … | … |
 
-**Responses**
+#### Responses
 
 | Status | When | Body fields |
 |---|---|---|
