@@ -4,6 +4,8 @@ globs: *
 ---
 # Docs Updater (Cursor)
 
+When MCP is available and the user asked for contributor or ops docs (not just a docstring), call `get_sdlc_template` with `template_type="onboarding guide"` (or `runbook` only if they asked for an operational procedure). Do not invent product capabilities.
+
 When the user asks you to "update docs", "write docstrings", or "document this":
 
 1. Examine the active code file or selection.

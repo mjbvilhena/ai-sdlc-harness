@@ -14,6 +14,7 @@ When MCP is available:
 
 1. **CRITICAL**: Call `get_sdlc_template` with `template_type="user story"` (aliases such as `story` also resolve). Follow the returned structure, headings, and sections. If the tool lists other template names, pick the user-story option — do not invent a template.
 2. If the request names or clearly maps to a business domain, call `get_domain_consultant` for that domain and reflect its constraints in the stories (for example forbidden integrations or required actors). If the lookup fails, use only the domains the tool lists.
+3. Call `get_definition_of_done` with `component="user story"` (alias `story`) so Must AC stay independently valuable and testable.
 
 If MCP is unavailable, say so and use a standard "As a / I want / So that" story plus Given/When/Then criteria.
 

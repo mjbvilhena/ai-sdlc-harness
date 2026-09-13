@@ -1,5 +1,7 @@
 # Docs Updater (GitHub Copilot)
 
+When MCP is available and the user asked for contributor or ops docs (not just a docstring), call `get_sdlc_template` with `template_type="onboarding guide"` (or `runbook` only if they asked for an operational procedure). Do not invent product capabilities.
+
 When the user asks you to "update documentation", "document my code", or uses the `/docs` convention:
 
 1. Look at the open files or the specific changes highlighted by the user.

@@ -8,24 +8,32 @@ description: |
 
 ## Purpose
 
-This skill generates unit tests or test stubs for a specific function, class, or module. It helps developers maintain high test coverage by automatically scaffolding tests based on the target code's logic and edge cases.
+Write unit or integration tests for a function, class, or module using the project's existing framework. Prefer a risk-ranked plan before dumping cases.
 
 ## Activation
 
-Trigger this skill when the user asks to "write tests for X", "generate test stubs", or uses a command like `/test <filename>`.
+Trigger when the user asks to "write tests for X", "generate test stubs", or uses `/test`.
+
+## MCP tools (required)
+
+When MCP is available:
+
+1. **CRITICAL**: Call `get_sdlc_template` with `template_type="test plan"`. Outline coverage in that shape, then emit tests. For journey-level work, defer to `sdlc-e2e-scripter` and fetch `e2e test plan` instead.
+2. Call `get_definition_of_done` with `component="feature"` or `bugfix` (use `bugfix` when the user is locking in a regression). Honor the returned test expectations.
+3. Call `get_layer_consultant` for the layer under test when it is inferable (`api`, `database`, `ui`). Honor testing MUST/NEVER.
+
+If MCP is unavailable, say so and still cover happy path, one edge, and one error path.
 
 ## Instructions
 
-When acting as the Test Writer, you must:
+1. Identify the target from the user, the active file, or the diff. Read the code. Do not invent APIs.
+2. Match the repo's language and test runner (pytest, Jest, go test, …). Place files where this project already puts tests.
+3. Cover: happy path, edges (empty, bounds), expected errors, and mocks only for I/O you must not hit.
+4. Bugfixes need a test that failed on the old behavior.
+5. Use descriptive names. No secrets, production URLs, or real personal data in fixtures.
 
-1. **Identify the target**: Determine which file, module, or function the user wants to test. If not specified, ask for clarification or use the currently active file.
-2. **Analyze the target**: Read the target code. Identify:
-   - Happy paths (standard expected behavior).
-   - Edge cases (empty inputs, nulls, bounds).
-   - Error handling (expected exceptions or failure modes).
-   - Dependencies (things that need to be mocked).
-3. **Generate Tests**:
-   - Write tests in the same language and testing framework used by the project (e.g., `pytest` for Python, `Jest` for JS/TS, `JUnit` for Java). If unknown, default to the most common framework for the language.
-   - Include mock setups if external dependencies (like databases or APIs) are involved.
-   - Use clear, descriptive test names.
-4. **Output**: Output the test code in a code block. If the project dictates a specific location for tests (e.g., `tests/` directory or `__tests__`), suggest saving the file there.
+## Safety
+
+- Do not target production systems.
+- Do not invent product behavior that is not in the code or the user's story.
+- Do not weaken or delete tests just to go green.

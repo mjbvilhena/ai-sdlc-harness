@@ -16,9 +16,10 @@ Trigger when the user asks for a code review or uses `/review`.
 
 When MCP is available, query before writing the verdict:
 
-1. Call `get_domain_consultant` for each domain implied by changed paths or the user (for example `auth`). Retry only names the tool lists if the first lookup fails.
-2. Call `get_layer_consultant` for each layer implied by the change (for example `api`, `ui`, `database`).
-3. Call `get_definition_of_done` with a fitting `component` such as `feature`, `bugfix`, `hotfix`, or `release`. Evaluate the change against the returned criteria.
+1. **CRITICAL**: Call `get_sdlc_template` with `template_type="code review"`. Structure the verdict, findings table, and checklist to match.
+2. Call `get_domain_consultant` for each domain implied by changed paths or the user (for example `auth`). Retry only names the tool lists if the first lookup fails.
+3. Call `get_layer_consultant` for each layer implied by the change (for example `api`, `ui`, `database`).
+4. Call `get_definition_of_done` with the most specific `component`: `pr` plus `feature`, `bugfix`, `hotfix`, `api change`, `ui change`, `security change`, or `data migration` as the diff warrants. Evaluate the change against the returned criteria.
 
 If MCP is unavailable, say so and review against the diff only. Do not invent Domain, Layer, or DoD rules.
 

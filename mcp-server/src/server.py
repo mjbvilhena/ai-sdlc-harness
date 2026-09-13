@@ -22,41 +22,118 @@ def get_available_files(directory: str) -> dict[str, str]:
             files[logical_name] = str(f)
     return files
 
+# Longer aliases win when several match as substrings (see resolve_alias).
+# Canonical values are logical names: stem with '-' and '_' turned into spaces.
 ALIASES = {
-    "pull request": "pr",
-    "pull requests": "pr",
+    # Existing templates
+    "architectural decision record": "adr",
+    "architecture decision record": "adr",
+    "architecture decision": "adr",
+    "decision record": "adr",
     "pull request template": "pr",
-    "stories": "user story",
+    "pull requests": "pr",
+    "pull request": "pr",
     "stories template": "user story",
+    "user stories": "user story",
+    "user story": "user story",
+    "stories": "user story",
     "story": "user story",
+    "bug report": "bug report",
+    "bug ticket": "bug report",
+    "defect": "bug report",
     "bug": "bug report",
     "issue": "bug report",
+    "incident postmortem": "incident postmortem",
+    "incident post-mortem": "incident postmortem",
+    "post mortem": "incident postmortem",
+    "post-mortem": "incident postmortem",
     "postmortem": "incident postmortem",
     "incident": "incident postmortem",
     "request for comments": "rfc",
     "request for comment": "rfc",
+    "domain template": "domain",
+    "domain consultant": "domain",
+    "layer template": "layer",
+    "layer consultant": "layer",
+    # New templates
+    "threat model": "threat model",
+    "stride": "threat model",
+    "code review": "code review",
+    "review checklist": "code review",
+    "e2e test plan": "e2e test plan",
+    "end to end test plan": "e2e test plan",
+    "end-to-end test plan": "e2e test plan",
+    "e2e plan": "e2e test plan",
+    "test plan": "test plan",
+    "qa plan": "test plan",
+    "release notes": "release notes",
+    "changelog": "release notes",
+    "run book": "runbook",
+    "ops runbook": "runbook",
+    "playbook": "runbook",
+    "api contract": "api contract",
+    "openapi": "api contract",
+    "api spec": "api contract",
+    "api design": "api design",
+    "rest design": "api design",
+    "security review": "security review",
+    "sec review": "security review",
+    "accessibility audit": "accessibility audit",
+    "a11y audit": "accessibility audit",
+    "wcag": "accessibility audit",
+    "migration plan": "migration plan",
+    "schema migration": "migration plan",
+    "onboarding guide": "onboarding guide",
+    "onboarding": "onboarding guide",
+    "new hire": "onboarding guide",
+    "rollout plan": "rollout plan",
+    "launch plan": "rollout plan",
+    # DoD (logical names share some aliases with templates; catalogs are separate)
     "bug fix": "bugfix",
     "hot fix": "hotfix",
-    "domain template": "domain",
-    "layer template": "layer",
+    "security change": "security change",
+    "ui change": "ui change",
+    "frontend change": "ui change",
+    "api change": "api change",
+    "data migration": "data migration",
+    "user story dod": "user story",
+    "story dod": "user story",
+    "pr dod": "pr",
 }
+
+
+def resolve_alias(query: str) -> str:
+    """Map a natural-language query to a canonical logical name.
+
+    When multiple alias phrases appear in the query, the longest alias wins
+    so that e.g. 'e2e test plan' does not collapse to 'test plan'.
+    """
+    query_lower = query.lower().strip()
+    matches = [
+        (alias, canonical)
+        for alias, canonical in ALIASES.items()
+        if alias in query_lower
+    ]
+    if not matches:
+        return query_lower
+    _, canonical = max(matches, key=lambda pair: len(pair[0]))
+    return canonical
+
 
 def fuzzy_match(query: str, options: list[str]) -> str | None:
     """Finds the best match for the query in the options list."""
     if not options:
         return None
-        
-    query_lower = query.lower().strip()
-    
-    # Try exact alias match first
-    for alias, canonical in ALIASES.items():
-        if alias in query_lower:
-            query_lower = canonical
-            break
-            
+
+    raw = query.lower().strip()
+    if raw in options:
+        return raw
+
+    query_lower = resolve_alias(query)
+
     if query_lower in options:
         return query_lower
-    
+
     best_match, score = process.extractOne(query_lower, options)
     if score >= 70:  # Restore threshold
         return best_match
@@ -65,10 +142,12 @@ def fuzzy_match(query: str, options: list[str]) -> str | None:
 @mcp.tool()
 def get_sdlc_template(template_type: str) -> str:
     """
-    Retrieve a standard SDLC template (e.g., 'ADR', 'PR', 'User Story').
-    
+    Retrieve a standard SDLC template (e.g., 'ADR', 'PR', 'User Story',
+    'threat model', 'api design', 'runbook').
+
     Args:
-        template_type: The type of template you are looking for.
+        template_type: The type of template you are looking for. Aliases
+            such as 'pull request', 'stride', or 'changelog' also resolve.
     """
     files = get_available_files("templates")
     options = list(files.keys())
@@ -93,9 +172,10 @@ def get_sdlc_template(template_type: str) -> str:
 def get_definition_of_done(component: str) -> str:
     """
     Retrieve the Definition of Done (DoD) for a specific project component or phase.
-    
+
     Args:
-        component: The component (e.g., 'frontend', 'backend', 'feature').
+        component: The component (e.g., 'feature', 'bugfix', 'pr',
+            'security change', 'api change', 'data migration').
     """
     files = get_available_files("dod")
     options = list(files.keys())

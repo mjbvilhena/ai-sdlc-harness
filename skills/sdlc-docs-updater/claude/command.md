@@ -3,6 +3,10 @@
 ## Trigger
 `/docs`
 
+## MCP tools (when relevant)
+
+When MCP is available and the user asked for contributor or ops docs (not just a docstring), call `get_sdlc_template` with `template_type="onboarding guide"` (or `runbook` only if they asked for an operational procedure). Do not invent product capabilities.
+
 ## Instructions
 Your task is to update the documentation to match the current state of the codebase.
 

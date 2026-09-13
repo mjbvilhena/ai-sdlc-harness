@@ -1,0 +1,12 @@
+name: sdlc-rfc-drafter
+description: Drafts a Request for Comments from a problem statement or design discussion.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - "/rfc"
+  - "draft rfc"

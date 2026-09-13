@@ -1,0 +1,12 @@
+name: sdlc-runbook-writer
+description: Writes a stress-ready operational runbook for a single failure mode.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - "/runbook"
+  - "write runbook"

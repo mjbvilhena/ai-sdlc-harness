@@ -14,8 +14,10 @@ Review frontend markup and components against a **WCAG 2.2 Level AA** checklist.
 
 When the change touches UI or frontend code and MCP is available:
 
-1. Call `get_layer_consultant` for the UI/frontend layer (try `ui`, `frontend`, or `web` as appropriate; if the tool lists other layer names, use those).
-2. Honor any accessibility or markup constraints returned. If MCP is unavailable, say so and continue from the code alone.
+1. Call `get_sdlc_template` with `template_type="accessibility audit"` (aliases `a11y audit`, `wcag` also resolve). File findings in that shape.
+2. Call `get_definition_of_done` with `component="ui change"` when the diff is user-facing and treat gaps as review comments.
+3. Call `get_layer_consultant` for the UI/frontend layer (try `ui`, `frontend`, or `web` as appropriate; if the tool lists other layer names, use those).
+4. Honor any accessibility or markup constraints returned. If MCP is unavailable, say so and continue from the code alone.
 
 Do not invent layer rules or product a11y features that were not retrieved or visible in the workspace.
 

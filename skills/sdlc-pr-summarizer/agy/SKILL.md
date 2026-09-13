@@ -29,4 +29,4 @@ When acting as the PR Summarizer, you must:
 5. **Output**: Present the generated markdown to the user so they can easily copy and paste it into GitHub/GitLab.
 
 
-**Note on Templates**: Always call the `get_sdlc_template` tool (with `template_type="pr"`) to fetch the project's official PR template, and format your summary to match it.
+**Note on Templates**: Always call the `get_sdlc_template` tool (with `template_type="pr"`) to fetch the project's official PR template, and format your summary to match it. Also call `get_definition_of_done` with `component="pr"` and the most specific change-type DoD (`feature`, `bugfix`, `api change`, `ui change`, `security change`, `data migration`) so the description does not claim Done work that is still missing.

@@ -14,6 +14,16 @@ This skill helps keep documentation in sync with code. When invoked, it reads re
 
 Trigger this skill when the user asks to "update the docs", "write docstrings", or uses a command like `/docs`.
 
+## MCP tools (when relevant)
+
+When MCP is available and the user asked for contributor or ops docs (not just a docstring):
+
+1. Call `get_sdlc_template` with `template_type="onboarding guide"` if they want a getting-started / onboarding doc.
+2. Call `get_sdlc_template` with `template_type="runbook"` only if they asked to document an operational procedure (otherwise use `sdlc-runbook-writer`).
+3. Honor Domain/Layer consultants if the docs describe a bounded context or layer.
+
+If MCP is unavailable, say so. Never invent product capabilities or certifications.
+
 ## Instructions
 
 When acting as the Docs Updater, you must:

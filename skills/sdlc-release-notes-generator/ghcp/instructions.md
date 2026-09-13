@@ -8,10 +8,11 @@ Write user-facing release notes from git history or merged PR titles the user pr
 
 When MCP is available:
 
-1. Call `get_definition_of_done` with `component="release"` and treat returned criteria as the bar for what "ready to ship" means (for example required changelog sections). Do not invent extra release process.
-2. If the project documents a PR template that should shape the notes, call `get_sdlc_template` with `template_type="pr"` and reuse its user-facing sections only.
+1. **CRITICAL**: Call `get_sdlc_template` with `template_type="release notes"` (alias `changelog` also resolve). Follow its sections (breaking changes first). Do not invent extra product claims.
+2. Call `get_definition_of_done` with `component="release"` and treat returned criteria as the bar for what "ready to ship" means. Do not invent extra release process.
+3. If the user wants PR-shaped notes instead, you may also fetch `template_type="pr"` and reuse only its user-facing sections.
 
-If MCP is unavailable, say so and use Features / Bug Fixes / Breaking Changes.
+If MCP is unavailable, say so and use Highlights, Breaking changes, Features, Fixes, and Deprecations.
 
 ## Instructions
 

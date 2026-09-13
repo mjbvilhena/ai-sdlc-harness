@@ -11,4 +11,4 @@ When the user asks you to "create a PR description", "generate a PR summary", or
 4. Output the result in clean markdown so the user can copy it directly to GitHub. Do not include chatty filler text.
 
 
-**Note on Templates**: Always call the `get_sdlc_template` tool (with `template_type="pr"`) to fetch the project's official PR template, and format your summary to match it.
+**Note on Templates**: Always call the `get_sdlc_template` tool (with `template_type="pr"`) to fetch the project's official PR template, and format your summary to match it. Also call `get_definition_of_done` with `component="pr"` and the most specific change-type DoD (`feature`, `bugfix`, `api change`, `ui change`, `security change`, `data migration`) so the description does not claim Done work that is still missing.

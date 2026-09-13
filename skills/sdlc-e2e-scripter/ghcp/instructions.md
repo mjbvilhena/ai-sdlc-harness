@@ -8,8 +8,9 @@ Scaffold Playwright or Cypress end-to-end tests from user-story acceptance crite
 
 When MCP is available:
 
-1. Call `get_sdlc_template` with `template_type="user story"` so scenarios follow the project's story/AC shape. If the user already pasted complete Given/When/Then criteria, still fetch the template and map their criteria onto it.
-2. Call `get_layer_consultant` for the UI/frontend layer when the flow is user-facing (`ui`, `frontend`, or a name the tool lists). Honor selector or testing constraints it returns.
+1. Call `get_sdlc_template` with `template_type="e2e test plan"` (aliases `e2e plan`, `end-to-end test plan` also resolve). Use it to structure journeys, stability, and environment rules before writing scripts.
+2. Call `get_sdlc_template` with `template_type="user story"` so scenarios follow the project's story/AC shape. If the user already pasted complete Given/When/Then criteria, still fetch the template and map their criteria onto it.
+3. Call `get_layer_consultant` for the UI/frontend layer when the flow is user-facing (`ui`, `frontend`, or a name the tool lists). Honor selector or testing constraints it returns.
 
 If MCP is unavailable, say so and proceed from the provided acceptance criteria.
 

@@ -2,7 +2,7 @@
 
 ## Trigger
 /threat
-security review
+threat model
 
 ## Purpose
 
@@ -12,8 +12,10 @@ Perform a high-level STRIDE security review of proposed design or code changes. 
 
 Before listing findings, query the SDLC Knowledge MCP server when it is available:
 
-1. Call `get_domain_consultant` for each business domain touched by the change (for example `auth`, `billing`). Use whatever domains you can infer from paths or the user; if a lookup fails, read the tool's list of available domains and retry only those that exist.
-2. Call `get_layer_consultant` for each architectural layer touched (for example `ui`, `api`, `database`). Same retry rule as above.
+1. **CRITICAL**: Call `get_sdlc_template` with `template_type="threat model"` (alias `stride` also resolve). Follow that document's sections, finding table, and quality bar.
+2. Call `get_definition_of_done` with `component="security change"` and note Done gaps. For a dedicated control checklist use `sdlc-security-reviewer` / `security review` — this skill stays on STRIDE.
+3. Call `get_domain_consultant` for each business domain touched by the change (for example `auth`, `billing`). Use whatever domains you can infer from paths or the user; if a lookup fails, read the tool's list of available domains and retry only those that exist.
+4. Call `get_layer_consultant` for each architectural layer touched (for example `ui`, `api`, `database`). Same retry rule as above.
 
 Apply retrieved Domain and Layer constraints when judging impact. If MCP is unavailable, say so and continue from the repo and the user's description only. Do not invent Domain/Layer rules that were not retrieved or present in the workspace.
 

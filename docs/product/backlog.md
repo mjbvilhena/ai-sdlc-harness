@@ -96,3 +96,16 @@
 - **Task 9.7** *(Done)*: Add MCP auto-configuration to `install/install_ghcp.sh` and `install/install_ghcp.ps1`. Writes `<ws>/.vscode/mcp.json` with the VS Code / Copilot `servers` key. Does not overwrite an existing file.
 - **Task 9.8** *(Done)*: Product decision: do **not** invent full agent packages. Product and technical docs state that `skills/` currently serve as Lifecycle Drivers and `agents/` is deferred. No empty `agents/` scaffolding added (installers already skip a missing directory).
 - **Task 9.9** *(Done)*: Expand `docs/guides/installation-and-usage.md` for cursor/ghcp/PS1/`--workspace` nuances and GHCP MCP status (`.vscode/mcp.json` after Task 9.7).
+
+## Epic 10: World-class MCP Knowledge Base & Companion Skills
+
+> Goal: Replace stub MCP templates/DoD with production-grade agent payloads, add the high-value templates existing skills were missing, extend aliases/tests, and ship the focused companion skills those payloads unlock.
+
+- **Task 10.1** *(Done)*: Rewrite the original eight templates (`adr`, `bug_report`, `domain`, `incident_postmortem`, `layer`, `pr`, `rfc`, `user_story`) into dense, practical markdown (sections, checklists, anti-patterns, quality bars). *(Evidence: `mcp-server/data/templates/`.)*
+- **Task 10.2** *(Done)*: Add templates the library needed: `threat_model`, `code_review`, `test_plan`, `e2e_test_plan`, `release_notes`, `runbook`, `api_design`, `api_contract`, `security_review`, `accessibility_audit`, `migration_plan`, `onboarding_guide`, plus justified `rollout_plan`. *(Evidence: new files under `mcp-server/data/templates/`.)*
+- **Task 10.3** *(Done)*: Rewrite existing DoD (`bugfix`, `epic`, `feature`, `hotfix`, `release`) and add `pr`, `user_story`, `security_change`, `ui_change`, `api_change`, `data_migration`. Extend `ALIASES` with longest-match resolution in `mcp-server/src/server.py`. *(Evidence: `mcp-server/data/dod/`; `resolve_alias` in `server.py`.)*
+- **Task 10.4** *(Done)*: Author four-harness companion skills with `skill.yaml`: `sdlc-rfc-drafter`, `sdlc-bug-triager`, `sdlc-runbook-writer`, `sdlc-api-designer`, `sdlc-security-reviewer`, `sdlc-migration-planner`. Each calls MCP templates/DoD and includes safety language. *(Evidence: `skills/sdlc-{rfc-drafter,bug-triager,runbook-writer,api-designer,security-reviewer,migration-planner}/`.)*
+- **Task 10.5** *(Done)*: Wire existing Lifecycle Drivers to the new payloads (`sdlc-threat-modeler`, `sdlc-code-reviewer`, `sdlc-test-writer`, `sdlc-e2e-scripter`, `sdlc-release-notes-generator`, `sdlc-pr-summarizer`, `sdlc-user-story-refiner`, `sdlc-a11y-auditor`, `sdlc-dod-checker`). Disambiguate `/threat` vs `/security-review`. *(Evidence: MCP tool lists in those skill/rule files.)*
+- **Task 10.6** *(Done)*: Extend `mcp-server/tests/test_server.py` for catalog completeness, new names, aliases, longest-match, and exact-over-short-alias (`bugfix` vs `bug`). *(Evidence: `test_catalog_templates_and_dod`, parametrized alias tests.)*
+- **Task 10.7** *(Done)*: Minimal discoverability docs — architecture catalog, README pointer, installation driver list. *(Evidence: `docs/technical_design/architecture.md`, `README.md`, `docs/guides/installation-and-usage.md`.)*
+
