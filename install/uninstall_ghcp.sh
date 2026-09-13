@@ -42,7 +42,6 @@ while [[ $# -gt 0 ]]; do
 done
 WORKSPACE="$(cd "$WORKSPACE" && pwd)"
 DEST_DIR="${WORKSPACE}/.github/instructions"
-DEST_DIR="${DEST_DIR}"
 
 echo "============================================="
 echo " AI SDLC Harness — GitHub Copilot Uninstaller"

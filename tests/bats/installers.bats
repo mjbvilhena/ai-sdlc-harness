@@ -107,8 +107,8 @@ teardown() {
 @test "install_cursor.sh workspace install works" {
     run "$REPO_ROOT/install/install_cursor.sh" --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
-    [ -d "$MOCK_WORKSPACE/.cursor/rules" ]
-    [ -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-code-reviewer.mdc" ]
+    [ -d "$MOCK_WORKSPACE/.cursor/prompts" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/prompts/sdlc-code-reviewer.md" ]
     [ -f "$MOCK_WORKSPACE/.cursor/mcp.json" ]
 }
 
@@ -120,7 +120,7 @@ teardown() {
     cd "$MOCK_WORKSPACE"
     run "$REPO_ROOT/install/install_cursor.sh"
     [ "$status" -eq 0 ]
-    [ -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-code-reviewer.mdc" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/prompts/sdlc-code-reviewer.md" ]
 }
 
 @test "install_ghcp.sh defaults to PWD when --workspace is omitted" {
@@ -168,13 +168,13 @@ teardown() {
     [ "$status" -eq 0 ]
     run "$REPO_ROOT/install/install_cursor.sh" --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
-    [ -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-code-reviewer.mdc" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/prompts/sdlc-code-reviewer.md" ]
     expected="$(mktemp)"
     . "$REPO_ROOT/install/lib/expand_content.sh"
     expand_harness_file "$REPO_ROOT/skills/sdlc-code-reviewer" \
-        "$REPO_ROOT/skills/sdlc-code-reviewer/cursor/rule.mdc" \
+        "$REPO_ROOT/skills/sdlc-code-reviewer/cursor/rule.md" \
         "$expected" "sdlc-code-reviewer"
-    cmp -s "$expected" "$MOCK_WORKSPACE/.cursor/rules/sdlc-code-reviewer.mdc"
+    cmp -s "$expected" "$MOCK_WORKSPACE/.cursor/prompts/sdlc-code-reviewer.md"
 }
 
 @test "install_claude.sh global install is idempotent" {
@@ -370,28 +370,28 @@ EOF
 }
 
 @test "install_cursor.sh removes stale sdlc-* rules and keeps neighbors" {
-    mkdir -p "$MOCK_WORKSPACE/.cursor/rules"
-    printf '%s\n' 'stale' > "$MOCK_WORKSPACE/.cursor/rules/sdlc-stale-skill.mdc"
-    printf '%s\n' 'keep' > "$MOCK_WORKSPACE/.cursor/rules/my-custom-rule.mdc"
+    mkdir -p "$MOCK_WORKSPACE/.cursor/prompts"
+    printf '%s\n' 'stale' > "$MOCK_WORKSPACE/.cursor/prompts/sdlc-stale-skill.md"
+    printf '%s\n' 'keep' > "$MOCK_WORKSPACE/.cursor/prompts/my-custom-rule.md"
     run "$REPO_ROOT/install/install_cursor.sh" --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
-    [ ! -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-stale-skill.mdc" ]
-    [ -f "$MOCK_WORKSPACE/.cursor/rules/my-custom-rule.mdc" ]
-    [ -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-code-reviewer.mdc" ]
-    [ -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-dod-checker.mdc" ]
+    [ ! -f "$MOCK_WORKSPACE/.cursor/prompts/sdlc-stale-skill.md" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/prompts/my-custom-rule.md" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/prompts/sdlc-code-reviewer.md" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/prompts/sdlc-dod-checker.md" ]
 }
 
 @test "install_cursor.sh dry-run reports cleanup without deleting" {
-    mkdir -p "$MOCK_WORKSPACE/.cursor/rules"
-    printf '%s\n' 'stale' > "$MOCK_WORKSPACE/.cursor/rules/sdlc-stale-skill.mdc"
-    printf '%s\n' 'keep' > "$MOCK_WORKSPACE/.cursor/rules/my-custom-rule.mdc"
+    mkdir -p "$MOCK_WORKSPACE/.cursor/prompts"
+    printf '%s\n' 'stale' > "$MOCK_WORKSPACE/.cursor/prompts/sdlc-stale-skill.md"
+    printf '%s\n' 'keep' > "$MOCK_WORKSPACE/.cursor/prompts/my-custom-rule.md"
     run "$REPO_ROOT/install/install_cursor.sh" --dry-run --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
-    [ -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-stale-skill.mdc" ]
-    [ -f "$MOCK_WORKSPACE/.cursor/rules/my-custom-rule.mdc" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/prompts/sdlc-stale-skill.md" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/prompts/my-custom-rule.md" ]
     [[ "$output" == *"[dry-run] Would remove:"* ]]
-    [[ "$output" == *"sdlc-stale-skill.mdc"* ]]
-    [ ! -f "$MOCK_WORKSPACE/.cursor/rules/sdlc-code-reviewer.mdc" ]
+    [[ "$output" == *"sdlc-stale-skill.md"* ]]
+    [ ! -f "$MOCK_WORKSPACE/.cursor/prompts/sdlc-code-reviewer.md" ]
 }
 
 @test "install_agy.sh removes stale sdlc-* skill dirs and keeps neighbors" {

@@ -199,6 +199,7 @@ else
     MCP_CONFIG_DIR="${WORKSPACE}"
   else
     MCP_CONFIG_DIR="${HOME}/.claude"
+  fi
 
   echo "Configuring MCP Server..."
   if [[ -n "$MCP_CONFIG_DIR" ]]; then
@@ -236,7 +237,6 @@ print("  [ok] Registered sdlc-knowledge MCP server in " + config_path)
     echo "  [info] Global MCP config must be managed manually in this environment."
   fi
 
-fi
 
 echo ""
 echo "--------------------------------------------------"

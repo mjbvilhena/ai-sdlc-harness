@@ -43,7 +43,6 @@ done
 WORKSPACE="$(cd "$WORKSPACE" && pwd)"
 DEST_DIR="${WORKSPACE}/.cursor/prompts"
 MCP_CONFIG_FILE="${WORKSPACE}/.cursor/mcp.json"
-DEST_DIR="${DEST_DIR}"
 
 echo "============================================="
 echo " AI SDLC Harness — Cursor Uninstaller"

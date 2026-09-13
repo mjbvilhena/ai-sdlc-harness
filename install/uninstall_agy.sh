@@ -50,7 +50,6 @@ else
   MCP_CONFIG_FILE="${HOME}/.gemini/config/mcp_config.json"
 fi
 
-DEST_DIR="${DEST_DIR}"
 
 echo "============================================="
 echo " AI SDLC Harness — Antigravity (agy) Uninstaller"

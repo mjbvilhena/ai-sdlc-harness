@@ -14,7 +14,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WORKSPACE=""
+_WORKSPACE=""
 DRY_RUN=false
 
 . "${SCRIPT_DIR}/lib/sdlc_names.sh"
@@ -26,7 +26,7 @@ while [[ $# -gt 0 ]]; do
         echo "Error: --workspace requires a path argument." >&2
         exit 1
       fi
-      WORKSPACE="$2"
+      _WORKSPACE="$2"
       shift 2
       ;;
     --dry-run)
@@ -42,7 +42,6 @@ while [[ $# -gt 0 ]]; do
 done
 DEST_DIR="${HOME}/.claude/commands"
 MCP_CONFIG_FILE="${HOME}/.claude/claude_desktop_config.json"
-DEST_DIR="${DEST_DIR}"
 
 echo "============================================="
 echo " AI SDLC Harness — Claude Desktop Uninstaller"

@@ -8,7 +8,7 @@ VALID_TARGETS = {'agy', 'claude', 'ghcp', 'cursor'}
 HARNESS_PRIMARY_FILE = {
     'agy': {'skill': 'SKILL.md', 'agent': 'SKILL.md', 'rule': 'RULE.md'},
     'claude': {'skill': 'command.md', 'agent': 'command.md', 'rule': 'command.md'},
-    'cursor': {'skill': 'rule.mdc', 'agent': 'rule.mdc', 'rule': 'rule.mdc'},
+    'cursor': {'skill': 'prompt.md', 'agent': 'prompt.md', 'rule': 'prompt.md'},
     'ghcp': {'skill': 'instructions.md', 'agent': 'instructions.md', 'rule': 'instructions.md'},
 }
 
