@@ -44,8 +44,10 @@ done
 if [[ -n "$WORKSPACE" ]]; then
   WORKSPACE="$(cd "$WORKSPACE" && pwd)"
   DEST_DIR="${WORKSPACE}/.agents/skills"
+  MCP_CONFIG_FILE="${WORKSPACE}/.agents/mcp_config.json"
 else
   DEST_DIR="${HOME}/.gemini/antigravity-cli/builtin/skills"
+  MCP_CONFIG_FILE="${HOME}/.gemini/config/mcp_config.json"
 fi
 
 DEST_DIR="${DEST_DIR}"
@@ -57,6 +59,28 @@ echo " Destination: ${DEST_DIR}"
 echo ""
 
 remove_sdlc_dirs "${DEST_DIR}" "${DRY_RUN}"
+
+if [[ -f "$MCP_CONFIG_FILE" && "$DRY_RUN" == false ]]; then
+  echo "Cleaning MCP Server configuration..."
+  python3 -c '
+import sys, json
+try:
+    with open(sys.argv[1], "r") as f: data = json.load(f)
+    modified = False
+    if "mcpServers" in data and "sdlc-knowledge" in data["mcpServers"]:
+        del data["mcpServers"]["sdlc-knowledge"]
+        modified = True
+        if not data["mcpServers"]: del data["mcpServers"]
+    if modified:
+        with open(sys.argv[1], "w") as f: json.dump(data, f, indent=2)
+        print("  [ok] Removed sdlc-knowledge MCP server from " + sys.argv[1])
+except Exception:
+    pass
+' "$MCP_CONFIG_FILE"
+elif [[ -f "$MCP_CONFIG_FILE" && "$DRY_RUN" == true ]]; then
+  echo "  [dry-run] Would remove sdlc-knowledge MCP server from $MCP_CONFIG_FILE (if present)"
+fi
+
 
 echo ""
 echo "---------------------------------------------"

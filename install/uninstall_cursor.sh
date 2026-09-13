@@ -42,6 +42,7 @@ while [[ $# -gt 0 ]]; do
 done
 WORKSPACE="$(cd "$WORKSPACE" && pwd)"
 DEST_DIR="${WORKSPACE}/.cursor/rules"
+MCP_CONFIG_FILE="${WORKSPACE}/.cursor/mcp.json"
 DEST_DIR="${DEST_DIR}"
 
 echo "============================================="
@@ -51,6 +52,28 @@ echo " Destination: ${DEST_DIR}"
 echo ""
 
 remove_sdlc_files "${DEST_DIR}" "sdlc-*.mdc" "${DRY_RUN}"
+
+if [[ -f "$MCP_CONFIG_FILE" && "$DRY_RUN" == false ]]; then
+  echo "Cleaning MCP Server configuration..."
+  python3 -c '
+import sys, json
+try:
+    with open(sys.argv[1], "r") as f: data = json.load(f)
+    modified = False
+    if "mcpServers" in data and "sdlc-knowledge" in data["mcpServers"]:
+        del data["mcpServers"]["sdlc-knowledge"]
+        modified = True
+        if not data["mcpServers"]: del data["mcpServers"]
+    if modified:
+        with open(sys.argv[1], "w") as f: json.dump(data, f, indent=2)
+        print("  [ok] Removed sdlc-knowledge MCP server from " + sys.argv[1])
+except Exception:
+    pass
+' "$MCP_CONFIG_FILE"
+elif [[ -f "$MCP_CONFIG_FILE" && "$DRY_RUN" == true ]]; then
+  echo "  [dry-run] Would remove sdlc-knowledge MCP server from $MCP_CONFIG_FILE (if present)"
+fi
+
 
 echo ""
 echo "---------------------------------------------"
