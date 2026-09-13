@@ -43,6 +43,7 @@ INSTRUCTIONS_FILE="instructions.md"
 # Dry-run mode flag
 DRY_RUN=false
 
+# shellcheck source-path=SCRIPTDIR
 # shellcheck source=lib/expand_content.sh
 . "${SCRIPT_DIR}/lib/expand_content.sh"
 
