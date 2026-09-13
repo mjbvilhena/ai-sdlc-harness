@@ -44,6 +44,7 @@ DRY_RUN=false
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=lib/expand_content.sh
 . "${SCRIPT_DIR}/lib/expand_content.sh"
+# shellcheck source-path=SCRIPTDIR
 # shellcheck source=lib/sdlc_names.sh
 . "${SCRIPT_DIR}/lib/sdlc_names.sh"
 
