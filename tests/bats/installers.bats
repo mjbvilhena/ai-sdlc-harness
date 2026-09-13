@@ -210,7 +210,7 @@ teardown() {
     run "$REPO_ROOT/install/install_ghcp.sh" --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
     grep -q 'keep-me' "$MOCK_WORKSPACE/.vscode/mcp.json"
-    grep -q 'sdlc-knowledge' "$MOCK_WORKSPACE/.cursor/mcp.json"
+    grep -q 'sdlc-knowledge' "$MOCK_WORKSPACE/.vscode/mcp.json"
 }
 
 # ---------------------------------------------------------------------------

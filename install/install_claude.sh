@@ -50,6 +50,7 @@ DRY_RUN=false
 . "${SCRIPT_DIR}/lib/expand_content.sh"
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=lib/sdlc_names.sh
+# shellcheck disable=SC1091
 . "${SCRIPT_DIR}/lib/sdlc_names.sh"
 
 # ---------------------------------------------------------------------------

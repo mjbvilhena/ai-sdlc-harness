@@ -17,6 +17,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE=""
 DRY_RUN=false
 
+# shellcheck disable=SC1091
 . "${SCRIPT_DIR}/lib/sdlc_names.sh"
 
 while [[ $# -gt 0 ]]; do
