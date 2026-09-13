@@ -4,7 +4,7 @@ This guide explains how to deploy the AI SDLC Harness to a real repository and b
 
 ## Step 1: Install Skills & Configure MCP
 
-To deploy the harness into a target repository, run the installer script corresponding to your AI tool. You MUST provide the `--workspace` flag pointing to your project's root directory. 
+To deploy the harness into a target repository, run the installer script corresponding to your AI tool. You MUST provide the `--workspace` flag pointing to your project's root directory.
 
 For example, to configure a project for both Antigravity and Claude Code:
 
