@@ -174,6 +174,8 @@ teardown() {
     expand_harness_file "$REPO_ROOT/skills/sdlc-code-reviewer" \
         "$REPO_ROOT/skills/sdlc-code-reviewer/cursor/prompt.md" \
         "$expected" "sdlc-code-reviewer"
+    . "$REPO_ROOT/install/lib/sdlc_names.sh"
+    ensure_sdlc_frontmatter_name "$expected" "sdlc-code-reviewer"
     cmp -s "$expected" "$MOCK_WORKSPACE/.cursor/prompts/sdlc-code-reviewer.md"
 }
 
