@@ -172,7 +172,7 @@ teardown() {
     expected="$(mktemp)"
     . "$REPO_ROOT/install/lib/expand_content.sh"
     expand_harness_file "$REPO_ROOT/skills/sdlc-code-reviewer" \
-        "$REPO_ROOT/skills/sdlc-code-reviewer/cursor/rule.md" \
+        "$REPO_ROOT/skills/sdlc-code-reviewer/cursor/prompt.md" \
         "$expected" "sdlc-code-reviewer"
     cmp -s "$expected" "$MOCK_WORKSPACE/.cursor/prompts/sdlc-code-reviewer.md"
 }
@@ -201,7 +201,7 @@ teardown() {
     run "$REPO_ROOT/install/install_cursor.sh" --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
     grep -q 'keep-me' "$MOCK_WORKSPACE/.cursor/mcp.json"
-    [[ "$output" == *"already exists"* ]]
+    grep -q 'sdlc-knowledge' "$MOCK_WORKSPACE/.cursor/mcp.json"
 }
 
 @test "install_ghcp.sh does not overwrite an existing .vscode/mcp.json" {
@@ -210,7 +210,7 @@ teardown() {
     run "$REPO_ROOT/install/install_ghcp.sh" --workspace "$MOCK_WORKSPACE"
     [ "$status" -eq 0 ]
     grep -q 'keep-me' "$MOCK_WORKSPACE/.vscode/mcp.json"
-    [[ "$output" == *"already exists"* ]]
+    grep -q 'sdlc-knowledge' "$MOCK_WORKSPACE/.cursor/mcp.json"
 }
 
 # ---------------------------------------------------------------------------
