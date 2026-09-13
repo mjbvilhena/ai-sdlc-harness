@@ -48,6 +48,10 @@ ensure_sdlc_frontmatter_name() {
 
     if [[ "$in_fm" -eq 1 ]]; then
       if [[ "$raw" == "---" ]]; then
+        if [[ "$seen_name" -eq 0 ]]; then
+          printf "name: %s\n" "$dest_name" >> "$tmp"
+          seen_name=1
+        fi
         in_fm=0
         printf '%s\n' "$raw" >> "$tmp"
         continue
