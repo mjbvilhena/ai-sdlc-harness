@@ -64,14 +64,18 @@ install/install_<harness>.sh | .ps1
     │
     ├─ 2. Resolve SCRIPT_DIR / PROJECT_ROOT (install/ → repo root)
     │
-    ├─ 3. For each item in skills/*/, agents/*/ (if present), rules/*/:
-    │       a. Check if <item>/<harness>/ exists → skip if not
-    │       b. Copy the harness file(s) to DEST
-    │       c. Print: "Installed <name> → …"
+    ├─ 3. Remove existing sdlc-* artifacts in DEST (dry-run: print only)
     │
-    ├─ 4. Print summary: N items installed.
+    ├─ 4. For each item in skills/*/, agents/*/ (if present), rules/*/:
+    │       a. Normalize dest name to sdlc-* (prefix if the folder lacks it)
+    │       b. Check if <item>/<harness>/ exists → skip if not
+    │       c. Copy the harness file(s) to DEST
+    │       d. Ensure YAML frontmatter name: is sdlc-* when present
+    │       e. Print: "Installed <name> → …"
     │
-    └─ 5. Configure MCP Server (unless --dry-run / -DryRun)
+    ├─ 5. Print summary: N items installed.
+    │
+    └─ 6. Configure MCP Server (unless --dry-run / -DryRun)
             Creates the host config if missing; does not overwrite:
               Claude  → claude.json (`mcpServers`)
               Cursor  → <ws>/.cursor/mcp.json (`mcpServers`)

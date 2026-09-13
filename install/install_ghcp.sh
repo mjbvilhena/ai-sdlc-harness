@@ -6,7 +6,13 @@
 # files into the target workspace's .github/instructions/ directory.
 #
 # Each skill's ghcp/instructions.md is installed as:
-#   <workspace>/.github/instructions/<skill-name>.instructions.md
+#   <workspace>/.github/instructions/sdlc-<skill-name>.instructions.md
+#
+# Naming: destination filenames are always sdlc- prefixed (source folder
+# basename is used as-is when it already starts with sdlc-).
+# Cleanup: before installing, existing sdlc-*.instructions.md files in
+# .github/instructions/ are removed (dry-run prints them only).
+# Non-sdlc-* files are left alone.
 #
 # Note: GitHub Copilot instructions are WORKSPACE-SCOPED. You must specify the
 # workspace you want to install into. If no --workspace flag is given, the
@@ -46,6 +52,8 @@ DRY_RUN=false
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=lib/expand_content.sh
 . "${SCRIPT_DIR}/lib/expand_content.sh"
+# shellcheck source=lib/sdlc_names.sh
+. "${SCRIPT_DIR}/lib/sdlc_names.sh"
 
 # ---------------------------------------------------------------------------
 # Argument parsing
@@ -85,9 +93,9 @@ GHCP_INSTRUCTIONS_DIR="${WORKSPACE}/.github/instructions"
 # ---------------------------------------------------------------------------
 
 install_item() {
-  local item_dir="$1"   # e.g. skills/code-reviewer or agents/my-agent
+  local item_dir="$1"   # e.g. skills/sdlc-code-reviewer or agents/my-agent
   local item_name
-  item_name="$(basename "$item_dir")"
+  item_name="$(sdlc_prefixed_name "$(basename "$item_dir")")"
   local harness_dir="${item_dir}/${HARNESS}"
   local source_file="${harness_dir}/${INSTRUCTIONS_FILE}"
   # GHCP instruction files use the .instructions.md suffix convention
@@ -114,6 +122,7 @@ install_item() {
   fi
 
   expand_harness_file "$item_dir" "$source_file" "$dest_file" "$item_name"
+  ensure_sdlc_frontmatter_name "$dest_file" "$item_name"
 
   echo "  [ok] Installed: ${item_name} → ${dest_file}"
 }
@@ -127,6 +136,9 @@ echo " AI SDLC Harness — GitHub Copilot (ghcp) Installer"
 echo "======================================================="
 echo " Workspace: ${WORKSPACE}"
 echo " Destination: ${GHCP_INSTRUCTIONS_DIR}"
+echo ""
+
+remove_sdlc_files "${GHCP_INSTRUCTIONS_DIR}" "sdlc-*.instructions.md" "${DRY_RUN}"
 echo ""
 
 install_count=0

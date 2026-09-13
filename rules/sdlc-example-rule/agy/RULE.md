@@ -1,5 +1,5 @@
 ---
-name: example-rule
+name: sdlc-example-rule
 description: A passive rule stub for Antigravity (AGY).
 ---
 

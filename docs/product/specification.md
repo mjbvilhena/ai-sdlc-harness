@@ -75,15 +75,17 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 
 Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
 
-- `install/install_claude.sh`: Iterates over `skills/*/claude/`, `agents/*/claude/` (if present), and `rules/*/claude/`. Expands each `command.md` + sibling `CONTENT.md` to `~/.claude/commands/<name>.md`, or `<ws>/.claude/commands/` when `--workspace` is set.
-- `install/install_cursor.sh`: Same pattern for `cursor/rule.mdc` → `<ws>/.cursor/rules/<name>.mdc`. Workspace defaults to `$PWD`.
-- `install/install_ghcp.sh`: Same pattern for `ghcp/instructions.md` → `<ws>/.github/instructions/<name>.instructions.md`. Workspace defaults to `$PWD`.
-- `install/install_agy.sh`: Expands `agy/` files (typically `SKILL.md` / `RULE.md`) into `~/.gemini/antigravity-cli/builtin/skills/<name>/` or `<ws>/.agents/skills/<name>/`.
+- `install/install_claude.sh`: Iterates over `skills/*/claude/`, `agents/*/claude/` (if present), and `rules/*/claude/`. Expands each `command.md` + sibling `CONTENT.md` to `~/.claude/commands/sdlc-<name>.md`, or `<ws>/.claude/commands/` when `--workspace` is set.
+- `install/install_cursor.sh`: Same pattern for `cursor/rule.mdc` → `<ws>/.cursor/rules/sdlc-<name>.mdc`. Workspace defaults to `$PWD`.
+- `install/install_ghcp.sh`: Same pattern for `ghcp/instructions.md` → `<ws>/.github/instructions/sdlc-<name>.instructions.md`. Workspace defaults to `$PWD`.
+- `install/install_agy.sh`: Expands `agy/` files (typically `SKILL.md` / `RULE.md`) into `~/.gemini/antigravity-cli/builtin/skills/sdlc-<name>/` or `<ws>/.agents/skills/sdlc-<name>/`. Destination YAML `name:` is rewritten to the same `sdlc-` name.
 - `--workspace <path>` is optional for Claude and AGY (omit for user-global install). Cursor and GHCP are always workspace-scoped; omitting the flag uses `$PWD`.
 
 ### F5. Installer Behaviour
 
 - Installers MUST be idempotent: running the script multiple times must produce the same result.
+- Installers MUST remove previously installed `sdlc-*` artifacts in the destination before writing new ones (dry-run must report those paths without deleting). Non-`sdlc-*` user files MUST be left untouched.
+- Installed destination names (and YAML frontmatter `name:` when present) MUST start with `sdlc-`. If a source folder basename already has that prefix it is used as-is; otherwise the installer prefixes it.
 - Installers MUST print a summary of what was installed and where.
 - Installers MUST skip any directory that does not have the relevant harness subdirectory (e.g., `install_claude.sh` skips items with no `claude/` directory).
 - Installers SHOULD create destination directories if they do not already exist.

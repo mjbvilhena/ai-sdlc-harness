@@ -6,7 +6,12 @@
 # files into the target workspace's .cursor/rules/ directory.
 #
 # Each skill's cursor/rule.mdc is installed as:
-#   <workspace>/.cursor/rules/<skill-name>.mdc
+#   <workspace>/.cursor/rules/sdlc-<skill-name>.mdc
+#
+# Naming: destination filenames are always sdlc- prefixed (source folder
+# basename is used as-is when it already starts with sdlc-).
+# Cleanup: before installing, existing sdlc-*.mdc files in .cursor/rules/
+# are removed (dry-run prints them only). Non-sdlc-* files are left alone.
 #
 # Note: Cursor rules are WORKSPACE-SCOPED. You must specify the
 # workspace you want to install into. If no --workspace flag is given, the
@@ -46,6 +51,8 @@ DRY_RUN=false
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=lib/expand_content.sh
 . "${SCRIPT_DIR}/lib/expand_content.sh"
+# shellcheck source=lib/sdlc_names.sh
+. "${SCRIPT_DIR}/lib/sdlc_names.sh"
 
 # ---------------------------------------------------------------------------
 # Argument parsing
@@ -85,9 +92,9 @@ CURSOR_RULES_DIR="${WORKSPACE}/.cursor/rules"
 # ---------------------------------------------------------------------------
 
 install_item() {
-  local item_dir="$1"   # e.g. skills/code-reviewer or agents/my-agent
+  local item_dir="$1"   # e.g. skills/sdlc-code-reviewer or agents/my-agent
   local item_name
-  item_name="$(basename "$item_dir")"
+  item_name="$(sdlc_prefixed_name "$(basename "$item_dir")")"
   local harness_dir="${item_dir}/${HARNESS}"
   local source_file="${harness_dir}/${RULE_FILE}"
   # Cursor rule files use the .mdc suffix convention
@@ -114,6 +121,7 @@ install_item() {
   fi
 
   expand_harness_file "$item_dir" "$source_file" "$dest_file" "$item_name"
+  ensure_sdlc_frontmatter_name "$dest_file" "$item_name"
 
   echo "  [ok] Installed: ${item_name} → ${dest_file}"
 }
@@ -127,6 +135,9 @@ echo " AI SDLC Harness — Cursor Installer"
 echo "======================================================="
 echo " Workspace: ${WORKSPACE}"
 echo " Destination: ${CURSOR_RULES_DIR}"
+echo ""
+
+remove_sdlc_files "${CURSOR_RULES_DIR}" "sdlc-*.mdc" "${DRY_RUN}"
 echo ""
 
 install_count=0

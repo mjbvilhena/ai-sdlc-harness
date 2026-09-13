@@ -7,7 +7,12 @@ Installs all skills and agents from this repo as GitHub Copilot instruction
 files into the target workspace's .github\instructions\ directory.
 
 Each skill's ghcp/instructions.md is installed as:
-  <workspace>\.github\instructions\<skill-name>.instructions.md
+  <workspace>\.github\instructions\sdlc-<skill-name>.instructions.md
+
+Destination names are always sdlc- prefixed (source folder basename is used
+as-is when it already starts with sdlc-). Before installing, existing
+sdlc-*.instructions.md files in .github\instructions\ are removed (DryRun
+prints them only). Non-sdlc-* files are left alone.
 
 Note: GitHub Copilot instructions are WORKSPACE-SCOPED. You must specify the
 workspace you want to install into. If no -Workspace parameter is given, the
@@ -59,6 +64,7 @@ $Harness = "ghcp"
 $InstructionsFile = "instructions.md"
 
 . (Join-Path $ScriptDir "lib\Expand-Content.ps1")
+. (Join-Path $ScriptDir "lib\Sdlc-Names.ps1")
 
 # ---------------------------------------------------------------------------
 # Helper functions
@@ -69,7 +75,7 @@ function Install-Item {
         [string]$ItemDir
     )
 
-    $ItemName = Split-Path -Leaf $ItemDir
+    $ItemName = Get-SdlcPrefixedName -Name (Split-Path -Leaf $ItemDir)
     $HarnessDir = Join-Path $ItemDir $Harness
     $SourceFile = Join-Path $HarnessDir $InstructionsFile
     $DestFile = Join-Path $GhcpInstructionsDir "${ItemName}.instructions.md"
@@ -97,6 +103,7 @@ function Install-Item {
     }
 
     Expand-HarnessFile -ItemDir $ItemDir -SourceFile $SourceFile -DestFile $DestFile -ItemName $ItemName
+    Set-SdlcFrontmatterName -File $DestFile -DestName $ItemName
 
     Write-Host "  [ok] Installed: $ItemName → $DestFile"
     return $true
@@ -116,6 +123,9 @@ Write-Host ""
 if ($DryRun) {
     Write-Host "[dry-run] No files will be modified."
 }
+
+Remove-SdlcFiles -DestDir $GhcpInstructionsDir -Filter "sdlc-*.instructions.md" -DryRun ([bool]$DryRun)
+Write-Host ""
 
 $InstallCount = 0
 $SkipCount = 0

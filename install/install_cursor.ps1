@@ -7,7 +7,12 @@ Installs all skills and agents from this repo as Cursor rule
 files into the target workspace's .cursor\rules\ directory.
 
 Each skill's cursor/rule.mdc is installed as:
-  <workspace>\.cursor\rules\<skill-name>.mdc
+  <workspace>\.cursor\rules\sdlc-<skill-name>.mdc
+
+Destination names are always sdlc- prefixed (source folder basename is used
+as-is when it already starts with sdlc-). Before installing, existing
+sdlc-*.mdc files in .cursor\rules\ are removed (DryRun prints them only).
+Non-sdlc-* files are left alone.
 
 Note: Cursor rules are WORKSPACE-SCOPED. You must specify the
 workspace you want to install into. If no -Workspace parameter is given, the
@@ -59,6 +64,7 @@ $Harness = "cursor"
 $RuleFile = "rule.mdc"
 
 . (Join-Path $ScriptDir "lib\Expand-Content.ps1")
+. (Join-Path $ScriptDir "lib\Sdlc-Names.ps1")
 
 # ---------------------------------------------------------------------------
 # Helper functions
@@ -69,7 +75,7 @@ function Install-Item {
         [string]$ItemDir
     )
 
-    $ItemName = Split-Path -Leaf $ItemDir
+    $ItemName = Get-SdlcPrefixedName -Name (Split-Path -Leaf $ItemDir)
     $HarnessDir = Join-Path $ItemDir $Harness
     $SourceFile = Join-Path $HarnessDir $RuleFile
     $DestFile = Join-Path $CursorRulesDir "${ItemName}.mdc"
@@ -97,6 +103,7 @@ function Install-Item {
     }
 
     Expand-HarnessFile -ItemDir $ItemDir -SourceFile $SourceFile -DestFile $DestFile -ItemName $ItemName
+    Set-SdlcFrontmatterName -File $DestFile -DestName $ItemName
 
     Write-Host "  [ok] Installed: $ItemName → $DestFile"
     return $true
@@ -116,6 +123,9 @@ Write-Host ""
 if ($DryRun) {
     Write-Host "[dry-run] No files will be modified."
 }
+
+Remove-SdlcFiles -DestDir $CursorRulesDir -Filter "sdlc-*.mdc" -DryRun ([bool]$DryRun)
+Write-Host ""
 
 $InstallCount = 0
 $SkipCount = 0
