@@ -208,39 +208,45 @@ else
   if [[ -n "$WORKSPACE" ]]; then
     MCP_CONFIG_DIR="${WORKSPACE}/.cursor"
   else
-    # Cursor globally stores MCP config in its internal AppData, but we can't easily guess it on Linux/Mac/Win identically without jq.
-    # For global installs, we'll skip or just put it in a known Cursor config path. 
-    # For now, we only automatically configure for workspace.
     MCP_CONFIG_DIR=""
   fi
-  
+
+  echo "Configuring MCP Server..."
   if [[ -n "$MCP_CONFIG_DIR" ]]; then
     mkdir -p "$MCP_CONFIG_DIR"
     MCP_CONFIG_FILE="${MCP_CONFIG_DIR}/mcp.json"
-    
     MCP_SERVER_PATH="${PROJECT_ROOT}/mcp-server/src/server.py"
-    
-    if [[ ! -f "$MCP_CONFIG_FILE" ]]; then
-      cat <<EOF > "$MCP_CONFIG_FILE"
-{
-  "mcpServers": {
-    "sdlc-knowledge": {
-      "command": "python3",
-      "args": ["${MCP_SERVER_PATH}"]
-    }
-  }
+
+    python3 -c '
+import sys, json, os
+config_path = sys.argv[1]
+server_path = sys.argv[2]
+
+if os.path.exists(config_path):
+    try:
+        with open(config_path, "r") as f:
+            data = json.load(f)
+    except Exception:
+        data = {}
+else:
+    data = {}
+
+if "mcpServers" not in data:
+    data["mcpServers"] = {}
+
+data["mcpServers"]["sdlc-knowledge"] = {
+    "command": "python3",
+    "args": [server_path]
 }
-EOF
-      echo "  [ok] Created MCP configuration: ${MCP_CONFIG_FILE}"
-    else
-      echo "  [info] MCP configuration already exists at ${MCP_CONFIG_FILE}."
-      echo "  [info] Please ensure 'sdlc-knowledge' server is registered pointing to ${MCP_SERVER_PATH}."
-    fi
+
+with open(config_path, "w") as f:
+    json.dump(data, f, indent=2)
+print("  [ok] Registered sdlc-knowledge MCP server in " + config_path)
+' "$MCP_CONFIG_FILE" "$MCP_SERVER_PATH"
   else
-    echo "  [info] Global Cursor MCP config is managed in Cursor UI. Please manually add the MCP server:"
-    echo "         Command: python3"
-    echo "         Args:    ${PROJECT_ROOT}/mcp-server/src/server.py"
+    echo "  [info] Global MCP config must be managed manually in this environment."
   fi
+
 fi
 
 echo ""

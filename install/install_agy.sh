@@ -189,32 +189,43 @@ else
   else
     MCP_CONFIG_DIR="${HOME}/.gemini/config"
   fi
-  
-  mkdir -p "$MCP_CONFIG_DIR"
-  MCP_CONFIG_FILE="${MCP_CONFIG_DIR}/mcp_config.json"
-  
-  # Note: jq is typically required for safe JSON manipulation, but for 
-  # zero-dependency we will construct a basic config if it doesn't exist,
-  # or warn the user if it does exist.
-  
-  MCP_SERVER_PATH="${PROJECT_ROOT}/mcp-server/src/server.py"
-  
-  if [[ ! -f "$MCP_CONFIG_FILE" ]]; then
-    cat <<EOF > "$MCP_CONFIG_FILE"
-{
-  "mcpServers": {
-    "sdlc-knowledge": {
-      "command": "python3",
-      "args": ["${MCP_SERVER_PATH}"]
-    }
-  }
+
+  echo "Configuring MCP Server..."
+  if [[ -n "$MCP_CONFIG_DIR" ]]; then
+    mkdir -p "$MCP_CONFIG_DIR"
+    MCP_CONFIG_FILE="${MCP_CONFIG_DIR}/mcp_config.json"
+    MCP_SERVER_PATH="${PROJECT_ROOT}/mcp-server/src/server.py"
+
+    python3 -c '
+import sys, json, os
+config_path = sys.argv[1]
+server_path = sys.argv[2]
+
+if os.path.exists(config_path):
+    try:
+        with open(config_path, "r") as f:
+            data = json.load(f)
+    except Exception:
+        data = {}
+else:
+    data = {}
+
+if "mcpServers" not in data:
+    data["mcpServers"] = {}
+
+data["mcpServers"]["sdlc-knowledge"] = {
+    "command": "python3",
+    "args": [server_path]
 }
-EOF
-    echo "  [ok] Created MCP configuration: ${MCP_CONFIG_FILE}"
+
+with open(config_path, "w") as f:
+    json.dump(data, f, indent=2)
+print("  [ok] Registered sdlc-knowledge MCP server in " + config_path)
+' "$MCP_CONFIG_FILE" "$MCP_SERVER_PATH"
   else
-    echo "  [info] MCP configuration already exists at ${MCP_CONFIG_FILE}."
-    echo "  [info] Please ensure 'sdlc-knowledge' server is registered pointing to ${MCP_SERVER_PATH}."
+    echo "  [info] Global MCP config must be managed manually in this environment."
   fi
+
 fi
 
 echo ""
