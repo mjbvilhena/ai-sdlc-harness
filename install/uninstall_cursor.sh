@@ -2,8 +2,8 @@
 # =============================================================================
 # uninstall_cursor.sh — AI SDLC Harness uninstaller for Cursor
 #
-# Removes all sdlc-*.mdc skills and agents from the workspace rules directory at:
-#   .cursor/rules/sdlc-*.mdc
+# Removes all sdlc-*.md skills and agents from the workspace rules directory at:
+#   .cursor/prompts/sdlc-*.md
 #
 # Usage:
 #   ./uninstall_cursor.sh           # Uninstall
@@ -41,7 +41,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 WORKSPACE="$(cd "$WORKSPACE" && pwd)"
-DEST_DIR="${WORKSPACE}/.cursor/rules"
+DEST_DIR="${WORKSPACE}/.cursor/prompts"
 MCP_CONFIG_FILE="${WORKSPACE}/.cursor/mcp.json"
 DEST_DIR="${DEST_DIR}"
 
@@ -51,7 +51,7 @@ echo "============================================="
 echo " Destination: ${DEST_DIR}"
 echo ""
 
-remove_sdlc_files "${DEST_DIR}" "sdlc-*.mdc" "${DRY_RUN}"
+remove_sdlc_files "${DEST_DIR}" "sdlc-*.md" "${DRY_RUN}"
 
 if [[ -f "$MCP_CONFIG_FILE" && "$DRY_RUN" == false ]]; then
   echo "Cleaning MCP Server configuration..."

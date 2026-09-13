@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Uninstalls all sdlc-*.mdc skills and agents from the Cursor config.
+Uninstalls all sdlc-*.md skills and agents from the Cursor config.
 
 .DESCRIPTION
-Removes sdlc- artifacts from .cursor/rules/sdlc-*.mdc.
+Removes sdlc- artifacts from .cursor/prompts/sdlc-*.md.
 
 .EXAMPLE
 .\uninstall_cursor.ps1
@@ -29,7 +29,7 @@ Write-Host "============================================="
 Write-Host " Destination: $DestDir"
 Write-Host ""
 
-Remove-SdlcFiles -DestDir $DestDir -Pattern "sdlc-*.mdc" -DryRun:$DryRun
+Remove-SdlcFiles -DestDir $DestDir -Pattern "sdlc-*.md" -DryRun:$DryRun
 
 if ($null -ne $McpConfigFile -and (Test-Path $McpConfigFile)) {
     if ($DryRun) {

@@ -2,18 +2,18 @@
 # =============================================================================
 # install_cursor.sh — AI SDLC Harness installer for Cursor
 #
-# Installs all skills and agents from this repo as Cursor rule
-# files into the target workspace's .cursor/rules/ directory.
+# Installs all skills and agents from this repo as Cursor Custom Prompt
+# files into the target workspace's .cursor/prompts/ directory.
 #
-# Each skill's cursor/rule.mdc is installed as:
-#   <workspace>/.cursor/rules/sdlc-<skill-name>.mdc
+# Each skill's cursor/prompt.md is installed as:
+#   <workspace>/.cursor/prompts/sdlc-<skill-name>.mdc
 #
 # Naming: destination filenames are always sdlc- prefixed (source folder
 # basename is used as-is when it already starts with sdlc-).
-# Cleanup: before installing, existing sdlc-*.mdc files in .cursor/rules/
+# Cleanup: before installing, existing sdlc-*.md files in .cursor/prompts/
 # are removed (dry-run prints them only). Non-sdlc-* files are left alone.
 #
-# Note: Cursor rules are WORKSPACE-SCOPED. You must specify the
+# Note: Cursor Custom Prompts are WORKSPACE-SCOPED. You must specify the
 # workspace you want to install into. If no --workspace flag is given, the
 # current working directory ($PWD) is used as the workspace root.
 #
@@ -43,7 +43,7 @@ WORKSPACE="${PWD}"
 HARNESS="cursor"
 
 # The filename inside each cursor/ subdirectory to install
-RULE_FILE="rule.mdc"
+RULE_FILE="prompt.md"
 
 # Dry-run mode flag
 DRY_RUN=false
@@ -85,8 +85,8 @@ done
 # Resolve workspace to absolute path
 WORKSPACE="$(cd "$WORKSPACE" && pwd)"
 
-# Cursor rules destination directory (inside the workspace)
-CURSOR_RULES_DIR="${WORKSPACE}/.cursor/rules"
+# Cursor Custom Prompts destination directory (inside the workspace)
+CURSOR_RULES_DIR="${WORKSPACE}/.cursor/prompts"
 
 # ---------------------------------------------------------------------------
 # Helper functions
@@ -98,8 +98,8 @@ install_item() {
   item_name="$(sdlc_prefixed_name "$(basename "$item_dir")")"
   local harness_dir="${item_dir}/${HARNESS}"
   local source_file="${harness_dir}/${RULE_FILE}"
-  # Cursor rule files use the .mdc suffix convention
-  local dest_file="${CURSOR_RULES_DIR}/${item_name}.mdc"
+  # Cursor Custom Prompt files use the .mdc suffix convention
+  local dest_file="${CURSOR_RULES_DIR}/${item_name}.md"
 
   # Skip if this skill/agent has no cursor/ subdirectory
   if [[ ! -d "$harness_dir" ]]; then
@@ -138,7 +138,7 @@ echo " Workspace: ${WORKSPACE}"
 echo " Destination: ${CURSOR_RULES_DIR}"
 echo ""
 
-remove_sdlc_files "${CURSOR_RULES_DIR}" "sdlc-*.mdc" "${DRY_RUN}"
+remove_sdlc_files "${CURSOR_RULES_DIR}" "sdlc-*.md" "${DRY_RUN}"
 echo ""
 
 install_count=0
@@ -251,7 +251,7 @@ else
   echo " Done. ${install_count} item(s) installed to: ${CURSOR_RULES_DIR}"
   echo " ${skip_count} item(s) skipped (no ${HARNESS}/${RULE_FILE})."
   echo ""
-  echo " NOTE: Remember to commit .cursor/rules/ to your workspace repo"
-  echo "       so that Cursor can read the rule files."
+  echo " NOTE: Remember to commit .cursor/prompts/ to your workspace repo"
+  echo "       so that Cursor can read the Custom Prompt files."
 fi
 echo "======================================================="
