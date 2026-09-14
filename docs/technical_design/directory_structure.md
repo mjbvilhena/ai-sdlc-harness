@@ -8,15 +8,15 @@ ai-sdlc-harness/
 ├── .markdownlint.json
 ├── .gitignore
 │
-├── install/                     # Harness installers (not at repo root)
-│   ├── install_agy.sh
-│   ├── install_agy.ps1
-│   ├── install_claude.sh
-│   ├── install_claude.ps1
-│   ├── install_cursor.sh
-│   ├── install_cursor.ps1
-│   ├── install_ghcp.sh
-│   ├── install_ghcp.ps1
+├── install/                     # Harness installers + uninstallers (not at repo root)
+│   ├── install_agy.sh / uninstall_agy.sh
+│   ├── install_agy.ps1 / uninstall_agy.ps1
+│   ├── install_claude.sh / uninstall_claude.sh
+│   ├── install_claude.ps1 / uninstall_claude.ps1
+│   ├── install_cursor.sh / uninstall_cursor.sh
+│   ├── install_cursor.ps1 / uninstall_cursor.ps1
+│   ├── install_ghcp.sh / uninstall_ghcp.sh
+│   ├── install_ghcp.ps1 / uninstall_ghcp.ps1
 │   └── lib/
 │       ├── expand_content.sh    # Bash: expand CONTENT.md into harness shells
 │       ├── Expand-Content.ps1   # PowerShell twin
@@ -32,7 +32,7 @@ ai-sdlc-harness/
 │       ├── claude/
 │       │   └── command.md
 │       ├── cursor/
-│       │   └── rule.mdc
+│       │   └── prompt.md     # Custom Prompt shell
 │       └── ghcp/
 │           └── instructions.md
 │
@@ -42,7 +42,7 @@ ai-sdlc-harness/
 │       ├── CONTENT.md           # Canonical body ({{RULE_BODY}})
 │       ├── agy/RULE.md
 │       ├── claude/command.md
-│       ├── cursor/rule.mdc
+│       ├── cursor/prompt.md
 │       └── ghcp/instructions.md
 │
 ├── mcp-server/                  # Optional Python MCP knowledge server
@@ -81,7 +81,8 @@ ai-sdlc-harness/
 
 ## Notes
 
-- **Installers live under `install/`**. Invoke them as `./install/install_<harness>.sh` (or the `.ps1` twin).
+- **Installers live under `install/`**. Invoke them as `./install/install_<harness>.sh` (or the `.ps1` twin). Uninstallers are `./install/uninstall_<harness>.sh` / `.ps1`.
+- **Cursor destinations are Custom Prompts**: source `cursor/prompt.md` → `<ws>/.cursor/prompts/sdlc-<name>.md`. Not `.cursor/rules/*.mdc`.
 - **`skills/` and `rules/` are the runtime source of truth today.** They are the Lifecycle Drivers and ambient rules the installers copy. A top-level `agents/` tree is **deferred**; installers already tolerate a missing `agents/` directory (they print a skip message and continue).
 - `skill.yaml` / `rule.yaml` / `agent.yaml` (when present) are for humans, docs, and CI. Installer scripts do not parse them.
 - Target-specific subdirectories (`agy/`, `claude/`, `cursor/`, `ghcp/`) are optional per item. An item that only targets AGY only needs `agy/`.

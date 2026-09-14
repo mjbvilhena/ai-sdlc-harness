@@ -1,18 +1,18 @@
 # Product Backlog
 
-> Status convention: each task line includes `*(Done)*`, `*(In progress)*`, or `*(Not done)*` based on the repo audit plus the Epic 9 / quality-gate implementation (2026-09-13).
+> Status convention: each task line includes `*(Done)*`, `*(In progress)*`, or `*(Not done)*` based on the repo audit (2026-09-14, post PR #6). Epic 9 closed the pre-#6 docs wave; Epic 12 tracks remaining post-#6 installer/uninstaller drift.
 
 ## Epic 1: Installer Scripts
 
 > Goal: Deliver working installer scripts for each supported harness across macOS, Linux, and Windows.
 
 - **Task 1.1** *(Done)*: Implement `install_claude.sh` — discovers `skills/*/claude/` and copies `.md` files to `~/.claude/commands/`. *(Evidence: `install/install_claude.sh`; also supports `--workspace` → `<ws>/.claude/commands/`.)*
-- **Task 1.2** *(Done)*: Implement `install_cursor.sh` — discovers `skills/*/cursor/` and copies rules to `.cursor/rules/`. *(Evidence: `install/install_cursor.sh`.)*
+- **Task 1.2** *(Done)*: Implement `install_cursor.sh` — discovers `skills/*/cursor/` and installs Custom Prompts to `.cursor/prompts/`. *(Evidence: `install/install_cursor.sh` reads `cursor/prompt.md` and writes `<ws>/.cursor/prompts/sdlc-<name>.md`. `install_cursor.ps1` is still on the old `.cursor/rules/*.mdc` path — Task 12.1.)*
 - **Task 1.3** *(Done)*: Implement `install_ghcp.sh` — discovers `skills/*/ghcp/` and copies instruction files to `.github/instructions/`. Support `--workspace <path>` flag. *(Evidence: `install/install_ghcp.sh`.)*
 - **Task 1.4** *(Done)*: Implement `install_agy.sh` — discovers `skills/*/agy/` and copies contents to `~/.gemini/antigravity-cli/builtin/skills/<name>/`. *(Evidence: `install/install_agy.sh`; workspace mode uses `<ws>/.agents/skills/`.)*
 - **Task 1.5** *(Done)*: Add agent and rule support to all four installers (i.e., also iterate over `agents/*/` and `rules/*/`). *(Evidence: all four `.sh` and `.ps1` installers call `Process-Category` / loop over `agents` and `rules`. `agents/` itself remains deferred — see Task 9.8.)*
 - **Task 1.6** *(Done)*: Write installer test stubs (dry-run mode or `--dry-run` flag) that print what would be copied without performing any file operations. *(Evidence: `--dry-run` on all `.sh`; `-DryRun` on all `.ps1`.)*
-- **Task 1.7** *(Done)*: Implement PowerShell equivalents (`.ps1`) for all installers to provide native, zero-dependency support for Windows users. *(Evidence: `install/install_{claude,cursor,ghcp,agy}.ps1`.)*
+- **Task 1.7** *(In progress)*: Implement PowerShell equivalents (`.ps1`) for all installers to provide native, zero-dependency support for Windows users. *(Evidence: all four `install/install_*.ps1` files exist, but `install_cursor.ps1` still looks for `cursor/rule.mdc` and writes `.cursor/rules/*.mdc` — it would skip every current skill/rule. PS1 MCP is still create-once + `python3`, not venv merge. See Tasks 12.1 / 12.2.)*
 
 ## Epic 2: Bundled Skill Library
 
@@ -42,7 +42,7 @@
 - **Task 4.1** *(Done)*: Scaffold a basic Python or TypeScript MCP server with tool definitions for `get_sdlc_template` and `get_definition_of_done`. *(Evidence: `mcp-server/src/server.py`.)*
 - **Task 4.2** *(Done)*: Implement fuzzy matching and alias resolution for parameters (e.g., mapping "user story" and "stories" to "story"). *(Evidence: `ALIASES` + `fuzzy_match` / `thefuzz` in `server.py`; covered by `mcp-server/tests/test_server.py`.)*
 - **Task 4.3** *(Done)*: Implement graceful degradation so that unrecognized queries return a helpful list of valid options instead of failing blindly. *(Evidence: fallback messages in `get_sdlc_template` / `get_definition_of_done`.)*
-- **Task 4.4** *(Done)*: Populate the initial database/directory of SDLC standards (ADR templates, PR checklists, etc.). *(Evidence: `mcp-server/data/templates/` (8 files) and `mcp-server/data/dod/` (5 files).)*
+- **Task 4.4** *(Done)*: Populate the initial database/directory of SDLC standards (ADR templates, PR checklists, etc.). *(Evidence: `mcp-server/data/templates/` (21 files) and `mcp-server/data/dod/` (11 files); asserted by `test_catalog_templates_and_dod` in `mcp-server/tests/test_server.py`. Epic 10 expanded the original 8/5 set.)*
 - **Task 4.5** *(Done)*: Add tests for the MCP server ensuring robust LLM interaction flows. *(Evidence: `mcp-server/tests/test_server.py`.)*
 
 ## Epic 5: Requirements & Design Phase Skills
@@ -77,7 +77,7 @@
 
 > Goal: Meet all automated testing and static validation requirements outlined in the product specification (Section 6).
 
-- **Task 8.1** *(Done)*: Implement BATS (Bash Automated Testing System) tests for all shell installer scripts to verify idempotency, file copying, and flag handling. *(Evidence: `tests/bats/installers.bats` covers dry-run for all four `.sh` installers, global/workspace paths, PWD default for cursor/ghcp, idempotency, MCP create-once, unknown flags, missing `--workspace` path, and absent `agents/`.)*
+- **Task 8.1** *(Done)*: Implement BATS (Bash Automated Testing System) tests for all shell installer scripts to verify idempotency, file copying, and flag handling. *(Evidence: `tests/bats/installers.bats` covers dry-run for all four `.sh` installers, global/workspace paths, PWD default for cursor/ghcp, idempotency, MCP **merge** (sibling servers kept + `sdlc-knowledge` added), Cursor `.cursor/prompts/*.md`, unknown flags, missing `--workspace` path, `CONTENT.md` expansion, and absent `agents/`. Uninstallers and PS1 are not covered — Task 12.4.)*
 - **Task 8.2** *(Done)*: Update GitHub Actions CI to include `shellcheck` (for bash scripts) and `markdownlint` (for prompts and docs). *(Evidence: `.github/workflows/lint.yaml` with `scandir: './install'` + markdownlint on `**/*.md`.)*
 - **Task 8.3** *(Done)*: Scaffold an E2E agent evaluation framework (e.g., using `promptfoo` or `pytest`) to programmatically test agents against a sandboxed mock repository. *(Evidence: `tests/e2e/test_agent_behavior.py` (Gemini) + `tests/e2e/test_cli_integration.py`; wired optionally via `run_tests.sh` when `GEMINI_API_KEY` is set. Not using promptfoo.)*
 - **Task 8.4** *(Done)*: Update `install_claude` and `install_agy` scripts (Bash and PS1) to fully support the `--workspace` flag for workspace-scoped installations, ensuring parity across all installers as mandated by the spec. *(Evidence: `--workspace` / `-Workspace` in `install/install_claude.{sh,ps1}` and `install/install_agy.{sh,ps1}`.)*
@@ -85,7 +85,7 @@
 
 ## Epic 9: Documentation Drift Remediation
 
-> Goal: Bring README, product docs, and technical design docs back in sync with the actual repository layout and behaviour (post `install/` move, Cursor support, MCP, tests).
+> Goal: Bring README, product docs, and technical design docs back in sync with the actual repository layout and behaviour (post `install/` move, Cursor support, MCP, tests). Re-synced 2026-09-14 for PR #6 (Custom Prompts, MCP merge, venv Python, uninstallers). Remaining code-level post-#6 drift is Epic 12.
 
 - **Task 9.1** *(Done)*: Update root `README.md` to match reality: installers live under `install/`; add **Cursor** to the Supported Harnesses table; example path `skills/sdlc-example-skill/`; `agents/` marked deferred; soften the absolute "No Python" claim given `mcp-server/`; clone URL `mjbvilhena/ai-sdlc-harness`.
 - **Task 9.2** *(Done)*: Rewrite `docs/technical_design/directory_structure.md` to show `install/`, `mcp-server/`, `tests/`, `run_tests.sh`, Cursor harness dirs, and `docs/guides/` including `authoring-for-cursor.md`. Stop claiming installers live at repo root and that `agents/` currently exists. Remove the "guides (planned)" wording.
@@ -93,7 +93,7 @@
 - **Task 9.4** *(Done)*: Update `docs/technical_design/architecture.md` and `docs/technical_design/schemas.md`: use `./install/install_*.sh` in diagrams; include `cursor` in schema `targets:` examples; document CI validation as implemented (`.github/workflows/validate-metadata.yaml`).
 - **Task 9.5** *(Done)*: Fix `CONTRIBUTING.md` layout/examples to the `sdlc-*` naming convention; keep `agents/` references accurate (supported by installers, directory not populated).
 - **Task 9.6** *(Done)*: Wire MCP tool instructions (`get_sdlc_template`, `get_definition_of_done`, `get_domain_consultant`, `get_layer_consultant` as appropriate) into Lifecycle Driver skills that should use MCP. *(Evidence: `sdlc-user-story-refiner`, `sdlc-code-reviewer`, `sdlc-threat-modeler`, `sdlc-e2e-scripter`, `sdlc-ci-debugger`, `sdlc-postmortem-writer`, `sdlc-release-notes-generator`, `sdlc-a11y-auditor`, in addition to the previously MCP-aware `sdlc-dod-checker`, `sdlc-adr-drafter`, `sdlc-domain-architect`, `sdlc-layer-architect`, `sdlc-pr-summarizer`.)*
-- **Task 9.7** *(Done)*: Add MCP auto-configuration to `install/install_ghcp.sh` and `install/install_ghcp.ps1`. Writes `<ws>/.vscode/mcp.json` with the VS Code / Copilot `servers` key. Does not overwrite an existing file.
+- **Task 9.7** *(Done)*: Add MCP auto-configuration to `install/install_ghcp.sh` and `install/install_ghcp.ps1`. Writes `<ws>/.vscode/mcp.json` with the VS Code / Copilot `servers` key. *(Evidence: Bash now **merges** `sdlc-knowledge` into an existing file and points `command` at `mcp-server/venv/bin/python`. PS1 still create-once with `python3` — Task 12.2.)*
 - **Task 9.8** *(Done)*: Product decision: do **not** invent full agent packages. Product and technical docs state that `skills/` currently serve as Lifecycle Drivers and `agents/` is deferred. No empty `agents/` scaffolding added (installers already skip a missing directory).
 - **Task 9.9** *(Done)*: Expand `docs/guides/installation-and-usage.md` for cursor/ghcp/PS1/`--workspace` nuances and GHCP MCP status (`.vscode/mcp.json` after Task 9.7).
 
@@ -116,5 +116,17 @@
 - **Task 11.1** *(Done)*: Add `CONTENT.md` and `{{SKILL_BODY}}` / `{{RULE_BODY}}` shells for every skill and rule (including Epic 10 additions). *(Evidence: `skills/*/CONTENT.md`, `rules/*/CONTENT.md`.)*
 - **Task 11.2** *(Done)*: Update all eight installers (`.sh` / `.ps1`) plus `install/lib/expand_content.sh` and `install/lib/Expand-Content.ps1` to expand placeholders, fail on missing `CONTENT.md` or placeholder, and never write unresolved tokens. *(Evidence: `install/`.)*
 - **Task 11.3** *(Done)*: Extend BATS for expanded destinations, idempotent expand, and helper failure cases; update E2E prompt loader to substitute `CONTENT.md`. *(Evidence: `tests/bats/installers.bats`, `tests/e2e/test_agent_behavior.py`.)*
-- **Task 11.4** *(Done)*: Document the convention in CONTRIBUTING, schemas, authoring guides, architecture, directory structure, README, and specification. CI metadata validation requires `CONTENT.md` and the correct placeholder. *(Evidence: those docs; `.github/scripts/validate_metadata.py`.)*
+- **Task 11.4** *(Done)*: Document the convention in CONTRIBUTING, schemas, authoring guides, architecture, directory structure, README, and specification. CI metadata validation requires `CONTENT.md` and the correct placeholder. *(Evidence: those docs; `.github/scripts/validate_metadata.py` requires `cursor/prompt.md`.)*
+
+## Epic 12: Post-#6 installer / uninstaller parity
+
+> Goal: Close the code and test gaps left after PR #6 (Cursor Custom Prompts, MCP merge, venv Python, uninstallers). Docs were re-synced on 2026-09-14; these items are remaining implementation work.
+
+- **Task 12.1** *(Not done)*: Bring `install/install_cursor.ps1` to parity with `install/install_cursor.sh`. Read `cursor/prompt.md`, write `<ws>/.cursor/prompts/sdlc-<name>.md`, and wipe `sdlc-*.md` in that directory. Today the PS1 installer still looks for `cursor/rule.mdc` and writes `.cursor/rules/*.mdc`, so it would skip every current skill and rule.
+- **Task 12.2** *(Not done)*: Bring PowerShell MCP wiring to Bash parity on all four installers: merge `sdlc-knowledge` into an existing host config (keep sibling servers) and invoke `mcp-server/venv` Python instead of create-once + `python3`. Align Claude filename: Bash writes `claude_desktop_config.json`; `install_claude.ps1` still writes `claude.json`.
+- **Task 12.3** *(Not done)*: Repair uninstallers so they reverse the current installers. Concrete bugs: `uninstall_claude.sh` deletes `sdlc-*.json` (install writes `sdlc-*.md`), parses `--workspace` but always targets `~/.claude/commands`, and ignores workspace MCP; `uninstall_ghcp.sh` / `.ps1` never remove `sdlc-knowledge` from `.vscode/mcp.json`; PS1 uninstallers source missing `lib/sdlc_names.ps1` (actual file is `Sdlc-Names.ps1`), pass `-Pattern` instead of `-Filter`, call `Remove-SdlcDirs` (actual name `Remove-SdlcDirectories`), leave `$McpConfigFile` unset, and `uninstall_cursor.ps1` still targets `.cursor/rules`.
+- **Task 12.4** *(Not done)*: Add BATS coverage for all eight uninstallers (dest paths, globs, `--workspace`, MCP key removal, `--dry-run`). Extend installer BATS to assert Bash MCP `command` is `mcp-server/venv/bin/python` and that Claude writes `claude_desktop_config.json`. Add Pester (or equivalent) if PowerShell remains first-class — there is no PS1 test suite today, which is why 12.1–12.3 drifted undetected.
+- **Task 12.5** *(Not done)*: Bootstrap or fail-soft when `mcp-server/venv` is missing. Bash installers write `mcp-server/venv/bin/python` even if that interpreter does not exist. `run_tests.sh` creates a venv for tests; installers do not. Either create the venv during install or refuse/warn before writing a broken MCP command.
+- **Task 12.6** *(Not done)*: Migrate leftover pre-#6 Cursor rules. The new installer only cleans `.cursor/prompts/sdlc-*.md`. Workspaces that installed before #6 still have `.cursor/rules/sdlc-*.mdc`. Add cleanup (or a one-shot migration step on install/uninstall) so stale rules do not keep applying.
+- **Task 12.7** *(Not done)*: Clean leftover rules-era wording in shipped sources: `skills/sdlc-example-skill/cursor/prompt.md` still says "example rule stub"; `install_cursor.sh` header comment says dest `sdlc-<name>.mdc` while the script writes `.md`; `install_claude.sh` dry-run text still says `claude.json`.
 

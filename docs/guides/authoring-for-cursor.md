@@ -1,24 +1,26 @@
 # Authoring for Cursor
 
-Cursor supports workspace-level rules via `.mdc` files placed in the `.cursor/rules/` directory.
+Cursor supports workspace-level **Custom Prompts** via `.md` files placed in the `.cursor/prompts/` directory.
 
 ## File Convention
-In this repository, Cursor files are stored in the `cursor/` subdirectory and must be named `rule.mdc`. Keep YAML frontmatter (`description`, `globs`) here. Put the shared body in sibling `CONTENT.md` and leave `{{SKILL_BODY}}` or `{{RULE_BODY}}` on its own line. The installer expands it when writing `.cursor/rules/`.
+In this repository, Cursor files are stored in the `cursor/` subdirectory and must be named `prompt.md`. Keep YAML frontmatter (`description`, and `globs` when the prompt should stay file-scoped) here. Put the shared body in sibling `CONTENT.md` and leave `{{SKILL_BODY}}` or `{{RULE_BODY}}` on its own line. The installer expands it when writing `<ws>/.cursor/prompts/sdlc-<name>.md`.
 
-## Structure of a `rule.mdc`
-Cursor rules require YAML frontmatter followed by Markdown content:
+Do not author `rule.mdc` or target `.cursor/rules/` — that pre-#6 rules layout is no longer what the Bash installer deploys.
 
-```mdc
+## Structure of a `prompt.md`
+Cursor Custom Prompts are Markdown with optional YAML frontmatter:
+
+```md
 ---
-description: A short description of the rule.
+description: A short description of the prompt.
 globs: *
 ---
-# Rule Name
+# Prompt Name
 
-1. Step one.
-2. Step two.
+{{SKILL_BODY}}
 ```
 
 ## Tips
-- Use the `globs` field to restrict rules to specific file types (e.g., `*.ts` or `src/**/*.py`) if the rule only applies to certain languages.
-- Cursor rules act as ambient context. They are injected into the context window when relevant files are open or when the user asks a related question.
+- Use the `globs` field to restrict a prompt to specific file types (e.g., `*.ts` or `src/**/*.py`) when it should only apply to certain languages.
+- Custom Prompts are workspace-scoped. After install, commit `.cursor/prompts/` in the **target** project so teammates get the same files.
+- Ambient library rules (`rules/sdlc-*`) use the same `prompt.md` + `{{RULE_BODY}}` convention; they still land in `.cursor/prompts/`, not `.cursor/rules/`.

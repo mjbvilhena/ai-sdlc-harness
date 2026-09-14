@@ -16,7 +16,7 @@ skills/
     claude/
       command.md
     cursor/
-      rule.mdc
+      prompt.md
     ghcp/
       instructions.md
 ```
@@ -27,7 +27,11 @@ Author shared instructions once in `CONTENT.md`. Harness files keep only frontma
 
 See [`skills/sdlc-example-skill/`](skills/sdlc-example-skill/) and [`rules/sdlc-example-rule/`](rules/sdlc-example-rule/) for complete stubs.
 
+Cursor shells are `cursor/prompt.md`. The installer expands them into `<ws>/.cursor/prompts/sdlc-<name>.md` (Custom Prompts, not `.cursor/rules/*.mdc`).
+
 Installers also accept an `agents/` tree with the same layout, but **`agents/` is not populated**. Lifecycle Drivers currently live as `skills/` (and ambient `rules/`). Do not add empty agent packages unless a later product decision asks for them.
+
+Matching uninstallers live beside the installers (`install/uninstall_<harness>.sh` / `.ps1`).
 
 ## Metadata Schemas
 
@@ -72,7 +76,7 @@ Before submitting a Pull Request, please ensure:
 
 ## Testing
 
-This repository includes a unified testing script `run_tests.sh` at the root, which executes Metadata Validation, MCP Server unit tests, and BATS installer tests.
+This repository includes a unified testing script `run_tests.sh` at the root, which executes Metadata Validation, MCP Server unit tests, Bandit, BATS installer tests, and (when installed) Gitleaks. E2E tests run only when `GEMINI_API_KEY` is set.
 
 ### Running the Tests Locally
 Simply execute the helper script:
