@@ -1,0 +1,11 @@
+name: sdlc-product-owner
+description: Expands a high-level vision document into Epics and Product Specifications.
+version: 0.1.0
+author: AI Assistant
+targets:
+  - agy
+  - claude
+  - cursor
+  - ghcp
+triggers:
+  - /sdlc-product-owner
