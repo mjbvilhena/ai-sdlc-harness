@@ -3,14 +3,14 @@
 # install_cursor.sh — AI SDLC Harness installer for Cursor
 #
 # Installs all skills and agents from this repo as Cursor Custom Prompt
-# files into the target workspace's .cursor/prompts/ directory.
+# files into the target workspace's .cursor/commands/ directory.
 #
 # Each skill's cursor/prompt.md is installed as:
-#   <workspace>/.cursor/prompts/sdlc-<skill-name>.mdc
+#   <workspace>/.cursor/commands/sdlc-<skill-name>.mdc
 #
 # Naming: destination filenames are always sdlc- prefixed (source folder
 # basename is used as-is when it already starts with sdlc-).
-# Cleanup: before installing, existing sdlc-*.md files in .cursor/prompts/
+# Cleanup: before installing, existing sdlc-*.md files in .cursor/commands/
 # are removed (dry-run prints them only). Non-sdlc-* files are left alone.
 #
 # Note: Cursor Custom Prompts are WORKSPACE-SCOPED. You must specify the
@@ -87,7 +87,7 @@ done
 WORKSPACE="$(cd "$WORKSPACE" && pwd)"
 
 # Cursor Custom Prompts destination directory (inside the workspace)
-CURSOR_RULES_DIR="${WORKSPACE}/.cursor/prompts"
+CURSOR_RULES_DIR="${WORKSPACE}/.cursor/commands"
 
 # ---------------------------------------------------------------------------
 # Helper functions
@@ -258,7 +258,7 @@ else
   echo " Done. ${install_count} item(s) installed to: ${CURSOR_RULES_DIR}"
   echo " ${skip_count} item(s) skipped (no ${HARNESS}/${RULE_FILE})."
   echo ""
-  echo " NOTE: Remember to commit .cursor/prompts/ to your workspace repo"
+  echo " NOTE: Remember to commit .cursor/commands/ to your workspace repo"
   echo "       so that Cursor can read the Custom Prompt files."
 fi
 echo "======================================================="
