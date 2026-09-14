@@ -30,7 +30,7 @@ install/install_claude.sh
                     Copy contents → ~/.claude/commands/
 ```
 
-The same pattern applies for `./install/install_cursor.sh`, `./install/install_ghcp.sh`, and `./install/install_agy.sh` across both `.sh` and `.ps1` variants.
+The same pattern applies for `./install/install_cursor.sh` (Custom Prompts under `.cursor/prompts/`), `./install/install_ghcp.sh`, and `./install/install_agy.sh` across both `.sh` and `.ps1` variants. Matching `install/uninstall_*.sh` / `.ps1` scripts remove `sdlc-*` destinations.
 
 ## Skill Library Layout
 
@@ -38,14 +38,15 @@ The same pattern applies for `./install/install_cursor.sh`, `./install/install_g
 skills/
 └─ <skill-name>/
        ├─ skill.yaml          ← Metadata only. Not parsed by scripts.
+       ├─ CONTENT.md          ← Canonical body (expanded at install time)
        ├─ claude/
-       │     └─ command.md    ← Copied verbatim to Claude commands dir
+       │     └─ command.md    ← Thin shell → ~/.claude/commands/ (or <ws>)
        ├─ cursor/
-       │     └─ rule.mdc      ← Copied verbatim to Cursor rules dir
+       │     └─ prompt.md     ← Thin shell → <ws>/.cursor/prompts/*.md
        ├─ ghcp/
-       │     └─ instructions.md  ← Copied verbatim to workspace instructions dir
+       │     └─ instructions.md  ← Thin shell → <ws>/.github/instructions/
        └─ agy/
-             └─ SKILL.md      ← Copied verbatim to AGY config dir
+             └─ SKILL.md      ← Thin shell → AGY skills dir
 ```
 
 *(The `rules/` directory follows this same layout. `agents/` would follow it too when introduced.)*
@@ -76,18 +77,19 @@ install/install_<harness>.sh | .ps1
     ├─ 5. Print summary: N items installed.
     │
     └─ 6. Configure MCP Server (unless --dry-run / -DryRun)
-            Creates the host config if missing; does not overwrite:
-              Claude  → claude.json (`mcpServers`)
+            Merges sdlc-knowledge into the host config (keeps sibling servers):
+              Claude  → claude_desktop_config.json (`mcpServers`)
               Cursor  → <ws>/.cursor/mcp.json (`mcpServers`)
               AGY     → <ws>/.agents/mcp_config.json or ~/.gemini/config/mcp_config.json
               GHCP    → <ws>/.vscode/mcp.json (`servers` — VS Code / Copilot schema)
+            Bash MCP command: mcp-server/venv/bin/python (args: mcp-server/src/server.py)
 ```
 
 ## Design Principles
 
 - **No runtime dependencies for install**: Installers use only native system shell utilities (POSIX `bash`, `cp`, `mkdir` for Unix systems, and native PowerShell for Windows).
 - **No metadata parsing**: `skill.yaml` / `rule.yaml` are read by humans and CI validators only. Installers do not parse them. They do expand `CONTENT.md` into `{{SKILL_BODY}}` / `{{RULE_BODY}}`.
-- **Idempotency**: Copying files with `cp` / `Copy-Item` is naturally idempotent. Running installers multiple times is safe. Existing MCP JSON is left untouched.
+- **Idempotency**: Expanding the same `CONTENT.md` into the same destination is idempotent. Running installers multiple times is safe. Existing MCP JSON is **merged**: sibling servers stay; `sdlc-knowledge` is created or updated.
 - **Isolation**: Each harness installer is independent. Running `install/install_claude.sh` does not affect Cursor or Antigravity configuration, and vice versa.
 
 ## MCP Knowledge Server & Dynamic Consultants

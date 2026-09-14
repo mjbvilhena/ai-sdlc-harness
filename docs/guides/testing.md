@@ -10,16 +10,18 @@ You can run all local testing suites simultaneously using the unified runner scr
 ./run_tests.sh
 ```
 
-This script will automatically set up a Python virtual environment and run the following three suites:
+This script creates `mcp-server/venv` if needed and runs the following suites (Bandit and Gitleaks are included when those tools are available; E2E is appended only when `GEMINI_API_KEY` is set):
 
 ### 1. Metadata Validation
-A custom Python script (`.github/scripts/validate_metadata.py`) that strictly validates all `skill.yaml`, `agent.yaml`, and `rule.yaml` files against the schema (requiring Name, Description, Version, Author, and checking directory matching).
+A custom Python script (`.github/scripts/validate_metadata.py`) that strictly validates all `skill.yaml`, `agent.yaml`, and `rule.yaml` files against the schema (requiring Name, Description, Version, Author, and checking directory matching). Cursor's required primary file is `cursor/prompt.md`.
 
 ### 2. MCP Server Unit Tests
-Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files.
+Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files. The catalog assertion currently expects **21** templates and **11** Definitions of Done.
 
 ### 3. BATS (Bash Automated Testing System)
-BATS (`tests/bats/installers.bats`) evaluates the shell installer scripts under `install/` (`install_claude.sh`, `install_cursor.sh`, `install_ghcp.sh`, `install_agy.sh`). The suite covers dry-run (no files written), global vs `--workspace` paths, PWD default for Cursor/GHCP, idempotent re-runs, MCP create-once, flag/path errors, a missing `agents/` directory, `sdlc-` destination naming, and cleanup of stale `sdlc-*` artifacts (neighbors without the prefix survive; dry-run reports cleanup without deleting). It uses a transient mock `$HOME` and workspace so your real machine config is not touched.
+BATS (`tests/bats/installers.bats`) evaluates the shell installer scripts under `install/` (`install_claude.sh`, `install_cursor.sh`, `install_ghcp.sh`, `install_agy.sh`). The suite covers dry-run (no files written), global vs `--workspace` paths, PWD default for Cursor/GHCP, idempotent re-runs, MCP **merge** (existing sibling servers are kept and `sdlc-knowledge` is added), flag/path errors, a missing `agents/` directory, `CONTENT.md` expansion, `sdlc-` destination naming, and cleanup of stale `sdlc-*` artifacts (neighbors without the prefix survive; dry-run reports cleanup without deleting). Cursor destinations under test are `<ws>/.cursor/prompts/sdlc-*.md`. It uses a transient mock `$HOME` and workspace so your real machine config is not touched.
+
+Uninstallers (`install/uninstall_*.sh`) and the PowerShell twins are **not** covered by this BATS file.
 
 ---
 
@@ -46,11 +48,12 @@ Because this test executes a real LLM, it requires an API key. **If you do not p
 ## CI Pipelines (GitHub Actions)
 
 Every Pull Request automatically executes the following CI checks:
-1. **BATS Tests**: Runs the installer evaluation matrix.
-2. **Linting**:
-   - `shellcheck` ensures all `.sh` installer scripts follow Bash safety best practices.
-   - `markdownlint` ensures standard formatting across documentation and prompt stubs.
+1. **BATS Tests**: Runs the installer evaluation matrix (`.github/workflows/bats.yaml`).
+2. **Linting** (`.github/workflows/lint.yaml`):
+   - `shellcheck` on `./install` (installers, uninstallers, and `lib/`).
+   - `markdownlint` on `**/*.md`.
 3. **Metadata Validation**: Ensures no malformed or undocumented skills are merged into the library.
+4. **Security Scans**: Gitleaks + Bandit (`.github/workflows/security.yaml`).
 
 ## Security Scanning
 

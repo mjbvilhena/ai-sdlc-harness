@@ -6,7 +6,7 @@ Skill installation is zero-dependency: just shell or PowerShell scripts and file
 
 ## How It Works
 
-Skills in this repo are **authored once per target harness** — each skill has a dedicated file written in the exact format that a given AI tool expects (e.g. a `SKILL.md` for Antigravity, a `command.md` for Claude Code, a `rule.mdc` for Cursor). A top-level installer script for each harness discovers all skills in the `skills/` directory and copies the correct files into the right place on your machine.
+Skills in this repo are **authored once per target harness** — each skill has a dedicated file written in the exact format that a given AI tool expects (e.g. a `SKILL.md` for Antigravity, a `command.md` for Claude Code, a `prompt.md` for Cursor Custom Prompts). A top-level installer script for each harness discovers all skills in the `skills/` directory and copies the correct files into the right place on your machine.
 
 Lifecycle Drivers today live as these `skills/` (and ambient `rules/`). A separate `agents/` tree is deferred; installers already skip it when the directory is absent.
 
@@ -16,10 +16,10 @@ Lifecycle Drivers today live as these `skills/` (and ambient `rules/`). A separa
 |---|---|---|
 | **Antigravity (agy)** | `install/install_agy.sh` | Global: `~/.gemini/antigravity-cli/builtin/skills/<skill-name>/`. Workspace: `<ws>/.agents/skills/` |
 | **Claude Code** | `install/install_claude.sh` | Global: `~/.claude/commands/`. Workspace: `<ws>/.claude/commands/` |
-| **Cursor** | `install/install_cursor.sh` | `<ws>/.cursor/rules/` (workspace-scoped; defaults to `$PWD`) |
+| **Cursor** | `install/install_cursor.sh` | `<ws>/.cursor/prompts/` (workspace-scoped Custom Prompts; defaults to `$PWD`) |
 | **GitHub Copilot (ghcp)** | `install/install_ghcp.sh` | `<ws>/.github/instructions/` (workspace-scoped; defaults to `$PWD`) |
 
-PowerShell equivalents live beside the Bash scripts (`install/install_*.ps1`).
+PowerShell equivalents live beside the Bash scripts (`install/install_*.ps1`). Matching uninstallers (`install/uninstall_*.sh` / `.ps1`) remove previously installed `sdlc-*` artifacts and, where implemented, the `sdlc-knowledge` MCP entry.
 
 ## Installation
 
@@ -35,7 +35,7 @@ cd ai-sdlc-harness
 # Claude Code (global commands)
 ./install/install_claude.sh
 
-# Cursor (workspace rules + `.cursor/mcp.json`)
+# Cursor (workspace Custom Prompts + `.cursor/mcp.json`)
 ./install/install_cursor.sh --workspace /path/to/your/project
 
 # GitHub Copilot (workspace instructions + `.vscode/mcp.json`)
@@ -46,7 +46,16 @@ cd ai-sdlc-harness
 
 Each installer first removes previously installed `sdlc-*` artifacts in its destination (leaving other user files alone), then writes skills and rules with `sdlc-` destination names — including YAML frontmatter `name:` where present. `--dry-run` prints the cleanup and copies without changing files.
 
-The installer scripts require no dependencies beyond standard Unix shell utilities (`bash`, `cp`, `mkdir`) or native PowerShell on Windows.
+Bash installers **merge** the `sdlc-knowledge` MCP server into the host config if it already exists (they do not replace the whole file). The MCP `command` they write is `mcp-server/venv/bin/python` from this clone — create that venv (`python3 -m venv mcp-server/venv && mcp-server/venv/bin/pip install -r mcp-server/requirements.txt`) before the knowledge server can start. Skill *installation* still needs only `bash`/`cp`/`mkdir` (or native PowerShell).
+
+To remove a harness install:
+
+```bash
+./install/uninstall_cursor.sh --workspace /path/to/your/project
+./install/uninstall_ghcp.sh --workspace /path/to/your/project
+./install/uninstall_claude.sh            # global ~/.claude/commands
+./install/uninstall_agy.sh --workspace /path/to/your/project
+```
 
 ## Repository Structure
 
@@ -55,18 +64,18 @@ ai-sdlc-harness/
 ├── README.md
 ├── CONTRIBUTING.md
 ├── run_tests.sh             # Unified local test runner
-├── install/                 # Harness installers (Bash + PowerShell)
-│   ├── install_agy.sh
-│   ├── install_claude.sh
-│   ├── install_cursor.sh
-│   └── install_ghcp.sh
+├── install/                 # Harness installers + uninstallers (Bash + PowerShell)
+│   ├── install_agy.sh / uninstall_agy.sh
+│   ├── install_claude.sh / uninstall_claude.sh
+│   ├── install_cursor.sh / uninstall_cursor.sh
+│   └── install_ghcp.sh / uninstall_ghcp.sh
 ├── skills/                  # Lifecycle Driver skill definitions
 │   └── sdlc-example-skill/
 │       ├── skill.yaml
 │       ├── CONTENT.md           # Canonical body; installers expand into harness files
 │       ├── agy/SKILL.md         # Thin shell with {{SKILL_BODY}}
 │       ├── claude/command.md
-│       ├── cursor/rule.mdc
+│       ├── cursor/prompt.md
 │       └── ghcp/instructions.md
 ├── rules/                   # Ambient rules (same harness layout)
 ├── mcp-server/              # Optional Python MCP knowledge server
@@ -102,7 +111,7 @@ ai-sdlc-harness/
    - `skills/sdlc-my-skill/CONTENT.md` — canonical body
    - `skills/sdlc-my-skill/agy/SKILL.md` — Antigravity frontmatter + title
    - `skills/sdlc-my-skill/claude/command.md` — Claude trigger + title
-   - `skills/sdlc-my-skill/cursor/rule.mdc` — Cursor frontmatter + title
+   - `skills/sdlc-my-skill/cursor/prompt.md` — Cursor Custom Prompt frontmatter + title
    - `skills/sdlc-my-skill/ghcp/instructions.md` — GitHub Copilot title
 
    Rules use `{{RULE_BODY}}` the same way. Installers expand the placeholder from `CONTENT.md`; they fail if either the file or the placeholder is missing.
@@ -117,7 +126,7 @@ Pull requests for new skills, improved instructions, or additional harness insta
 
 ## Installation & Usage
 
-To deploy this harness into a real project (including `--workspace` nuances, PowerShell installers, and MCP auto-configuration), read the [Installation and Usage Guide](docs/guides/installation-and-usage.md).
+To deploy this harness into a real project (including `--workspace` nuances, uninstallers, PowerShell installers, and MCP merge / venv setup), read the [Installation and Usage Guide](docs/guides/installation-and-usage.md).
 
 ## Testing
 
