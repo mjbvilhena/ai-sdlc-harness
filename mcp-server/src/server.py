@@ -88,6 +88,9 @@ ALIASES = {
     "new hire": "onboarding guide",
     "rollout plan": "rollout plan",
     "launch plan": "rollout plan",
+    "product spec": "product spec",
+    "prd": "product spec",
+    "epic": "product spec",
     # DoD (logical names share some aliases with templates; catalogs are separate)
     "bug fix": "bugfix",
     "hot fix": "hotfix",
