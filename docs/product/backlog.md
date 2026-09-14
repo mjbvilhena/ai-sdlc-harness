@@ -24,6 +24,7 @@
 - **Task 2.4** *(Done)*: Author `sdlc-test-writer` skill — generates test stubs for a given function or module. Author for `claude`, `cursor`, `ghcp`, `agy`. *(Evidence: `skills/sdlc-test-writer/`.)*
 - **Task 2.5** *(Done)*: Author `sdlc-docs-updater` skill — updates inline documentation and README sections. Author for `claude`, `cursor`, `ghcp`, `agy`. *(Evidence: `skills/sdlc-docs-updater/`.)*
 - **Task 2.6** *(Done)*: Review and quality-gate all bundled skills and rules for accuracy and safety before first public release. *(Evidence: strengthened thin prompts for `sdlc-threat-modeler`, `sdlc-a11y-auditor`, `sdlc-user-story-refiner`, `sdlc-code-reviewer`, and Epic 6 drivers; safety language forbids fake product claims, exploit PoCs, and invented facts. MCP wiring completed under Task 9.6.)*
+- **Task 2.7** *(Done)*: Author `sdlc-docs-backlog-review` skill — full-repo docs↔code audit + backlog hygiene on the current workspace (not hard-coded to this harness); opens a review PR and does not merge. Distinct from `sdlc-docs-updater`. Author for `claude`, `cursor`, `ghcp`, `agy`. *(Evidence: `skills/sdlc-docs-backlog-review/` all four harnesses + `CONTENT.md`.)*
 
 ## Epic 3: Contributor Experience
 

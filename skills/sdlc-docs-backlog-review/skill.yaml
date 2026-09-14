@@ -1,0 +1,14 @@
+name: sdlc-docs-backlog-review
+description: Audits full-repo docs against the current codebase, syncs backlog status, and opens a review PR without merging.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - "/docs-backlog-review"
+  - "docs/backlog review"
+  - "audit docs vs repo"
+  - "sync the backlog"
