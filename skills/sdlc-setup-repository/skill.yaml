@@ -1,0 +1,13 @@
+name: sdlc-setup-repository
+description: Sets up a repository with basic QA checks based on its purpose and expected content.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - /setup-repo
+  - "setup repository"
+  - "configure repo"

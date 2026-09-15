@@ -1,0 +1,12 @@
+name: sdlc-researcher
+description: Researches topics across domains using online resources and the SDLC Knowledge MCP server to present structured options and recommendations.
+version: 1.0.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - ghcp
+  - cursor
+triggers:
+  - "/research"
+  - "research topic"
