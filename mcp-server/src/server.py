@@ -91,6 +91,9 @@ ALIASES = {
     "product spec": "product spec",
     "prd": "product spec",
     "epic": "product spec",
+    "research report": "research",
+    "spike": "research",
+    "investigation": "research",
     # DoD (logical names share some aliases with templates; catalogs are separate)
     "bug fix": "bugfix",
     "hot fix": "hotfix",
