@@ -22,7 +22,7 @@ On Windows, run the `.ps1` scripts from PowerShell (`-Workspace` / `-DryRun` ins
 
 `--dry-run` / `-DryRun` prints what would be removed, copied, and which MCP file would be written or merged, without creating or deleting files.
 
-Matching uninstallers live beside each installer (`install/uninstall_<harness>.sh` / `.ps1`). They remove only `sdlc-*` destinations and, where implemented, drop the `sdlc-knowledge` MCP server key without deleting the rest of the config.
+Matching uninstallers live beside each installer (`install/uninstall_<harness>.sh` / `.ps1`). They remove only `sdlc-*` destinations and, where implemented, drop the `sdlc-knowledge` MCP server key without deleting the rest of the config. After PR #10, `uninstall_cursor.sh` still targets `.cursor/prompts/` while the Bash installer writes `.cursor/commands/` (Task 12.3).
 
 ## Step 1: Install skills and configure MCP
 
@@ -52,14 +52,14 @@ PowerShell (from the same clone):
 
 1. **Clean previous `sdlc-*` artifacts**, then **inject skills and rules** with `sdlc-` destination names (the prefix is added at install time if a source folder somehow lacks it). YAML frontmatter `name:` is rewritten to match. Only harness-owned `sdlc-*` files/dirs are removed; other user content in the same directory is preserved:
    - Claude: `sdlc-*.md` under `~/.claude/commands/` or `<ws>/.claude/commands/`
-   - Cursor: `sdlc-*.md` under `<ws>/.cursor/prompts/`
+   - Cursor: `sdlc-*.md` under `<ws>/.cursor/commands/`
    - AGY: `sdlc-*` directories under the chosen skills root
    - GitHub Copilot: `sdlc-*.instructions.md` under `<ws>/.github/instructions/`
 
    Library prompts are then copied into those same hidden directories:
    - AGY workspace: `.agents/skills/`
    - Claude workspace: `.claude/commands/`
-   - Cursor: `.cursor/prompts/`
+   - Cursor: `.cursor/commands/`
    - GitHub Copilot: `.github/instructions/`
 2. **Attach the MCP server** by merging `sdlc-knowledge` into the host config (existing sibling servers are kept; the `sdlc-knowledge` key is created or updated):
 
@@ -85,7 +85,7 @@ PowerShell (from the same clone):
 
 3. **`agents/`**: If the directory is missing (the current default), installers print that they are skipping agents and continue. Skills are the Lifecycle Drivers.
 
-Commit the workspace-scoped files (`.cursor/prompts/`, `.cursor/mcp.json`, `.github/instructions/`, `.vscode/mcp.json`, `.agents/`, `.claude/`) in the **target** project so teammates get the same prompts and MCP wiring.
+Commit the workspace-scoped files (`.cursor/commands/`, `.cursor/mcp.json`, `.github/instructions/`, `.vscode/mcp.json`, `.agents/`, `.claude/`) in the **target** project so teammates get the same prompts and MCP wiring.
 
 To remove a harness install later:
 
@@ -96,7 +96,7 @@ To remove a harness install later:
 ./install/uninstall_ghcp.sh --workspace /path/to/your/real-project
 ```
 
-Uninstallers delete only `sdlc-*` artifacts. Cursor and AGY Bash uninstallers also remove the `sdlc-knowledge` MCP key from the host config. `uninstall_claude.sh` currently targets the global `~/.claude/commands` tree (workspace uninstall is not wired yet).
+Uninstallers delete only `sdlc-*` artifacts. Cursor and AGY Bash uninstallers also remove the `sdlc-knowledge` MCP key from the host config. `uninstall_claude.sh` currently targets the global `~/.claude/commands` tree (workspace uninstall is not wired yet). `uninstall_cursor.sh` currently removes `.cursor/prompts/sdlc-*.md`, not the `.cursor/commands/` files the installer now writes.
 
 ## Step 2: Define your project constraints
 
@@ -121,4 +121,4 @@ Open the target project in Antigravity, Cursor, Claude Code, or VS Code with Git
 2. Query the MCP server for Domain/Layer consultants and, when relevant, Definition of Done.
 3. Review the change against those constraints plus the diff — without inventing product claims.
 
-Other drivers follow the same pattern: fetch templates or consultants from MCP, then write the artifact. Besides `/story`, `/threat`, `/e2e`, `/postmortem`, and `/release-notes`, the library includes `/rfc`, `/triage`, `/runbook`, `/api-design`, `/security-review`, `/migration`, and `/docs-backlog-review` (full-repo docs↔code + backlog hygiene; distinct from `/docs`, which updates docs for a recent code change), plus the a11y and DoD rules.
+Other drivers follow the same pattern: fetch templates or consultants from MCP, then write the artifact. Besides `/story`, `/threat`, `/e2e`, `/postmortem`, and `/release-notes`, the library includes `/sdlc-product-owner` (vision → epics / product spec), `/rfc`, `/triage`, `/runbook`, `/api-design`, `/security-review`, `/migration`, and `/docs-backlog-review` (full-repo docs↔code + backlog hygiene; distinct from `/docs`, which updates docs for a recent code change), plus the a11y and DoD rules.

@@ -1,6 +1,6 @@
 # Architecture Overview
 
-The AI SDLC Harness has a deliberately minimal architecture. There is no compiler engine, no schema parser, and no runtime. The system consists of:
+The AI SDLC Harness has a deliberately minimal architecture. There is no compiler engine and no schema parser. Skill/rule installation is file copies. The only runtime is the optional MCP knowledge server. The system consists of:
 
 1. **A skill/rule library** — directories of pre-authored, target-specific files. These are the **Lifecycle Drivers** today.
 2. **Installer scripts (Bash / PowerShell)** under `install/` — scripts that copy those files to the correct locations on the user's machine.
@@ -30,7 +30,7 @@ install/install_claude.sh
                     Copy contents → ~/.claude/commands/
 ```
 
-The same pattern applies for `./install/install_cursor.sh` (Custom Prompts under `.cursor/prompts/`), `./install/install_ghcp.sh`, and `./install/install_agy.sh` across both `.sh` and `.ps1` variants. Matching `install/uninstall_*.sh` / `.ps1` scripts remove `sdlc-*` destinations.
+The same pattern applies for `./install/install_cursor.sh` (slash commands under `.cursor/commands/`), `./install/install_ghcp.sh`, and `./install/install_agy.sh` across both `.sh` and `.ps1` variants. Matching `install/uninstall_*.sh` / `.ps1` scripts remove `sdlc-*` destinations.
 
 ## Skill Library Layout
 
@@ -42,7 +42,7 @@ skills/
        ├─ claude/
        │     └─ command.md    ← Thin shell → ~/.claude/commands/ (or <ws>)
        ├─ cursor/
-       │     └─ prompt.md     ← Thin shell → <ws>/.cursor/prompts/*.md
+       │     └─ prompt.md     ← Thin shell → <ws>/.cursor/commands/*.md
        ├─ ghcp/
        │     └─ instructions.md  ← Thin shell → <ws>/.github/instructions/
        └─ agy/
@@ -98,8 +98,8 @@ In addition to static skills, this project includes a standalone Model Context P
 
 The MCP server acts as an intelligent knowledge retrieval layer for the Lifecycle Drivers (the installed skills/rules), fulfilling the role of "Consultants" in the Tri-Dimensional Framework:
 
-- **SDLC Templates**: `get_sdlc_template` serves markdown under `mcp-server/data/templates/`. The catalog covers the original set (ADR, bug report, domain, layer, PR, RFC, user story, incident postmortem) plus threat model, code review, test / e2e plans, release notes, runbook, API design & contract, security review, accessibility audit, migration plan, onboarding guide, and rollout plan. Natural-language aliases (`stride`, `changelog`, `playbook`, `openapi`, …) resolve via longest-match in `server.py`.
+- **SDLC Templates**: `get_sdlc_template` serves markdown under `mcp-server/data/templates/`. The catalog covers the original set (ADR, bug report, domain, layer, PR, RFC, user story, incident postmortem) plus threat model, code review, test / e2e plans, release notes, runbook, API design & contract, security review, accessibility audit, migration plan, onboarding guide, rollout plan, and product spec. Natural-language aliases (`stride`, `changelog`, `playbook`, `openapi`, `prd`, …) resolve via longest-match in `server.py`.
 - **Definitions of Done**: `get_definition_of_done` serves `mcp-server/data/dod/` for `bugfix`, `epic`, `feature`, `hotfix`, `release`, `pr`, `user story`, `security change`, `ui change`, `api change`, and `data migration`.
 - **Dynamic Consultant Discovery**: Tools like `get_domain_consultant` and `get_layer_consultant` dynamically scan the user's `WORKSPACE_ROOT` for `DOMAIN.md` and `LAYER.md` files. This allows the MCP server to construct constraints that reflect the real-time architectural state of the user's repository without hardcoded mappings.
 
-Lifecycle Driver prompts (e.g., `sdlc-user-story-refiner`, `sdlc-code-reviewer`, `sdlc-rfc-drafter`, `sdlc-security-reviewer`, `sdlc-docs-backlog-review`, `sdlc-dod-checker`) explicitly instruct the model to query this MCP server for templates and constraints before generating artifacts. Tool names stay stable; only payloads, aliases, and tests expand.
+Lifecycle Driver prompts (e.g., `sdlc-product-owner`, `sdlc-user-story-refiner`, `sdlc-code-reviewer`, `sdlc-rfc-drafter`, `sdlc-security-reviewer`, `sdlc-docs-backlog-review`, `sdlc-dod-checker`) explicitly instruct the model to query this MCP server for templates and constraints before generating artifacts. Tool names stay stable; only payloads, aliases, and tests expand.
