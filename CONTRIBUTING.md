@@ -27,7 +27,7 @@ Author shared instructions once in `CONTENT.md`. Harness files keep only frontma
 
 See [`skills/sdlc-example-skill/`](skills/sdlc-example-skill/) and [`rules/sdlc-example-rule/`](rules/sdlc-example-rule/) for complete stubs.
 
-Cursor shells are `cursor/prompt.md`. The installer expands them into `<ws>/.cursor/prompts/sdlc-<name>.md` (Custom Prompts, not `.cursor/rules/*.mdc`).
+Cursor shells are `cursor/prompt.md`. The Bash installer expands them into `<ws>/.cursor/commands/sdlc-<name>.md` (slash commands, not `.cursor/prompts/` or `.cursor/rules/*.mdc`).
 
 Installers also accept an `agents/` tree with the same layout, but **`agents/` is not populated**. Lifecycle Drivers currently live as `skills/` (and ambient `rules/`). Do not add empty agent packages unless a later product decision asks for them.
 

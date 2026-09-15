@@ -20,7 +20,7 @@ The core philosophy is built on three pillars:
 ## Target Harnesses (v1)
 
 - **Claude Code**: Skills installed as custom slash commands to `~/.claude/commands/` (or `<ws>/.claude/commands/` with `--workspace`)
-- **Cursor**: Custom Prompts installed to `<ws>/.cursor/prompts/`
+- **Cursor**: Slash commands installed to `<ws>/.cursor/commands/`
 - **GitHub Copilot (ghcp)**: Instructions installed to `<ws>/.github/instructions/`
 - **Antigravity (agy)**: Skills installed globally to `~/.gemini/antigravity-cli/builtin/skills/` or, with `--workspace`, to `<ws>/.agents/skills/`. Workspace MCP config is `<ws>/.agents/mcp_config.json`.
 

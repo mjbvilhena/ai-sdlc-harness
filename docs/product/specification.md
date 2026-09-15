@@ -4,7 +4,7 @@
 
 The AI SDLC Harness is a shell-script-based installer and skill library for AI developer tools. It provides a curated set of skills and agents — authored in the native format of each supported harness — and simple installer scripts that copy those files into the correct local configuration directories.
 
-There is no CLI tool to install, no Python package, and no compilation step. The project is a collection of files and shell scripts. The *installation of skills* is strictly zero-dependency (using only `bash` and `cp`). Additionally, the project includes an optional standalone Model Context Protocol (MCP) server that provides agents with Just-In-Time (JIT) retrieval of SDLC standards, templates, and Definitions of Done. (Note: running the MCP server itself requires a local Python/Node runtime).
+There is no CLI tool to install, no compiled package, and no compilation step. The project is a collection of files and shell scripts. The *installation of skills* is strictly zero-dependency (using only `bash` and `cp`, or native PowerShell). Additionally, the project includes an optional standalone Model Context Protocol (MCP) server that provides agents with Just-In-Time (JIT) retrieval of SDLC standards, templates, and Definitions of Done. Running that server requires a local Python runtime.
 
 ## 2. Target Personas
 
@@ -60,7 +60,7 @@ There is no CLI tool to install, no Python package, and no compilation step. The
   - **Lifecycle Drivers (current)**: Authored as native skills and rules under `skills/<name>/<harness>/` and `rules/<name>/<harness>/` using each harness's primitives. These are what the installers deploy today.
   - **Domain/Layer Consultants**: Dynamic knowledge payloads served by the MCP Server (`get_domain_consultant`, `get_layer_consultant`), sourced from workspace `DOMAIN.md` / `LAYER.md` files.
   - **`agents/` (deferred)**: A separate agent-package tree is **not populated**. Installers already iterate `agents/` when present and skip it when absent. Do not invent full agent packages until that product decision is revisited.
-- Installers deploy Lifecycle Drivers to the target harness location (e.g., `.claude/commands/`, `.cursor/prompts/`, `.github/instructions/`, global AGY `~/.gemini/antigravity-cli/builtin/skills/` or workspace `.agents/skills/`).
+- Installers deploy Lifecycle Drivers to the target harness location (e.g., `.claude/commands/`, `.cursor/commands/`, `.github/instructions/`, global AGY `~/.gemini/antigravity-cli/builtin/skills/` or workspace `.agents/skills/`).
 - If `agents/` is introduced later, each agent directory MUST contain an `agent.yaml` manifest.
 
 ### F3. Rule Directory Convention
@@ -76,7 +76,7 @@ There is no CLI tool to install, no Python package, and no compilation step. The
 Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
 
 - `install/install_claude.sh`: Iterates over `skills/*/claude/`, `agents/*/claude/` (if present), and `rules/*/claude/`. Expands each `command.md` + sibling `CONTENT.md` to `~/.claude/commands/sdlc-<name>.md`, or `<ws>/.claude/commands/` when `--workspace` is set.
-- `install/install_cursor.sh`: Same pattern for `cursor/prompt.md` → `<ws>/.cursor/prompts/sdlc-<name>.md`. Workspace defaults to `$PWD`.
+- `install/install_cursor.sh`: Same pattern for `cursor/prompt.md` → `<ws>/.cursor/commands/sdlc-<name>.md`. Workspace defaults to `$PWD`.
 - `install/install_ghcp.sh`: Same pattern for `ghcp/instructions.md` → `<ws>/.github/instructions/sdlc-<name>.instructions.md`. Workspace defaults to `$PWD`.
 - `install/install_agy.sh`: Expands `agy/` files (typically `SKILL.md` / `RULE.md`) into `~/.gemini/antigravity-cli/builtin/skills/sdlc-<name>/` or `<ws>/.agents/skills/sdlc-<name>/`. Destination YAML `name:` is rewritten to the same `sdlc-` name.
 - `--workspace <path>` is optional for Claude and AGY (omit for user-global install). Cursor and GHCP are always workspace-scoped; omitting the flag uses `$PWD`.
@@ -95,7 +95,7 @@ Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
 
 ### F6. MCP Knowledge Retrieval Server
 
-- A standalone MCP server (Python or TypeScript) will be scaffolded alongside the `skills/` and installers.
+- A standalone Python MCP server lives under `mcp-server/` alongside the `skills/` and installers.
 - It exposes a precise JSON API contract (e.g., `get_sdlc_template(doc_type)`, `get_definition_of_done(phase)`) to serve SDLC standards.
 - **Fuzzy Matching & Resilience**: The server MUST implement fuzzy string matching or robust alias mapping for input parameters (e.g., gracefully mapping "story", "user story", and "stories" to the same template). If a requested term cannot be resolved, the server MUST return a list of available valid options to help the LLM auto-correct.
 - Skill and agent prompts are designed to be lean, explicitly instructing the agent to call the MCP server for specific templates rather than hardcoding them in the prompt.

@@ -2,11 +2,11 @@
 
 A shell-script-based installer that deploys a curated library of AI skills and rules into your local AI tooling environments.
 
-Skill installation is zero-dependency: just shell or PowerShell scripts and file copies. An optional MCP knowledge server under `mcp-server/` needs a local Python runtime if you want Just-In-Time SDLC templates, Definitions of Done, and Domain/Layer consultants. Payloads live in `mcp-server/data/templates/` and `mcp-server/data/dod/` (ADR, RFC, PR, threat model, API design, runbook, migration, and change-type DoD such as `security change` / `api change`). Skills instruct the model to fetch those documents rather than hardcoding them.
+Skill installation is zero-dependency: just shell or PowerShell scripts and file copies. An optional MCP knowledge server under `mcp-server/` needs a local Python runtime if you want Just-In-Time SDLC templates, Definitions of Done, and Domain/Layer consultants. Payloads live in `mcp-server/data/templates/` and `mcp-server/data/dod/` (ADR, RFC, PR, product spec, threat model, API design, runbook, migration, and change-type DoD such as `security change` / `api change`). Skills instruct the model to fetch those documents rather than hardcoding them.
 
 ## How It Works
 
-Skills in this repo are **authored once per target harness** — each skill has a dedicated file written in the exact format that a given AI tool expects (e.g. a `SKILL.md` for Antigravity, a `command.md` for Claude Code, a `prompt.md` for Cursor Custom Prompts). A top-level installer script for each harness discovers all skills in the `skills/` directory and copies the correct files into the right place on your machine.
+Skills in this repo are **authored once per target harness** — each skill has a dedicated file written in the exact format that a given AI tool expects (e.g. a `SKILL.md` for Antigravity, a `command.md` for Claude Code, a `prompt.md` for Cursor slash commands). A top-level installer script for each harness discovers all skills in the `skills/` directory and copies the correct files into the right place on your machine.
 
 Lifecycle Drivers today live as these `skills/` (and ambient `rules/`). A separate `agents/` tree is deferred; installers already skip it when the directory is absent.
 
@@ -16,7 +16,7 @@ Lifecycle Drivers today live as these `skills/` (and ambient `rules/`). A separa
 |---|---|---|
 | **Antigravity (agy)** | `install/install_agy.sh` | Global: `~/.gemini/antigravity-cli/builtin/skills/<skill-name>/`. Workspace: `<ws>/.agents/skills/` |
 | **Claude Code** | `install/install_claude.sh` | Global: `~/.claude/commands/`. Workspace: `<ws>/.claude/commands/` |
-| **Cursor** | `install/install_cursor.sh` | `<ws>/.cursor/prompts/` (workspace-scoped Custom Prompts; defaults to `$PWD`) |
+| **Cursor** | `install/install_cursor.sh` | `<ws>/.cursor/commands/` (workspace-scoped slash commands; defaults to `$PWD`) |
 | **GitHub Copilot (ghcp)** | `install/install_ghcp.sh` | `<ws>/.github/instructions/` (workspace-scoped; defaults to `$PWD`) |
 
 PowerShell equivalents live beside the Bash scripts (`install/install_*.ps1`). Matching uninstallers (`install/uninstall_*.sh` / `.ps1`) remove previously installed `sdlc-*` artifacts and, where implemented, the `sdlc-knowledge` MCP entry.
@@ -35,7 +35,7 @@ cd ai-sdlc-harness
 # Claude Code (global commands)
 ./install/install_claude.sh
 
-# Cursor (workspace Custom Prompts + `.cursor/mcp.json`)
+# Cursor (workspace slash commands + `.cursor/mcp.json`)
 ./install/install_cursor.sh --workspace /path/to/your/project
 
 # GitHub Copilot (workspace instructions + `.vscode/mcp.json`)
@@ -111,7 +111,7 @@ ai-sdlc-harness/
    - `skills/sdlc-my-skill/CONTENT.md` — canonical body
    - `skills/sdlc-my-skill/agy/SKILL.md` — Antigravity frontmatter + title
    - `skills/sdlc-my-skill/claude/command.md` — Claude trigger + title
-   - `skills/sdlc-my-skill/cursor/prompt.md` — Cursor Custom Prompt frontmatter + title
+   - `skills/sdlc-my-skill/cursor/prompt.md` — Cursor slash-command frontmatter + title
    - `skills/sdlc-my-skill/ghcp/instructions.md` — GitHub Copilot title
 
    Rules use `{{RULE_BODY}}` the same way. Installers expand the placeholder from `CONTENT.md`; they fail if either the file or the placeholder is missing.
@@ -130,7 +130,7 @@ To deploy this harness into a real project (including `--workspace` nuances, uni
 
 ## Testing
 
-To run the local test suites (metadata validation, MCP unit tests, and BATS shell tests):
+To run the local test suites (metadata validation, MCP unit tests, Bandit, BATS shell tests, and Gitleaks when installed):
 
 ```bash
 ./run_tests.sh

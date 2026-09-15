@@ -32,7 +32,7 @@ ai-sdlc-harness/
 │       ├── claude/
 │       │   └── command.md
 │       ├── cursor/
-│       │   └── prompt.md     # Custom Prompt shell
+│       │   └── prompt.md     # Slash-command shell
 │       └── ghcp/
 │           └── instructions.md
 │
@@ -82,7 +82,7 @@ ai-sdlc-harness/
 ## Notes
 
 - **Installers live under `install/`**. Invoke them as `./install/install_<harness>.sh` (or the `.ps1` twin). Uninstallers are `./install/uninstall_<harness>.sh` / `.ps1`.
-- **Cursor destinations are Custom Prompts**: source `cursor/prompt.md` → `<ws>/.cursor/prompts/sdlc-<name>.md`. Not `.cursor/rules/*.mdc`.
+- **Cursor destinations are slash commands**: source `cursor/prompt.md` → `<ws>/.cursor/commands/sdlc-<name>.md`. Not `.cursor/prompts/` or `.cursor/rules/*.mdc`.
 - **`skills/` and `rules/` are the runtime source of truth today.** They are the Lifecycle Drivers and ambient rules the installers copy. A top-level `agents/` tree is **deferred**; installers already tolerate a missing `agents/` directory (they print a skip message and continue).
 - `skill.yaml` / `rule.yaml` / `agent.yaml` (when present) are for humans, docs, and CI. Installer scripts do not parse them.
 - Target-specific subdirectories (`agy/`, `claude/`, `cursor/`, `ghcp/`) are optional per item. An item that only targets AGY only needs `agy/`.
