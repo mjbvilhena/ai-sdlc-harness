@@ -20,14 +20,14 @@ If MCP is unavailable, proceed using the instructions below.
 1. **Context Gathering** — Start by asking the user the following questions to understand the repository's needs:
    - What is the repository about?
    - What type of content is expected to be added to it over time (e.g., Python code, Bash scripts, Markdown docs, Terraform, etc.)?
-   
+
 2. **Analysis** — Wait for the user's answers. Based on the responses, determine what type of basic quality assurance checks should be added from the very beginning. Use standard robust practices (similar to the `.github` workflows in `ai-sdlc-harness`) to establish basic QA:
    - If the repo contains Bash scripts, propose `bats` for testing and `shellcheck` for linting.
    - If it contains Python, propose SAST tools like `bandit`.
    - If it contains Markdown documentation, propose `markdownlint`.
    - Always propose universal security checks like `gitleaks` for secret scanning.
    - Suggest setting up a `CODEOWNERS` file to establish default ownership and ensure proper review processes.
-   
+
 3. **Execution** — Once the checks are agreed upon, generate and output the necessary GitHub Action workflows (or equivalent CI/CD configurations) to enforce these checks. Include a basic `CODEOWNERS` template.
 
 ## Safety
