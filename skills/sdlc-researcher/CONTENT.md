@@ -16,7 +16,7 @@ Apply retrieved Domain and Layer guidelines to frame your research. If MCP is un
 ## Instructions
 
 1. **Understand the Scope & Domain**: Review the user's request, apply any domain/layer context retrieved via MCP, and identify the key areas to research.
-2. **Conduct External Research**: 
+2. **Conduct External Research**:
    - Search the web for up-to-date, authoritative information on the topic.
    - Cross-reference multiple sources to ensure accuracy and objectivity.
    - Investigate across different disciplines (e.g., technical tradeoffs, business impact, security considerations).

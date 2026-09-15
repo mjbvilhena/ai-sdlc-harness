@@ -30,6 +30,9 @@ EXPECTED_TEMPLATES = {
     "test plan",
     "threat model",
     "user story",
+    "repository setup",
+    "product spec",
+    "research",
 }
 
 EXPECTED_DOD = {
@@ -44,6 +47,8 @@ EXPECTED_DOD = {
     "security change",
     "ui change",
     "user story",
+    "repository setup",
+    "research",
 }
 
 

@@ -30,7 +30,7 @@ For each approach, tool, or solution discovered:
 ### Option [Number]: [Name/Title]
 
 - **Description:** A brief overview of what this option entails.
-- **Key Characteristics:** 
+- **Key Characteristics:**
 - **Pros:**
   - Benefit 1
   - Benefit 2
@@ -39,7 +39,7 @@ For each approach, tool, or solution discovered:
   - Drawback 2
 - **Suitability:** When or why this would be a good fit given the project context.
 
-*(Repeat for each valid option)*
+<!-- Repeat for each valid option -->
 
 ## Trade-off Analysis
 
