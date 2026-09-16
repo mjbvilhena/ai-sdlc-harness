@@ -85,9 +85,9 @@ Simply execute the helper script:
 ```
 
 ### End-to-End (E2E) LLM Testing
-We have an E2E testing framework in `tests/e2e/test_agent_behavior.py` that executes a real LLM (Gemini) to verify that installed skills properly invoke the MCP server tools and respect constraints.
+`tests/e2e/` has two suites. `test_agent_behavior.py` executes a real LLM (Gemini) to verify that installed skills invoke MCP tools and respect constraints. `test_cli_integration.py` optionally drives installed `agy` / `claude` CLIs headlessly when those binaries are present. `run_tests.sh` runs the whole directory when `GEMINI_API_KEY` (or `gemini_api_key`) is set.
 
-Because this runs a real LLM, it requires an API key and is automatically skipped in standard CI runs if the key is missing.
+Because the Gemini suite runs a real LLM, it requires an API key and is automatically skipped in standard CI runs if the key is missing.
 
 To run the E2E tests locally:
 ```bash
@@ -99,6 +99,6 @@ pip install -r requirements.txt
 # 2. Export your Gemini API key
 export GEMINI_API_KEY="your-api-key-here"
 
-# 3. Run the pytest suite against the e2e directory
-PYTHONPATH=. pytest ../tests/e2e/test_agent_behavior.py -s
+# 3. Run the pytest suite against the whole e2e directory
+PYTHONPATH=. pytest ../tests/e2e/
 ```

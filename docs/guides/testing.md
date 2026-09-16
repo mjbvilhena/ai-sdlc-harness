@@ -10,24 +10,33 @@ You can run all local testing suites simultaneously using the unified runner scr
 ./run_tests.sh
 ```
 
-This script creates `mcp-server/venv` if needed and runs the following suites (Bandit and Gitleaks are included when those tools are available; E2E is appended only when `GEMINI_API_KEY` is set):
+This script creates `mcp-server/venv` if needed and runs the following suites in order:
 
 ### 1. Metadata Validation
-A custom Python script (`.github/scripts/validate_metadata.py`) that strictly validates all `skill.yaml`, `agent.yaml`, and `rule.yaml` files against the schema (requiring Name, Description, Version, Author, and checking directory matching). Cursor's required primary file is `cursor/prompt.md`.
+A custom Python script (`.github/scripts/validate_metadata.py`, CI workflow `.github/workflows/validate-metadata.yaml`) that strictly validates all `skill.yaml`, `agent.yaml`, and `rule.yaml` files against the schema (requiring Name, Description, Version, Author, and checking directory matching). Cursor's required primary file is `cursor/prompt.md`.
 
 ### 2. MCP Server Unit Tests
-Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files. On disk there are **22** templates (including `product_spec.md` from PR #9) and **11** Definitions of Done. `test_catalog_templates_and_dod` still asserts **21** template names and omits `product spec` — Task 10.8.
+Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files. On disk there are **24** templates (including `product_spec.md`, `research.md`, and `repository_setup.md`) and **13** Definitions of Done. `test_catalog_templates_and_dod` asserts the same 24 / 13 names. Remaining alias/regression coverage for those newer payloads is Task 10.9.
 
-### 3. BATS (Bash Automated Testing System)
+### 3. Python Security Scan (Bandit)
+`run_tests.sh` runs Bandit against `mcp-server/` (excluding tests and `venv`) when Python is available. The same scan runs in CI via `.github/workflows/security.yaml`.
+
+### 4. End-to-End (E2E) LLM Testing
+Appended only when `GEMINI_API_KEY` or `gemini_api_key` is set. See the E2E section below. `run_tests.sh` runs `pytest ../tests/e2e/` (both `test_agent_behavior.py` and `test_cli_integration.py`).
+
+### 5. BATS (Bash Automated Testing System)
 BATS (`tests/bats/installers.bats`) evaluates the shell installer scripts under `install/` (`install_claude.sh`, `install_cursor.sh`, `install_ghcp.sh`, `install_agy.sh`). The suite covers dry-run (no files written), global vs `--workspace` paths, PWD default for Cursor/GHCP, idempotent re-runs, MCP **merge** (existing sibling servers are kept and `sdlc-knowledge` is added), flag/path errors, a missing `agents/` directory, `CONTENT.md` expansion, `sdlc-` destination naming, and cleanup of stale `sdlc-*` artifacts (neighbors without the prefix survive; dry-run reports cleanup without deleting). Cursor destinations under test are `<ws>/.cursor/commands/sdlc-*.md`. It uses a transient mock `$HOME` and workspace so your real machine config is not touched.
 
 Uninstallers (`install/uninstall_*.sh`) and the PowerShell twins are **not** covered by this BATS file.
+
+### 6. Gitleaks Secret Scan
+Run locally when the `gitleaks` binary is installed; always run in CI (`.github/workflows/security.yaml`).
 
 ---
 
 ## End-to-End (E2E) LLM Testing
 
-To ensure that the Tri-Dimensional Framework functions correctly, we have an E2E testing framework (`tests/e2e/test_agent_behavior.py`). This framework actively invokes a real LLM (Gemini) headlessly to verify that the agent properly reaches out to the MCP Server tools and applies architectural constraints to its output.
+To ensure that the Tri-Dimensional Framework functions correctly, we have an E2E testing framework. `tests/e2e/test_agent_behavior.py` invokes a real LLM (Gemini) headlessly to verify that the agent reaches out to MCP tools and applies architectural constraints. `tests/e2e/test_cli_integration.py` optionally drives installed `agy` / `claude` CLIs when those binaries are present. `run_tests.sh` runs the whole `tests/e2e/` directory.
 
 Because this test executes a real LLM, it requires an API key. **If you do not provide an API key, this test will gracefully skip itself** (both locally and in CI).
 
@@ -38,7 +47,7 @@ Because this test executes a real LLM, it requires an API key. **If you do not p
    export GEMINI_API_KEY="your-api-key-here"
    ```
 
-2. Run the `run_tests.sh` script again. It will automatically detect the environment variable and append the E2E tests to the end of the suite:
+2. Run the `run_tests.sh` script again. It will automatically detect the environment variable and run `pytest` against `tests/e2e/` as step 4 (before BATS and Gitleaks):
    ```bash
    ./run_tests.sh
    ```
@@ -52,7 +61,7 @@ Every Pull Request automatically executes the following CI checks:
 2. **Linting** (`.github/workflows/lint.yaml`):
    - `shellcheck` on `./install` (installers, uninstallers, and `lib/`).
    - `markdownlint` on `**/*.md`.
-3. **Metadata Validation**: Ensures no malformed or undocumented skills are merged into the library.
+3. **Metadata Validation** (`.github/workflows/validate-metadata.yaml`): Ensures no malformed or undocumented skills are merged into the library.
 4. **Security Scans**: Gitleaks + Bandit (`.github/workflows/security.yaml`).
 
 ## Security Scanning

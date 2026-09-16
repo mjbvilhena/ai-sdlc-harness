@@ -4,7 +4,7 @@
 ai-sdlc-harness/
 ├── README.md
 ├── CONTRIBUTING.md
-├── run_tests.sh                 # Unified runner: metadata, MCP pytest, BATS, optional E2E
+├── run_tests.sh                 # Unified runner: metadata, MCP pytest, Bandit, optional E2E, BATS, Gitleaks
 ├── .markdownlint.json
 ├── .gitignore
 │
