@@ -2,7 +2,7 @@
 
 ## 1. Introduction & Purpose
 
-The AI SDLC Harness is a shell-script-based installer and skill library for AI developer tools. It provides a curated set of skills and agents — authored in the native format of each supported harness — and simple installer scripts that copy those files into the correct local configuration directories.
+The AI SDLC Harness is a shell-script-based installer and skill library for AI developer tools. It provides a curated set of skills and rules — authored in the native format of each supported harness — and simple installer scripts that copy those files into the correct local configuration directories. A separate `agents/` tree is deferred.
 
 There is no CLI tool to install, no compiled package, and no compilation step. The project is a collection of files and shell scripts. The *installation of skills* is strictly zero-dependency (using only `bash` and `cp`, or native PowerShell). Additionally, the project includes an optional standalone Model Context Protocol (MCP) server that provides agents with Just-In-Time (JIT) retrieval of SDLC standards, templates, and Definitions of Done. Running that server requires a local Python runtime.
 
@@ -68,7 +68,7 @@ There is no CLI tool to install, no compiled package, and no compilation step. T
 - Rules are used for passive, ambient context (e.g., style guidelines, format templates) rather than active workflows.
 - Each rule lives in `rules/<rule-name>/`.
 - Each rule directory MUST contain a `rule.yaml` metadata file.
-- Each rule directory MAY contain one or more harness-specific subdirectories (e.g., `claude/`, `cursor/`, `ghcp/`).
+- Each rule directory MAY contain one or more harness-specific subdirectories (e.g., `agy/`, `claude/`, `cursor/`, `ghcp/`).
 - Rules (and skills) are installed by expanding `CONTENT.md` into `{{RULE_BODY}}` / `{{SKILL_BODY}}` in the harness shell. Destinations never contain unresolved placeholders.
 
 ### F4. Installer Scripts
@@ -96,7 +96,7 @@ Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
 ### F6. MCP Knowledge Retrieval Server
 
 - A standalone Python MCP server lives under `mcp-server/` alongside the `skills/` and installers.
-- It exposes a precise JSON API contract (e.g., `get_sdlc_template(doc_type)`, `get_definition_of_done(phase)`) to serve SDLC standards.
+- It exposes a precise JSON API contract (e.g., `get_sdlc_template(template_type)`, `get_definition_of_done(component)`) to serve SDLC standards.
 - **Fuzzy Matching & Resilience**: The server MUST implement fuzzy string matching or robust alias mapping for input parameters (e.g., gracefully mapping "story", "user story", and "stories" to the same template). If a requested term cannot be resolved, the server MUST return a list of available valid options to help the LLM auto-correct.
 - Skill and agent prompts are designed to be lean, explicitly instructing the agent to call the MCP server for specific templates rather than hardcoding them in the prompt.
 
@@ -122,7 +122,7 @@ Given the shell-based nature of the installers and the modular nature of the ski
 ### 6.2 MCP Server Testing
 - **Framework**: Standard language-specific testing frameworks (`pytest` for Python, or `Jest`/`Vitest` for TypeScript).
 - **Test Cases**:
-  - Unit tests for API contracts (e.g., `get_sdlc_template(doc_type)`).
+  - Unit tests for API contracts (e.g., `get_sdlc_template(template_type)`).
   - Mocked integration tests to verify the MCP server correctly parses and serves the underlying knowledge documents.
   - **Dynamic Consultant Creation**: Verify that as a mock repository evolves (e.g., new domains or architectural layers are built), the MCP Server automatically discovers and generates the corresponding Domain and Layer Consultant knowledge payloads without manual reconfiguration.
 
@@ -142,13 +142,7 @@ Given the shell-based nature of the installers and the modular nature of the ski
   - **Structural correctness**: Assert that the agent generated the expected files and adhered to standard directory structures.
   - **LLM-as-a-Judge / Evaluation**: Programmatically evaluate the agent's compliance with the specific SDLC standards and Constraints served by the MCP server, and ensure it did not hallucinate or deviate from the given persona.
 
-## 7. Out of Scope for v1
-
-- **Universal format / compilation**: Writing a skill in one format and auto-generating the others is out of scope. Each target is authored directly.
-- **Cloud registry**: No hosted skill registry or auto-update mechanism.
-- **Bidirectional sync**: Importing a skill from an installed location back into this repo format is out of scope.
-
-### 6.4 Zero-Touch Workspace Integration
+### 6.5 Zero-Touch Workspace Integration
 The installer scripts MUST seamlessly configure the host IDE to communicate with the MCP Knowledge Server without requiring the user to manually edit JSON configuration files. Implemented locations:
 
 - Claude: `<ws>/claude_desktop_config.json` (workspace) or `~/.claude/claude_desktop_config.json` (global)
@@ -157,3 +151,9 @@ The installer scripts MUST seamlessly configure the host IDE to communicate with
 - GitHub Copilot / VS Code: `<ws>/.vscode/mcp.json` (`servers` key — VS Code / Copilot workspace schema)
 
 Bash installers merge `sdlc-knowledge` into an existing file (they do not replace the whole JSON). The MCP `command` they write is `mcp-server/venv/bin/python` from this clone.
+
+## 7. Out of Scope for v1
+
+- **Universal format / compilation**: Writing a skill in one format and auto-generating the others is out of scope. Each target is authored directly.
+- **Cloud registry**: No hosted skill registry or auto-update mechanism.
+- **Bidirectional sync**: Importing a skill from an installed location back into this repo format is out of scope.
