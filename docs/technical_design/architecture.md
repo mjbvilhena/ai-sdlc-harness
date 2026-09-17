@@ -30,7 +30,7 @@ install/install_claude.sh
                     Copy contents → ~/.claude/commands/
 ```
 
-The same pattern applies for `./install/install_cursor.sh` (slash commands under `.cursor/commands/`), `./install/install_ghcp.sh`, and `./install/install_agy.sh` across both `.sh` and `.ps1` variants. Matching `install/uninstall_*.sh` / `.ps1` scripts remove `sdlc-*` destinations.
+The same pattern applies for `./install/install_cursor.sh` (slash commands under `.cursor/commands/`), `./install/install_ghcp.sh`, and `./install/install_agy.sh`. Bash and PowerShell twins exist for every harness, but `install_cursor.ps1` is not at dest parity yet (it still looks for `cursor/rule.mdc` and writes `.cursor/rules/*.mdc` — Task 12.1). Matching `install/uninstall_*.sh` / `.ps1` scripts are meant to remove `sdlc-*` destinations; known reverse-path bugs are Epic 12.
 
 ## Skill Library Layout
 
@@ -98,8 +98,8 @@ In addition to static skills, this project includes a standalone Model Context P
 
 The MCP server acts as an intelligent knowledge retrieval layer for the Lifecycle Drivers (the installed skills/rules), fulfilling the role of "Consultants" in the Tri-Dimensional Framework:
 
-- **SDLC Templates**: `get_sdlc_template` serves markdown under `mcp-server/data/templates/`. The catalog covers the original set (ADR, bug report, domain, layer, PR, RFC, user story, incident postmortem) plus threat model, code review, test / e2e plans, release notes, runbook, API design & contract, security review, accessibility audit, migration plan, onboarding guide, rollout plan, and product spec. Natural-language aliases (`stride`, `changelog`, `playbook`, `openapi`, `prd`, …) resolve via longest-match in `server.py`.
-- **Definitions of Done**: `get_definition_of_done` serves `mcp-server/data/dod/` for `bugfix`, `epic`, `feature`, `hotfix`, `release`, `pr`, `user story`, `security change`, `ui change`, `api change`, and `data migration`.
+- **SDLC Templates**: `get_sdlc_template` serves markdown under `mcp-server/data/templates/` (**24** files). The catalog covers the original set (ADR, bug report, domain, layer, PR, RFC, user story, incident postmortem) plus threat model, code review, test / e2e plans, release notes, runbook, API design & contract, security review, accessibility audit, migration plan, onboarding guide, rollout plan, product spec, research, and repository setup. Natural-language aliases (`stride`, `changelog`, `playbook`, `openapi`, `prd`, `spike`, …) resolve via longest-match in `server.py`.
+- **Definitions of Done**: `get_definition_of_done` serves `mcp-server/data/dod/` (**13** files) for `bugfix`, `epic`, `feature`, `hotfix`, `release`, `pr`, `user story`, `security change`, `ui change`, `api change`, `data migration`, `research`, and `repository setup`.
 - **Dynamic Consultant Discovery**: Tools like `get_domain_consultant` and `get_layer_consultant` dynamically scan the user's `WORKSPACE_ROOT` for `DOMAIN.md` and `LAYER.md` files. This allows the MCP server to construct constraints that reflect the real-time architectural state of the user's repository without hardcoded mappings.
 
-Lifecycle Driver prompts (e.g., `sdlc-product-owner`, `sdlc-user-story-refiner`, `sdlc-code-reviewer`, `sdlc-rfc-drafter`, `sdlc-security-reviewer`, `sdlc-docs-backlog-review`, `sdlc-dod-checker`) explicitly instruct the model to query this MCP server for templates and constraints before generating artifacts. Tool names stay stable; only payloads, aliases, and tests expand.
+Lifecycle Driver prompts (e.g., `sdlc-product-owner`, `sdlc-researcher`, `sdlc-setup-repository`, `sdlc-user-story-refiner`, `sdlc-code-reviewer`, `sdlc-rfc-drafter`, `sdlc-security-reviewer`, `sdlc-docs-backlog-review`) and the ambient `sdlc-dod-checker` **rule** explicitly instruct the model to query this MCP server for templates and constraints before generating artifacts. Tool names stay stable; only payloads, aliases, and tests expand.

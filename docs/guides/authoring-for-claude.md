@@ -1,6 +1,6 @@
 # Authoring for Claude Code
 
-Claude Code supports custom slash commands by placing Markdown files in `~/.claude/commands/`.
+Claude Code supports custom slash commands by placing Markdown files in `~/.claude/commands/` (global default) or `<ws>/.claude/commands/` when the installer is run with `--workspace`.
 
 ## File Convention
 In this repository, Claude Code files are stored in the `claude/` subdirectory of a skill or agent and must be named `command.md`. Keep the Claude-specific Trigger block in this file and put the shared body in sibling `CONTENT.md`. The shell must contain `{{SKILL_BODY}}` (skills) or `{{RULE_BODY}}` (rules) on its own line.
