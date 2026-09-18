@@ -122,3 +122,5 @@ Open the target project in Antigravity, Cursor, Claude Code, or VS Code with Git
 3. Review the change against those constraints plus the diff — without inventing product claims.
 
 Other drivers follow the same pattern: fetch templates or consultants from MCP, then write the artifact. Besides `/story`, `/threat`, `/e2e`, `/postmortem`, `/release-notes`, `/review`, `/pr`, and `/test`, the library includes `/sdlc-product-owner` (vision → epics / product spec), `/research`, `/setup-repo`, `/rfc`, `/triage`, `/runbook`, `/api-design`, `/security-review`, `/migration`, `/adr`, `/ci`, `/docs-backlog-review` (full-repo docs↔code + backlog hygiene; distinct from `/docs`, which updates docs for a recent code change), `/domain-architect`, and `/layer-architect`, plus the a11y and DoD rules. Primary triggers for every skill live in `skills/*/skill.yaml`.
+
+A default front door for “what next?” — **`sdlc-conductor`** — is designed but **not shipped** ([design note](../technical_design/sdlc-conductor.md), Epic 13). Until then, invoke the specialist skills above directly.

@@ -40,7 +40,7 @@ There is no CLI tool to install, no compiled package, and no compilation of one 
 ### Journey 4: Execute a task using the Tri-Dimensional Framework
 
 1. The user initiates a software task via their preferred harness (e.g., Claude Code, Cursor, GitHub Copilot, Antigravity).
-2. The harness invokes the native Lifecycle Driver prompt (today: a skill under `skills/`, e.g. `sdlc-code-reviewer`). Dedicated `agents/` packages are deferred.
+2. The harness invokes the native Lifecycle Driver prompt (today: a skill under `skills/`, e.g. `sdlc-code-reviewer`). Dedicated `agents/` packages are deferred. A planned default front door (`sdlc-conductor`, Epic 13) is design-only; see `docs/technical_design/sdlc-conductor.md`.
 3. The Driver prompt explicitly instructs the AI to query the local MCP Knowledge Server to fetch SDLC standards and Domain/Layer constraints (the Consultants).
 4. The AI synthesizes the retrieved constraints to generate the final code artifact, maintaining strict context isolation.
 
