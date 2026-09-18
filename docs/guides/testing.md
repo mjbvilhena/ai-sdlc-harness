@@ -10,7 +10,7 @@ You can run all local testing suites simultaneously using the unified runner scr
 ./run_tests.sh
 ```
 
-This script creates `mcp-server/venv` if needed and runs the following suites in order:
+This script creates `mcp-server/venv` if needed and runs the following suites in order. If `python3` is missing, steps 1–4 are skipped and the script still continues; if `bats` is missing, step 5 prints an error and the script still exits 0 with a success banner (Task 8.6).
 
 ### 1. Metadata Validation
 A custom Python script (`.github/scripts/validate_metadata.py`, CI workflow `.github/workflows/validate-metadata.yaml`) that strictly validates all `skill.yaml`, `agent.yaml`, and `rule.yaml` files against the schema (requiring Name, Description, Version, Author, and checking directory matching). Cursor's required primary file is `cursor/prompt.md`.
@@ -36,7 +36,7 @@ Run locally when the `gitleaks` binary is installed; always run in CI (`.github/
 
 ## End-to-End (E2E) LLM Testing
 
-To ensure that the Tri-Dimensional Framework functions correctly, we have an E2E testing framework. `tests/e2e/test_agent_behavior.py` invokes a real LLM (Gemini) headlessly to verify that the agent reaches out to MCP tools and applies architectural constraints. `tests/e2e/test_cli_integration.py` optionally drives installed `agy` / `claude` CLIs when those binaries are present. `run_tests.sh` runs the whole `tests/e2e/` directory.
+To ensure that the Tri-Dimensional Framework functions correctly, we have an E2E testing framework. `tests/e2e/test_agent_behavior.py` invokes a real LLM (Gemini) headlessly with a **stub** `get_domain_consultant` function (it does not start `mcp-server`) and checks that the expanded skill prompt applies a domain constraint. `tests/e2e/test_cli_integration.py` optionally drives installed `agy` / `claude` CLIs when those binaries are present. `run_tests.sh` runs the whole `tests/e2e/` directory.
 
 Because this test executes a real LLM, it requires an API key. **If you do not provide an API key, this test will gracefully skip itself** (both locally and in CI).
 

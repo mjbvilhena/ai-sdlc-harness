@@ -2,11 +2,11 @@
 
 A shell-script-based installer that deploys a curated library of AI skills and rules into your local AI tooling environments.
 
-Skill installation is zero-dependency: just shell or PowerShell scripts and file copies. An optional MCP knowledge server under `mcp-server/` needs a local Python runtime if you want Just-In-Time SDLC templates, Definitions of Done, and Domain/Layer consultants. Payloads live in `mcp-server/data/templates/` and `mcp-server/data/dod/` (ADR, RFC, PR, product spec, research, repository setup, threat model, API design, runbook, migration, and change-type DoD such as `security change` / `api change`). Skills instruct the model to fetch those documents rather than hardcoding them.
+Skill/rule **copy and expand** is zero-dependency (shell or PowerShell). A live installer currently also needs host `python3` to merge MCP JSON. An optional MCP knowledge server under `mcp-server/` needs a local Python runtime if you want Just-In-Time SDLC templates, Definitions of Done, and Domain/Layer consultants. Payloads live in `mcp-server/data/templates/` and `mcp-server/data/dod/` (ADR, RFC, PR, product spec, research, repository setup, threat model, API design, runbook, migration, and change-type DoD such as `security change` / `api change`). Skills instruct the model to fetch those documents rather than hardcoding them.
 
 ## How It Works
 
-Skills in this repo are **authored once per target harness** — each skill has a dedicated file written in the exact format that a given AI tool expects (e.g. a `SKILL.md` for Antigravity, a `command.md` for Claude Code, a `prompt.md` for Cursor slash commands). A top-level installer script for each harness discovers all skills in the `skills/` directory and copies the correct files into the right place on your machine.
+Each skill is **authored once** in `CONTENT.md`. Thin harness shells (`agy/SKILL.md`, `claude/command.md`, `cursor/prompt.md`, `ghcp/instructions.md`) keep frontmatter, titles, and a `{{SKILL_BODY}}` placeholder. An installer under `install/` expands that body and writes the resolved file where the target tool expects it.
 
 Lifecycle Drivers today live as these `skills/` (and ambient `rules/`). A separate `agents/` tree is deferred; installers already skip it when the directory is absent.
 
@@ -19,7 +19,7 @@ Lifecycle Drivers today live as these `skills/` (and ambient `rules/`). A separa
 | **Cursor** | `install/install_cursor.sh` | `<ws>/.cursor/commands/` (workspace-scoped slash commands; defaults to `$PWD`) |
 | **GitHub Copilot (ghcp)** | `install/install_ghcp.sh` | `<ws>/.github/instructions/` (workspace-scoped; defaults to `$PWD`) |
 
-PowerShell equivalents live beside the Bash scripts (`install/install_*.ps1`). Matching uninstallers (`install/uninstall_*.sh` / `.ps1`) remove previously installed `sdlc-*` artifacts and, where implemented, the `sdlc-knowledge` MCP entry.
+PowerShell equivalents live beside the Bash scripts (`install/install_*.ps1`). **`install_cursor.ps1` is not at dest parity** — it still looks for `cursor/rule.mdc` and writes `.cursor/rules/*.mdc`, so it would skip every current skill and rule (Task 12.1). Matching uninstallers (`install/uninstall_*.sh` / `.ps1`) are meant to remove previously installed `sdlc-*` artifacts and, where implemented, the `sdlc-knowledge` MCP entry. Known reverse-path bugs (Cursor still deletes `.cursor/prompts/`; Claude deletes `sdlc-*.json` while install writes `sdlc-*.md`) are Epic 12.
 
 ## Installation
 
@@ -44,11 +44,11 @@ cd ai-sdlc-harness
 
 `--workspace` is **required in practice** for Cursor and GitHub Copilot (they always install into a workspace; omitting the flag uses `$PWD`). For Claude and Antigravity it is optional: omit it for a user-global install, or pass it for a project-local install.
 
-Each installer first removes previously installed `sdlc-*` artifacts in its destination (leaving other user files alone), then writes skills and rules with `sdlc-` destination names — including YAML frontmatter `name:` where present. `--dry-run` prints the cleanup and copies without changing files.
+Each installer first removes previously installed `sdlc-*` artifacts in its destination (leaving other user files alone), then expands `CONTENT.md` into skills and rules with `sdlc-` destination names — including YAML frontmatter `name:` where present. `--dry-run` prints the cleanup and copies without changing files.
 
-Bash installers **merge** the `sdlc-knowledge` MCP server into the host config if it already exists (they do not replace the whole file). The MCP `command` they write is `mcp-server/venv/bin/python` from this clone — create that venv (`python3 -m venv mcp-server/venv && mcp-server/venv/bin/pip install -r mcp-server/requirements.txt`) before the knowledge server can start. Skill *installation* still needs only `bash`/`cp`/`mkdir` (or native PowerShell).
+Bash installers **merge** the `sdlc-knowledge` MCP server into the host config if it already exists (they do not replace the whole file). A live (non-`--dry-run`) install currently invokes host `python3` to write that JSON, then sets MCP `command` to `mcp-server/venv/bin/python` from this clone — create that venv (`python3 -m venv mcp-server/venv && mcp-server/venv/bin/pip install -r mcp-server/requirements.txt`) before the knowledge server can start. `--dry-run` does not call Python. The copy/expand step itself uses only `bash`/`cp`/`mkdir` (or native PowerShell).
 
-To remove a harness install:
+To remove a harness install (see the [installation guide](docs/guides/installation-and-usage.md) for current reverse-path gaps):
 
 ```bash
 ./install/uninstall_cursor.sh --workspace /path/to/your/project

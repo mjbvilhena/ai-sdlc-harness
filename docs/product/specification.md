@@ -2,9 +2,9 @@
 
 ## 1. Introduction & Purpose
 
-The AI SDLC Harness is a shell-script-based installer and skill library for AI developer tools. It provides a curated set of skills and rules — authored in the native format of each supported harness — and simple installer scripts that copy those files into the correct local configuration directories. A separate `agents/` tree is deferred.
+The AI SDLC Harness is a shell-script-based installer and skill library for AI developer tools. It provides a curated set of skills and rules — a shared `CONTENT.md` body plus thin native shells per harness — and installer scripts that expand those files into the correct local configuration directories. A separate `agents/` tree is deferred.
 
-There is no CLI tool to install, no compiled package, and no compilation step. The project is a collection of files and shell scripts. The *installation of skills* is strictly zero-dependency (using only `bash` and `cp`, or native PowerShell). Additionally, the project includes an optional standalone Model Context Protocol (MCP) server that provides agents with Just-In-Time (JIT) retrieval of SDLC standards, templates, and Definitions of Done. Running that server requires a local Python runtime.
+There is no CLI tool to install, no compiled package, and no compilation of one harness file into another. Shared skill/rule instructions live in `CONTENT.md`; each target has a thin native shell. The *copy/expand of skills* uses only `bash` and `cp` (or native PowerShell). A live installer currently also invokes host `python3` to merge MCP JSON (Epic 12.5). The optional MCP server under `mcp-server/` needs a local Python runtime to actually serve templates, Definitions of Done, and Domain/Layer consultants.
 
 ## 2. Target Personas
 
@@ -26,8 +26,8 @@ There is no CLI tool to install, no compiled package, and no compilation step. T
 
 1. The author creates a directory under `skills/<skill-name>/`.
 2. The author creates `skill.yaml` with metadata (name, description, version, author, targets, triggers).
-3. The author creates one or more target-specific subdirectories (`claude/`, `cursor/`, `ghcp/`, `agy/`) and writes the native skill files inside them.
-4. The author tests locally by running the relevant installer script.
+3. The author writes `CONTENT.md` (canonical body) and thin harness shells (`claude/`, `cursor/`, `ghcp/`, `agy/`) that contain `{{SKILL_BODY}}` on its own line.
+4. The author tests locally by running the relevant installer script (it expands `CONTENT.md` into the destination).
 5. The author opens a Pull Request to contribute the skill back to the library.
 
 ### Journey 3: Contribute a skill back
@@ -80,7 +80,7 @@ Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
 - `install/install_ghcp.sh`: Same pattern for `ghcp/instructions.md` → `<ws>/.github/instructions/sdlc-<name>.instructions.md`. Workspace defaults to `$PWD`.
 - `install/install_agy.sh`: Expands `agy/` files (typically `SKILL.md` / `RULE.md`) into `~/.gemini/antigravity-cli/builtin/skills/sdlc-<name>/` or `<ws>/.agents/skills/sdlc-<name>/`. Destination YAML `name:` is rewritten to the same `sdlc-` name.
 - `--workspace <path>` is optional for Claude and AGY (omit for user-global install). Cursor and GHCP are always workspace-scoped; omitting the flag uses `$PWD`.
-- `install/uninstall_<harness>.sh` / `.ps1`: Remove previously installed `sdlc-*` artifacts from the same destinations. Where implemented, also drop the `sdlc-knowledge` MCP server key without deleting sibling servers.
+- `install/uninstall_<harness>.sh` / `.ps1`: Intended to remove previously installed `sdlc-*` artifacts from the same destinations and, where implemented, drop the `sdlc-knowledge` MCP server key without deleting sibling servers. Current reverse-path bugs are Epic 12 (Cursor still deletes `.cursor/prompts/`; Claude deletes `sdlc-*.json` while install writes `sdlc-*.md`; GHCP does not remove `.vscode/mcp.json`).
 
 ### F5. Installer Behaviour
 
@@ -90,7 +90,7 @@ Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
 - Installers MUST print a summary of what was installed and where.
 - Installers MUST skip any directory that does not have the relevant harness subdirectory (e.g., `install_claude.sh` skips items with no `claude/` directory).
 - Installers SHOULD create destination directories if they do not already exist.
-- Installers MUST NOT require any runtime dependency beyond standard Unix utilities (`bash`, `cp`, `mkdir`, `cat`, `grep`, `mktemp`) or native PowerShell.
+- Installers MUST NOT require any runtime dependency beyond standard Unix utilities (`bash`, `cp`, `mkdir`, `cat`, `grep`, `mktemp`) or native PowerShell **for the copy/expand step**. A live (non-`--dry-run`) install currently invokes host `python3` to merge MCP JSON (Task 12.5).
 - Installers MUST expand `CONTENT.md` into `{{SKILL_BODY}}` (skills/agents) or `{{RULE_BODY}}` (rules) and MUST fail if `CONTENT.md` or the placeholder is missing. They MUST NOT write unresolved placeholders.
 
 ### F6. MCP Knowledge Retrieval Server
@@ -102,7 +102,7 @@ Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
 
 ## 5. Non-Functional Requirements
 
-- **Zero dependencies**: The installer requires no external runtimes like Python or Node.
+- **Zero dependencies for copy/expand**: The skill/rule copy step requires no external runtimes like Node. A live installer currently needs host `python3` only to merge MCP JSON; running the knowledge server needs the `mcp-server/venv` Python.
 - **Portable**: Scripts must work on macOS and Linux (via `bash >= 3.2`) and Windows (via native `PowerShell` scripts, i.e., `.ps1`).
 - **Readable**: Installer scripts must be thoroughly commented so that authors understand and can trust what is being installed.
 - **Safe**: Installers must not delete existing user configuration. Overwrites of previously installed skill files are acceptable; deletion of other files is not.
@@ -114,7 +114,7 @@ Given the shell-based nature of the installers and the modular nature of the ski
 ### 6.1 Shell Script Testing
 - **Framework**: BATS (Bash Automated Testing System) is used to test the installer scripts (`install/install_claude.sh`, `install/install_cursor.sh`, `install/install_ghcp.sh`, `install/install_agy.sh`, etc.).
 - **Test Cases**:
-  - Verify correct file copying to target directories based on mock skill structures.
+  - Verify correct `CONTENT.md` expansion and destination writes based on mock skill structures.
   - Verify idempotency (multiple runs produce the same safe result).
   - Verify skipping of skills/agents that lack the target harness subdirectory.
   - Verify proper handling of the `--workspace` flag and creation of destination directories.
@@ -133,6 +133,7 @@ Given the shell-based nature of the installers and the modular nature of the ski
 
 ### 6.4 Agent Behavioral & E2E Testing
 - **Framework**: LLM evaluation tools (e.g., `promptfoo`, or custom scripts utilizing standard test runners like `pytest`) integrated with headless harness execution.
+- **Implemented today**: `tests/e2e/test_agent_behavior.py` runs Gemini with a stub `get_domain_consultant` function (not a live MCP process) plus optional `test_cli_integration.py` CLI smoke tests when `agy` / `claude` binaries exist. `run_tests.sh` includes the directory only when `GEMINI_API_KEY` is set. The mock-project evolution / promptfoo / LLM-as-judge cases below remain a scaffold target (Task 8.3), not current CI.
 - **Test Cases (Mock Projects)**:
   - Maintain sandboxed mock repositories (e.g., a simple API or frontend app) with predefined feature requests, bugs, or refactoring tasks.
   - Programmatically invoke the AI agent/skill (e.g., "Review this PR" or "Implement feature X") against the mock repository.
@@ -150,10 +151,10 @@ The installer scripts MUST seamlessly configure the host IDE to communicate with
 - Antigravity: `<ws>/.agents/mcp_config.json` (workspace) or `~/.gemini/config/mcp_config.json` (global)
 - GitHub Copilot / VS Code: `<ws>/.vscode/mcp.json` (`servers` key — VS Code / Copilot workspace schema)
 
-Bash installers merge `sdlc-knowledge` into an existing file (they do not replace the whole JSON). The MCP `command` they write is `mcp-server/venv/bin/python` from this clone.
+Bash installers merge `sdlc-knowledge` into an existing file (they do not replace the whole JSON). The MCP `command` they write is `mcp-server/venv/bin/python` from this clone. A live install currently calls host `python3` to perform that merge.
 
 ## 7. Out of Scope for v1
 
-- **Universal format / compilation**: Writing a skill in one format and auto-generating the others is out of scope. Each target is authored directly.
+- **Universal format / compilation**: We do not compile one harness file into the others. Shared instructions live in `CONTENT.md`; each target still has a thin native shell (frontmatter / triggers).
 - **Cloud registry**: No hosted skill registry or auto-update mechanism.
 - **Bidirectional sync**: Importing a skill from an installed location back into this repo format is out of scope.

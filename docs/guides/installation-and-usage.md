@@ -13,7 +13,7 @@ All installers live under `install/`, not the repo root:
 | Cursor | `install/install_cursor.sh` | `install/install_cursor.ps1` | Workspace only |
 | GitHub Copilot (ghcp) | `install/install_ghcp.sh` | `install/install_ghcp.ps1` | Workspace only |
 
-On Windows, run the `.ps1` scripts from PowerShell (`-Workspace` / `-DryRun` instead of `--workspace` / `--dry-run`).
+On Windows, run the `.ps1` scripts from PowerShell (`-Workspace` / `-DryRun` instead of `--workspace` / `--dry-run`). **`install_cursor.ps1` is not at dest parity** with the Bash installer: it still looks for `cursor/rule.mdc` and writes `.cursor/rules/*.mdc`, so it would skip every current skill and rule (Task 12.1). Use `install/install_cursor.sh` until that is fixed.
 
 ## `--workspace` vs global
 
@@ -44,7 +44,7 @@ PowerShell (from the same clone):
 ```powershell
 .\install\install_agy.ps1 -Workspace C:\path\to\your\real-project
 .\install\install_claude.ps1 -Workspace C:\path\to\your\real-project
-.\install\install_cursor.ps1 -Workspace C:\path\to\your\real-project
+.\install\install_cursor.ps1 -Workspace C:\path\to\your\real-project   # broken dest — Task 12.1; use the .sh installer
 .\install\install_ghcp.ps1 -Workspace C:\path\to\your\real-project
 ```
 
@@ -56,7 +56,7 @@ PowerShell (from the same clone):
    - AGY: `sdlc-*` directories under the chosen skills root
    - GitHub Copilot: `sdlc-*.instructions.md` under `<ws>/.github/instructions/`
 
-   Library prompts are then copied into those same hidden directories:
+   Library prompts are then expanded into those same hidden directories:
    - AGY workspace: `.agents/skills/`
    - Claude workspace: `.claude/commands/`
    - Cursor: `.cursor/commands/`
@@ -74,14 +74,14 @@ PowerShell (from the same clone):
 
    GitHub Copilot Chat in VS Code documents workspace MCP servers in [`.vscode/mcp.json`](https://docs.github.com/en/copilot/how-tos/provide-context/use-mcp-in-your-ide/extend-copilot-chat-with-mcp) with a top-level `servers` key (not `mcpServers`). After install, start the server from that file (VS Code shows a Start control) so Copilot can discover `sdlc-knowledge` tools.
 
-   Bash installers set the MCP `command` to `mcp-server/venv/bin/python` from this clone (args: `mcp-server/src/server.py`). Create that venv before starting the server:
+   A live (non-`--dry-run`) Bash install currently invokes host `python3` to merge that JSON, then sets MCP `command` to `mcp-server/venv/bin/python` from this clone (args: `mcp-server/src/server.py`). Create that venv before starting the server:
 
    ```bash
    python3 -m venv mcp-server/venv
    mcp-server/venv/bin/pip install -r mcp-server/requirements.txt
    ```
 
-   Skill *installation* does not require Python; *running* the knowledge server does. PowerShell installers are not yet at parity (they still create the MCP file only when missing, and invoke `python3` rather than the repo venv).
+   The copy/expand step itself does not require Python; *running* the knowledge server does. `--dry-run` does not call Python. PowerShell installers are not yet at MCP parity (they still create the MCP file only when missing, and invoke `python3` rather than the repo venv). `install_cursor.ps1` additionally uses the old `.cursor/rules/*.mdc` dest (Task 12.1).
 
 3. **`agents/`**: If the directory is missing (the current default), installers print that they are skipping agents and continue. Skills are the Lifecycle Drivers.
 
@@ -96,7 +96,7 @@ To remove a harness install later:
 ./install/uninstall_ghcp.sh --workspace /path/to/your/real-project
 ```
 
-Uninstallers delete only `sdlc-*` artifacts. Cursor and AGY Bash uninstallers also remove the `sdlc-knowledge` MCP key from the host config. `uninstall_claude.sh` currently targets the global `~/.claude/commands` tree (workspace uninstall is not wired yet). `uninstall_cursor.sh` currently removes `.cursor/prompts/sdlc-*.md`, not the `.cursor/commands/` files the installer now writes.
+Uninstallers delete only `sdlc-*` artifacts. Cursor and AGY Bash uninstallers also remove the `sdlc-knowledge` MCP key from the host config. `uninstall_claude.sh` currently targets the global `~/.claude/commands` tree (workspace uninstall is not wired yet) and deletes `sdlc-*.json` while install writes `sdlc-*.md`. `uninstall_cursor.sh` currently removes `.cursor/prompts/sdlc-*.md`, not the `.cursor/commands/` files the installer now writes. `uninstall_ghcp.sh` / `.ps1` do not remove `sdlc-knowledge` from `.vscode/mcp.json`.
 
 ## Step 2: Define your project constraints
 
@@ -121,4 +121,4 @@ Open the target project in Antigravity, Cursor, Claude Code, or VS Code with Git
 2. Query the MCP server for Domain/Layer consultants and, when relevant, Definition of Done.
 3. Review the change against those constraints plus the diff — without inventing product claims.
 
-Other drivers follow the same pattern: fetch templates or consultants from MCP, then write the artifact. Besides `/story`, `/threat`, `/e2e`, `/postmortem`, and `/release-notes`, the library includes `/sdlc-product-owner` (vision → epics / product spec), `/research`, `/setup-repo`, `/rfc`, `/triage`, `/runbook`, `/api-design`, `/security-review`, `/migration`, `/adr`, `/ci`, `/docs-backlog-review` (full-repo docs↔code + backlog hygiene; distinct from `/docs`, which updates docs for a recent code change), `/domain-architect`, and `/layer-architect`, plus the a11y and DoD rules. Primary triggers for every skill live in `skills/*/skill.yaml`.
+Other drivers follow the same pattern: fetch templates or consultants from MCP, then write the artifact. Besides `/story`, `/threat`, `/e2e`, `/postmortem`, and `/release-notes`, the library includes `/review`, `/pr`, `/test`, `/sdlc-product-owner` (vision → epics / product spec), `/research`, `/setup-repo`, `/rfc`, `/triage`, `/runbook`, `/api-design`, `/security-review`, `/migration`, `/adr`, `/ci`, `/docs-backlog-review` (full-repo docs↔code + backlog hygiene; distinct from `/docs`, which updates docs for a recent code change), `/domain-architect`, and `/layer-architect`, plus the a11y and DoD rules. Primary triggers for every skill live in `skills/*/skill.yaml`.

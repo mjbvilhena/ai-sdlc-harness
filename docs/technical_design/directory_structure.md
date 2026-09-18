@@ -87,4 +87,4 @@ ai-sdlc-harness/
 - `skill.yaml` / `rule.yaml` / `agent.yaml` (when present) are for humans, docs, and CI. Installer scripts do not parse them.
 - Target-specific subdirectories (`agy/`, `claude/`, `cursor/`, `ghcp/`) are optional per item. An item that only targets AGY only needs `agy/`.
 - There is no `build/` directory. Files are copied directly from source to destination.
-- `mcp-server/` is optional at install time. Running it requires Python; skill *installation* does not.
+- `mcp-server/` is optional at *runtime*. A live installer currently needs host `python3` to merge MCP JSON; running the server also needs the repo venv. `--dry-run` does not call Python. Skill/rule copy/expand does not parse YAML.
