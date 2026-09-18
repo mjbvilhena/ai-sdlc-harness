@@ -3,7 +3,7 @@
 GitHub Copilot supports workspace-level custom instructions via files placed in the `.github/instructions/` directory.
 
 ## File Convention
-In this repository, GitHub Copilot instructions are stored in the `ghcp/` subdirectory and must be named `instructions.md`. Optional `applyTo` frontmatter stays in this shell. Shared instructions live in sibling `CONTENT.md`; include `{{SKILL_BODY}}` or `{{RULE_BODY}}` on its own line.
+In this repository, GitHub Copilot instructions are stored in the `ghcp/` subdirectory and must be named `instructions.md`. Optional `applyTo` frontmatter stays in this shell. Shared instructions live in sibling `CONTENT.md`; include `{{SKILL_BODY}}` or `{{RULE_BODY}}` on its own line. The installer writes `<ws>/.github/instructions/sdlc-<name>.instructions.md`.
 
 ## Structure of an `instructions.md`
 GHCP instructions are simple Markdown files.
