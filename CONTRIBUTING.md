@@ -85,7 +85,7 @@ Simply execute the helper script:
 ```
 
 ### End-to-End (E2E) LLM Testing
-`tests/e2e/` has two suites. `test_agent_behavior.py` executes a real LLM (Gemini) to verify that installed skills invoke MCP tools and respect constraints. `test_cli_integration.py` optionally drives installed `agy` / `claude` CLIs headlessly when those binaries are present. `run_tests.sh` runs the whole directory when `GEMINI_API_KEY` (or `gemini_api_key`) is set.
+`tests/e2e/` has two suites. `test_agent_behavior.py` executes a real LLM (Gemini) with a **stub** `get_domain_consultant` function (it does not start `mcp-server`) to check that the expanded skill prompt applies domain constraints. `test_cli_integration.py` optionally drives installed `agy` / `claude` CLIs headlessly when those binaries are present. `run_tests.sh` runs the whole directory when `GEMINI_API_KEY` (or `gemini_api_key`) is set. If `python3` or `bats` is missing, the runner may still print a success banner (Task 8.6).
 
 Because the Gemini suite runs a real LLM, it requires an API key and is automatically skipped in standard CI runs if the key is missing.
 

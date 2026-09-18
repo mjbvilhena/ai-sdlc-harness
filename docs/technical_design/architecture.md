@@ -19,7 +19,7 @@ install/install_claude.sh
     ├─→ Iterates over skills/*/claude/
     │       │
     │       └─→ For each skill with a claude/ subdirectory:
-    │               Copy contents → ~/.claude/commands/
+    │               Expand CONTENT.md into command.md → ~/.claude/commands/
     │                   (or <ws>/.claude/commands/ with --workspace)
     │
     ├─→ Iterates over agents/*/claude/   (skipped if agents/ is absent)
@@ -27,7 +27,7 @@ install/install_claude.sh
     └─→ Iterates over rules/*/claude/
             │
             └─→ For each rule with a claude/ subdirectory:
-                    Copy contents → ~/.claude/commands/
+                    Expand CONTENT.md into command.md → ~/.claude/commands/
 ```
 
 The same pattern applies for `./install/install_cursor.sh` (slash commands under `.cursor/commands/`), `./install/install_ghcp.sh`, and `./install/install_agy.sh`. Bash and PowerShell twins exist for every harness, but `install_cursor.ps1` is not at dest parity yet (it still looks for `cursor/rule.mdc` and writes `.cursor/rules/*.mdc` — Task 12.1). Matching `install/uninstall_*.sh` / `.ps1` scripts are meant to remove `sdlc-*` destinations; known reverse-path bugs are Epic 12.
@@ -70,7 +70,7 @@ install/install_<harness>.sh | .ps1
     ├─ 4. For each item in skills/*/, agents/*/ (if present), rules/*/:
     │       a. Normalize dest name to sdlc-* (prefix if the folder lacks it)
     │       b. Check if <item>/<harness>/ exists → skip if not
-    │       c. Copy the harness file(s) to DEST
+    │       c. Expand CONTENT.md into the harness shell and write DEST
     │       d. Ensure YAML frontmatter name: is sdlc-* when present
     │       e. Print: "Installed <name> → …"
     │
@@ -87,7 +87,7 @@ install/install_<harness>.sh | .ps1
 
 ## Design Principles
 
-- **No runtime dependencies for install**: Installers use only native system shell utilities (POSIX `bash`, `cp`, `mkdir` for Unix systems, and native PowerShell for Windows).
+- **No runtime dependencies for copy/expand**: Skill/rule expansion uses only native shell utilities (POSIX `bash`, `cp`, `mkdir` on Unix; native PowerShell on Windows). A live install currently invokes host `python3` to merge MCP JSON (Task 12.5).
 - **No metadata parsing**: `skill.yaml` / `rule.yaml` are read by humans and CI validators only. Installers do not parse them. They do expand `CONTENT.md` into `{{SKILL_BODY}}` / `{{RULE_BODY}}`.
 - **Idempotency**: Expanding the same `CONTENT.md` into the same destination is idempotent. Running installers multiple times is safe. Existing MCP JSON is **merged**: sibling servers stay; `sdlc-knowledge` is created or updated.
 - **Isolation**: Each harness installer is independent. Running `install/install_claude.sh` does not affect Cursor or Antigravity configuration, and vice versa.

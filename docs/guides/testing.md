@@ -10,13 +10,13 @@ You can run all local testing suites simultaneously using the unified runner scr
 ./run_tests.sh
 ```
 
-This script creates `mcp-server/venv` if needed and runs the following suites in order:
+This script creates `mcp-server/venv` if needed and runs the following suites in order. If `python3` is missing, steps 1–4 are skipped and the script still continues; if `bats` is missing, step 5 prints an error and the script still exits 0 with a success banner (Task 8.6).
 
 ### 1. Metadata Validation
 A custom Python script (`.github/scripts/validate_metadata.py`, CI workflow `.github/workflows/validate-metadata.yaml`) that strictly validates all `skill.yaml`, `agent.yaml`, and `rule.yaml` files against the schema (requiring Name, Description, Version, Author, and checking directory matching). Cursor's required primary file is `cursor/prompt.md`.
 
 ### 2. MCP Server Unit Tests
-Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files. On disk there are **24** templates (including `product_spec.md`, `research.md`, and `repository_setup.md`) and **13** Definitions of Done. `test_catalog_templates_and_dod` asserts the same 24 / 13 names. Remaining alias/regression coverage for those newer payloads is Task 10.9. These tests run locally via `./run_tests.sh`; GitHub Actions does **not** run `pytest` today (Task 8.6).
+Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files. On disk there are **24** templates (including `product_spec.md`, `research.md`, and `repository_setup.md`) and **13** Definitions of Done. `test_catalog_templates_and_dod` asserts the same 24 / 13 names. Remaining alias/regression coverage for those newer payloads is Task 10.9. These tests run locally via `./run_tests.sh`; GitHub Actions does **not** run `pytest` today (Task 8.7).
 
 ### 3. Python Security Scan (Bandit)
 `run_tests.sh` runs Bandit against `mcp-server/` (excluding tests and `venv`) when Python is available. The same scan runs in CI via `.github/workflows/security.yaml`.
@@ -36,7 +36,7 @@ Run locally when the `gitleaks` binary is installed; always run in CI (`.github/
 
 ## End-to-End (E2E) LLM Testing
 
-To ensure that the Tri-Dimensional Framework functions correctly, we have an E2E testing framework. `tests/e2e/test_agent_behavior.py` invokes a real LLM (Gemini) headlessly to verify that the agent reaches out to MCP tools and applies architectural constraints. `tests/e2e/test_cli_integration.py` optionally drives installed `agy` / `claude` CLIs when those binaries are present. `run_tests.sh` runs the whole `tests/e2e/` directory.
+To ensure that the Tri-Dimensional Framework functions correctly, we have an E2E testing framework. `tests/e2e/test_agent_behavior.py` invokes a real LLM (Gemini) headlessly with a **stub** `get_domain_consultant` function (it does not start `mcp-server`) and checks that the expanded skill prompt applies a domain constraint. `tests/e2e/test_cli_integration.py` optionally drives installed `agy` / `claude` CLIs when those binaries are present. `run_tests.sh` runs the whole `tests/e2e/` directory.
 
 Because this test executes a real LLM, it requires an API key. **If you do not provide an API key, this test will gracefully skip itself** (both locally and in CI).
 
@@ -64,7 +64,7 @@ Every Pull Request automatically executes the following CI checks:
 3. **Metadata Validation** (`.github/workflows/validate-metadata.yaml`): Ensures no malformed or undocumented skills are merged into the library.
 4. **Security Scans**: Gitleaks + Bandit (`.github/workflows/security.yaml`).
 
-MCP `pytest` (`mcp-server/tests/`) and E2E are **not** GitHub Actions jobs. Catalog and alias regressions only fail locally until Task 8.6.
+MCP `pytest` (`mcp-server/tests/`) and E2E are **not** GitHub Actions jobs. Catalog and alias regressions only fail locally until Task 8.7.
 
 ## Security Scanning
 
