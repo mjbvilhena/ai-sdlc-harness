@@ -21,8 +21,8 @@ The core philosophy is built on three pillars:
 
 - **Claude Code**: Skills installed as custom slash commands to `~/.claude/commands/` (or `<ws>/.claude/commands/` with `--workspace`)
 - **Cursor**: Slash commands installed to `<ws>/.cursor/commands/`
-- **GitHub Copilot (ghcp)**: Instructions installed to `<ws>/.github/instructions/`
-- **Antigravity (agy)**: Skills installed globally to `~/.gemini/antigravity-cli/builtin/skills/` or, with `--workspace`, to `<ws>/.agents/skills/`. Workspace MCP config is `<ws>/.agents/mcp_config.json`.
+- **GitHub Copilot (ghcp)**: Instructions installed to `<ws>/.github/instructions/sdlc-<name>.instructions.md`
+- **Antigravity (agy)**: Skills installed globally to `~/.gemini/antigravity-cli/builtin/skills/sdlc-<name>/` or, with `--workspace`, to `<ws>/.agents/skills/sdlc-<name>/`. Workspace MCP config is `<ws>/.agents/mcp_config.json`.
 
 ## Non-Goals
 

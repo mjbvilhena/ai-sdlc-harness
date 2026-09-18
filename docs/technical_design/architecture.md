@@ -44,7 +44,7 @@ skills/
        ├─ cursor/
        │     └─ prompt.md     ← Thin shell → <ws>/.cursor/commands/*.md
        ├─ ghcp/
-       │     └─ instructions.md  ← Thin shell → <ws>/.github/instructions/
+       │     └─ instructions.md  ← Thin shell → <ws>/.github/instructions/sdlc-<name>.instructions.md
        └─ agy/
              └─ SKILL.md      ← Thin shell → AGY skills dir
 ```
@@ -100,6 +100,6 @@ The MCP server acts as an intelligent knowledge retrieval layer for the Lifecycl
 
 - **SDLC Templates**: `get_sdlc_template` serves markdown under `mcp-server/data/templates/` (**24** files). The catalog covers the original set (ADR, bug report, domain, layer, PR, RFC, user story, incident postmortem) plus threat model, code review, test / e2e plans, release notes, runbook, API design & contract, security review, accessibility audit, migration plan, onboarding guide, rollout plan, product spec, research, and repository setup. Natural-language aliases (`stride`, `changelog`, `playbook`, `openapi`, `prd`, `spike`, …) resolve via longest-match in `server.py`.
 - **Definitions of Done**: `get_definition_of_done` serves `mcp-server/data/dod/` (**13** files) for `bugfix`, `epic`, `feature`, `hotfix`, `release`, `pr`, `user story`, `security change`, `ui change`, `api change`, `data migration`, `research`, and `repository setup`.
-- **Dynamic Consultant Discovery**: Tools like `get_domain_consultant` and `get_layer_consultant` dynamically scan the user's `WORKSPACE_ROOT` for `DOMAIN.md` and `LAYER.md` files. This allows the MCP server to construct constraints that reflect the real-time architectural state of the user's repository without hardcoded mappings.
+- **Dynamic Consultant Discovery**: Tools like `get_domain_consultant` and `get_layer_consultant` walk `WORKSPACE_ROOT` for `DOMAIN.md` and `LAYER.md` files. That path is `os.getenv("WORKSPACE_ROOT", os.getcwd())` in `mcp-server/src/server.py`. Bash installers write only `command` + `args` into the host MCP config — they do **not** set `env.WORKSPACE_ROOT` to the `--workspace` target — so discovery depends on the MCP host process CWD unless the IDE (or the user) sets the env var (Task 12.8).
 
 Lifecycle Driver prompts (e.g., `sdlc-product-owner`, `sdlc-researcher`, `sdlc-setup-repository`, `sdlc-user-story-refiner`, `sdlc-code-reviewer`, `sdlc-rfc-drafter`, `sdlc-security-reviewer`, `sdlc-docs-backlog-review`) and the ambient `sdlc-dod-checker` **rule** explicitly instruct the model to query this MCP server for templates and constraints before generating artifacts. Tool names stay stable; only payloads, aliases, and tests expand.

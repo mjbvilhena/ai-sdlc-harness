@@ -96,7 +96,7 @@ To remove a harness install later:
 ./install/uninstall_ghcp.sh --workspace /path/to/your/real-project
 ```
 
-Uninstallers delete only `sdlc-*` artifacts. Cursor and AGY Bash uninstallers also remove the `sdlc-knowledge` MCP key from the host config. `uninstall_claude.sh` currently targets the global `~/.claude/commands` tree (workspace uninstall is not wired yet). `uninstall_cursor.sh` currently removes `.cursor/prompts/sdlc-*.md`, not the `.cursor/commands/` files the installer now writes.
+Uninstallers delete only `sdlc-*` artifacts. Cursor and AGY Bash uninstallers also remove the `sdlc-knowledge` MCP key from the host config. `uninstall_claude.sh` currently targets the global `~/.claude/commands` tree (workspace uninstall is not wired yet). `uninstall_cursor.sh` currently removes `.cursor/prompts/sdlc-*.md`, not the `.cursor/commands/` files the installer now writes. `uninstall_ghcp.sh` does not drop `sdlc-knowledge` from `.vscode/mcp.json`.
 
 ## Step 2: Define your project constraints
 
@@ -107,18 +107,18 @@ In the target workspace, add markdown files such as:
 - **Domains**: `src/domains/auth/DOMAIN.md` (for example, "Authentication must go through AuthService.")
 - **Layers**: `src/ui/LAYER.md` (for example, "UI components must be purely functional.")
 
-The MCP tools `get_domain_consultant` and `get_layer_consultant` discover these files by walking the workspace.
+The MCP tools `get_domain_consultant` and `get_layer_consultant` discover these files by walking `WORKSPACE_ROOT` (env var, else the MCP process CWD). Installers do not set that env var today (Task 12.8), so after install the scan follows whatever directory the IDE uses when it starts `mcp-server`.
 
 ## Step 3: Trigger a Lifecycle Driver
 
 Open the target project in Antigravity, Cursor, Claude Code, or VS Code with GitHub Copilot. Invoke a skill, for example:
 
-> `Please run the /sdlc-code-reviewer skill on my current branch.`
+> `Please run the /review skill on my current branch.`
 
 **The model should:**
 
-1. Recognize the `/sdlc-code-reviewer` (or equivalent) instructions.
+1. Recognize the `/review` instructions (Claude Trigger and `skills/sdlc-code-reviewer/skill.yaml`; Cursor dest filename is `sdlc-code-reviewer.md`).
 2. Query the MCP server for Domain/Layer consultants and, when relevant, Definition of Done.
 3. Review the change against those constraints plus the diff — without inventing product claims.
 
-Other drivers follow the same pattern: fetch templates or consultants from MCP, then write the artifact. Besides `/story`, `/threat`, `/e2e`, `/postmortem`, and `/release-notes`, the library includes `/sdlc-product-owner` (vision → epics / product spec), `/research`, `/setup-repo`, `/rfc`, `/triage`, `/runbook`, `/api-design`, `/security-review`, `/migration`, `/adr`, `/ci`, `/docs-backlog-review` (full-repo docs↔code + backlog hygiene; distinct from `/docs`, which updates docs for a recent code change), `/domain-architect`, and `/layer-architect`, plus the a11y and DoD rules. Primary triggers for every skill live in `skills/*/skill.yaml`.
+Other drivers follow the same pattern: fetch templates or consultants from MCP, then write the artifact. Besides `/story`, `/threat`, `/e2e`, `/postmortem`, `/release-notes`, `/pr`, and `/test`, the library includes `/sdlc-product-owner` (vision → epics / product spec), `/research`, `/setup-repo`, `/rfc`, `/triage`, `/runbook`, `/api-design`, `/security-review`, `/migration`, `/adr`, `/ci`, `/docs-backlog-review` (full-repo docs↔code + backlog hygiene; distinct from `/docs`, which updates docs for a recent code change), `/domain-architect`, and `/layer-architect`, plus the a11y and DoD rules. Primary triggers for every skill live in `skills/*/skill.yaml`.

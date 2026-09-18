@@ -16,7 +16,7 @@ This script creates `mcp-server/venv` if needed and runs the following suites in
 A custom Python script (`.github/scripts/validate_metadata.py`, CI workflow `.github/workflows/validate-metadata.yaml`) that strictly validates all `skill.yaml`, `agent.yaml`, and `rule.yaml` files against the schema (requiring Name, Description, Version, Author, and checking directory matching). Cursor's required primary file is `cursor/prompt.md`.
 
 ### 2. MCP Server Unit Tests
-Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files. On disk there are **24** templates (including `product_spec.md`, `research.md`, and `repository_setup.md`) and **13** Definitions of Done. `test_catalog_templates_and_dod` asserts the same 24 / 13 names. Remaining alias/regression coverage for those newer payloads is Task 10.9.
+Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files. On disk there are **24** templates (including `product_spec.md`, `research.md`, and `repository_setup.md`) and **13** Definitions of Done. `test_catalog_templates_and_dod` asserts the same 24 / 13 names. Remaining alias/regression coverage for those newer payloads is Task 10.9. These tests run locally via `./run_tests.sh`; GitHub Actions does **not** run `pytest` today (Task 8.6).
 
 ### 3. Python Security Scan (Bandit)
 `run_tests.sh` runs Bandit against `mcp-server/` (excluding tests and `venv`) when Python is available. The same scan runs in CI via `.github/workflows/security.yaml`.
@@ -63,6 +63,8 @@ Every Pull Request automatically executes the following CI checks:
    - `markdownlint` on `**/*.md`.
 3. **Metadata Validation** (`.github/workflows/validate-metadata.yaml`): Ensures no malformed or undocumented skills are merged into the library.
 4. **Security Scans**: Gitleaks + Bandit (`.github/workflows/security.yaml`).
+
+MCP `pytest` (`mcp-server/tests/`) and E2E are **not** GitHub Actions jobs. Catalog and alias regressions only fail locally until Task 8.6.
 
 ## Security Scanning
 

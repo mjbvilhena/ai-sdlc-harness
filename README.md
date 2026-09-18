@@ -6,7 +6,7 @@ Skill installation is zero-dependency: just shell or PowerShell scripts and file
 
 ## How It Works
 
-Skills in this repo are **authored once per target harness** — each skill has a dedicated file written in the exact format that a given AI tool expects (e.g. a `SKILL.md` for Antigravity, a `command.md` for Claude Code, a `prompt.md` for Cursor slash commands). A top-level installer script for each harness discovers all skills in the `skills/` directory and copies the correct files into the right place on your machine.
+Skills in this repo are **authored once per target harness** — each skill has a dedicated file written in the exact format that a given AI tool expects (e.g. a `SKILL.md` for Antigravity, a `command.md` for Claude Code, a `prompt.md` for Cursor slash commands). A top-level installer script for each harness discovers items in `skills/` and `rules/` and copies the correct files into the right place on your machine.
 
 Lifecycle Drivers today live as these `skills/` (and ambient `rules/`). A separate `agents/` tree is deferred; installers already skip it when the directory is absent.
 
@@ -14,12 +14,12 @@ Lifecycle Drivers today live as these `skills/` (and ambient `rules/`). A separa
 
 | Harness | Installer | Install location |
 |---|---|---|
-| **Antigravity (agy)** | `install/install_agy.sh` | Global: `~/.gemini/antigravity-cli/builtin/skills/<skill-name>/`. Workspace: `<ws>/.agents/skills/` |
+| **Antigravity (agy)** | `install/install_agy.sh` | Global: `~/.gemini/antigravity-cli/builtin/skills/sdlc-<name>/`. Workspace: `<ws>/.agents/skills/sdlc-<name>/` |
 | **Claude Code** | `install/install_claude.sh` | Global: `~/.claude/commands/`. Workspace: `<ws>/.claude/commands/` |
 | **Cursor** | `install/install_cursor.sh` | `<ws>/.cursor/commands/` (workspace-scoped slash commands; defaults to `$PWD`) |
-| **GitHub Copilot (ghcp)** | `install/install_ghcp.sh` | `<ws>/.github/instructions/` (workspace-scoped; defaults to `$PWD`) |
+| **GitHub Copilot (ghcp)** | `install/install_ghcp.sh` | `<ws>/.github/instructions/sdlc-<name>.instructions.md` (workspace-scoped; defaults to `$PWD`) |
 
-PowerShell equivalents live beside the Bash scripts (`install/install_*.ps1`). Matching uninstallers (`install/uninstall_*.sh` / `.ps1`) remove previously installed `sdlc-*` artifacts and, where implemented, the `sdlc-knowledge` MCP entry.
+PowerShell equivalents live beside the Bash scripts (`install/install_*.ps1`). Matching uninstallers (`install/uninstall_*.sh` / `.ps1`) are intended to remove previously installed `sdlc-*` artifacts and, where implemented, the `sdlc-knowledge` MCP entry. Bash uninstall paths are not yet at parity with the current installers (Cursor still targets `.cursor/prompts/`; Claude deletes `*.json` not `*.md`; GHCP does not drop the MCP key) — see the [Installation and Usage Guide](docs/guides/installation-and-usage.md) and Epic 12.
 
 ## Installation
 

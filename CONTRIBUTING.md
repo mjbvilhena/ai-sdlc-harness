@@ -31,7 +31,7 @@ Cursor shells are `cursor/prompt.md`. The Bash installer expands them into `<ws>
 
 Installers also accept an `agents/` tree with the same layout, but **`agents/` is not populated**. Lifecycle Drivers currently live as `skills/` (and ambient `rules/`). Do not add empty agent packages unless a later product decision asks for them.
 
-Matching uninstallers live beside the installers (`install/uninstall_<harness>.sh` / `.ps1`).
+Matching uninstallers live beside the installers (`install/uninstall_<harness>.sh` / `.ps1`). They are not yet a reliable reverse of the current Bash installers (wrong Cursor dest, Claude glob, GHCP MCP cleanup, and broken PS1 helpers) — tracked as Epic 12.
 
 ## Metadata Schemas
 

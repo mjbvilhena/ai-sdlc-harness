@@ -18,7 +18,7 @@ There is no CLI tool to install, no compiled package, and no compilation step. T
 
 1. The user clones this repository.
 2. The user runs the installer script for their preferred harness from the repo root (e.g., `./install/install_claude.sh`, `./install/install_cursor.sh`, `./install/install_ghcp.sh`, or `./install/install_agy.sh`).
-3. The script discovers all skill directories under `skills/` that contain the corresponding harness subdirectory (e.g., `claude/`, `cursor/`, `ghcp/`, `agy/`).
+3. The script discovers all skill directories under `skills/` and rule directories under `rules/` that contain the corresponding harness subdirectory (e.g., `claude/`, `cursor/`, `ghcp/`, `agy/`).
 4. For each skill, the script copies the contents into the target harness's expected local configuration directory.
 5. The user opens or reloads their AI tool and the skills are immediately available.
 
@@ -80,7 +80,7 @@ Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
 - `install/install_ghcp.sh`: Same pattern for `ghcp/instructions.md` → `<ws>/.github/instructions/sdlc-<name>.instructions.md`. Workspace defaults to `$PWD`.
 - `install/install_agy.sh`: Expands `agy/` files (typically `SKILL.md` / `RULE.md`) into `~/.gemini/antigravity-cli/builtin/skills/sdlc-<name>/` or `<ws>/.agents/skills/sdlc-<name>/`. Destination YAML `name:` is rewritten to the same `sdlc-` name.
 - `--workspace <path>` is optional for Claude and AGY (omit for user-global install). Cursor and GHCP are always workspace-scoped; omitting the flag uses `$PWD`.
-- `install/uninstall_<harness>.sh` / `.ps1`: Remove previously installed `sdlc-*` artifacts from the same destinations. Where implemented, also drop the `sdlc-knowledge` MCP server key without deleting sibling servers.
+- `install/uninstall_<harness>.sh` / `.ps1`: Intended to remove previously installed `sdlc-*` artifacts from the same destinations and, where implemented, drop the `sdlc-knowledge` MCP server key without deleting sibling servers. Current Bash uninstallers are **not** a reliable reverse of the installers (Cursor still targets `.cursor/prompts/`; Claude deletes `sdlc-*.json` and ignores `--workspace`; GHCP does not remove `.vscode/mcp.json`). Tracked as Epic 12.
 
 ### F5. Installer Behaviour
 
@@ -90,19 +90,19 @@ Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
 - Installers MUST print a summary of what was installed and where.
 - Installers MUST skip any directory that does not have the relevant harness subdirectory (e.g., `install_claude.sh` skips items with no `claude/` directory).
 - Installers SHOULD create destination directories if they do not already exist.
-- Installers MUST NOT require any runtime dependency beyond standard Unix utilities (`bash`, `cp`, `mkdir`, `cat`, `grep`, `mktemp`) or native PowerShell.
+- Skill *copy* MUST NOT require any runtime dependency beyond standard Unix utilities (`bash`, `cp`, `mkdir`, `cat`, `grep`, `mktemp`) or native PowerShell. Bash MCP merge currently shells out to host `python3` after files are copied and fails under `set -e` if that interpreter is missing (Task 12.5).
 - Installers MUST expand `CONTENT.md` into `{{SKILL_BODY}}` (skills/agents) or `{{RULE_BODY}}` (rules) and MUST fail if `CONTENT.md` or the placeholder is missing. They MUST NOT write unresolved placeholders.
 
 ### F6. MCP Knowledge Retrieval Server
 
 - A standalone Python MCP server lives under `mcp-server/` alongside the `skills/` and installers.
-- It exposes a precise JSON API contract (e.g., `get_sdlc_template(template_type)`, `get_definition_of_done(component)`) to serve SDLC standards.
+- It exposes four MCP tools (`get_sdlc_template`, `get_definition_of_done`, `get_domain_consultant`, `get_layer_consultant`) to serve SDLC standards and workspace consultants.
 - **Fuzzy Matching & Resilience**: The server MUST implement fuzzy string matching or robust alias mapping for input parameters (e.g., gracefully mapping "story", "user story", and "stories" to the same template). If a requested term cannot be resolved, the server MUST return a list of available valid options to help the LLM auto-correct.
 - Skill and agent prompts are designed to be lean, explicitly instructing the agent to call the MCP server for specific templates rather than hardcoding them in the prompt.
 
 ## 5. Non-Functional Requirements
 
-- **Zero dependencies**: The installer requires no external runtimes like Python or Node.
+- **Zero dependencies for skill copy**: File installation requires no external runtimes like Python or Node. Bash MCP merge currently shells out to host `python3` (Task 12.5). Running the knowledge server requires Python.
 - **Portable**: Scripts must work on macOS and Linux (via `bash >= 3.2`) and Windows (via native `PowerShell` scripts, i.e., `.ps1`).
 - **Readable**: Installer scripts must be thoroughly commented so that authors understand and can trust what is being installed.
 - **Safe**: Installers must not delete existing user configuration. Overwrites of previously installed skill files are acceptable; deletion of other files is not.
@@ -120,7 +120,7 @@ Given the shell-based nature of the installers and the modular nature of the ski
   - Verify proper handling of the `--workspace` flag and creation of destination directories.
 
 ### 6.2 MCP Server Testing
-- **Framework**: Standard language-specific testing frameworks (`pytest` for Python, or `Jest`/`Vitest` for TypeScript).
+- **Framework**: `pytest` (`mcp-server/tests/test_server.py`). The MCP server is Python-only.
 - **Test Cases**:
   - Unit tests for API contracts (e.g., `get_sdlc_template(template_type)`).
   - Mocked integration tests to verify the MCP server correctly parses and serves the underlying knowledge documents.
