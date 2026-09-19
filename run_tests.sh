@@ -24,6 +24,10 @@ else
     python3 .github/scripts/validate_metadata.py
     echo ""
 
+    echo "--- 1b. Docs browser catalog invariants ---"
+    python3 tests/docs_browser/test_dynamic_catalog.py
+    echo ""
+
     # 2. MCP Server Tests (pytest)
     echo "--- 2. MCP Server Tests ---"
     cd mcp-server

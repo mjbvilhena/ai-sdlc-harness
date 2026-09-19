@@ -1,0 +1,8 @@
+name: sample-beta
+description: Second fixture skill for filter tests.
+version: 0.0.1
+author: e2e
+targets:
+  - cursor
+triggers:
+  - /sample-beta

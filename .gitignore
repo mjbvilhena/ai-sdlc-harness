@@ -22,3 +22,10 @@ build/
 .vscode/
 *.swp
 *.swo
+
+# Node / Playwright (docs browser e2e)
+node_modules/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

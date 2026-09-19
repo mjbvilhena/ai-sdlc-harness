@@ -1,0 +1,133 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate the docs browser shell
+        run: python3 tests/docs_browser/test_dynamic_catalog.py
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/browser
+
+  deploy:
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  e2e-pr:
+    name: e2e-pr
+    needs: build
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tests/docs_browser/e2e/package-lock.json
+
+      - name: Install Playwright
+        working-directory: tests/docs_browser/e2e
+        run: npm ci && npx playwright install --with-deps chromium
+
+      - name: Run mocked UI e2e
+        working-directory: tests/docs_browser/e2e
+        env:
+          MOCK_GITHUB: "1"
+          CI: "true"
+        run: npx playwright test
+
+  e2e-live:
+    name: e2e-live
+    needs: deploy
+    if: success() && github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tests/docs_browser/e2e/package-lock.json
+
+      - name: Install Playwright
+        working-directory: tests/docs_browser/e2e
+        run: npm ci && npx playwright install --with-deps chromium
+
+      - name: Wait for Pages to serve the site
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          url="${BASE_URL:-https://mjbvilhena.github.io/ai-sdlc-harness/}"
+          case "$url" in
+            */) ;;
+            *) url="${url}/" ;;
+          esac
+          echo "Waiting for $url"
+          for i in $(seq 1 18); do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" "$url" || true)
+            echo "try ${i}: HTTP ${code}"
+            if [ "$code" = "200" ]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "GitHub Pages did not return HTTP 200 in time" >&2
+          exit 1
+
+      - name: Run live UI e2e
+        working-directory: tests/docs_browser/e2e
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.page_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CI: "true"
+        run: |
+          if [ -z "$BASE_URL" ]; then
+            export BASE_URL="https://mjbvilhena.github.io/ai-sdlc-harness/"
+          fi
+          npx playwright test

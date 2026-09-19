@@ -10,10 +10,13 @@ You can run all local testing suites simultaneously using the unified runner scr
 ./run_tests.sh
 ```
 
-This script creates `mcp-server/venv` if needed and runs the following suites in order. If `python3` is missing, steps 1–4 are skipped and the script still continues; if `bats` is missing, step 5 prints an error and the script still exits 0 with a success banner (Task 8.6).
+This script creates `mcp-server/venv` if needed and runs the following suites in order. If `python3` is missing, steps 1–4 are skipped and the script still continues; if `bats` is missing, step 5 prints an error and the script still exits 0 with a success banner (Task 8.6). Step 1b (docs browser invariants) runs in that same Python block.
 
 ### 1. Metadata Validation
 A custom Python script (`.github/scripts/validate_metadata.py`, CI workflow `.github/workflows/validate-metadata.yaml`) that strictly validates all `skill.yaml`, `agent.yaml`, and `rule.yaml` files against the schema (requiring Name, Description, Version, Author, and checking directory matching). Cursor's required primary file is `cursor/prompt.md`.
+
+### 1b. Docs browser catalog invariants
+`tests/docs_browser/test_dynamic_catalog.py` checks that `docs/browser/` stays a thin shell: relative asset URLs, default `mjbvilhena/ai-sdlc-harness@master`, live git-tree discovery, and **no hardcoded skill or MCP filename inventory**. The same check runs in `.github/workflows/pages.yaml` on every PR.
 
 ### 2. MCP Server Unit Tests
 Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files. On disk there are **24** templates (including `product_spec.md`, `research.md`, and `repository_setup.md`) and **13** Definitions of Done. `test_catalog_templates_and_dod` asserts the same 24 / 13 names. Remaining alias/regression coverage for those newer payloads is Task 10.9. These tests run locally via `./run_tests.sh`; GitHub Actions does **not** run `pytest` today (Task 8.7).
@@ -63,6 +66,10 @@ Every Pull Request automatically executes the following CI checks:
    - `markdownlint` on `**/*.md`.
 3. **Metadata Validation** (`.github/workflows/validate-metadata.yaml`): Ensures no malformed or undocumented skills are merged into the library.
 4. **Security Scans**: Gitleaks + Bandit (`.github/workflows/security.yaml`).
+5. **GitHub Pages** (`.github/workflows/pages.yaml`):
+   - Validates the docs-browser shell on every PR.
+   - **`e2e-pr`**: Playwright against a local `docs/browser/` server with a mocked GitHub API.
+   - **`deploy`** + **`e2e-live`**: only on `master` / `main` after Pages source is GitHub Actions. Live e2e hits `https://mjbvilhena.github.io/ai-sdlc-harness/` (or the deploy `page_url`) after the site returns HTTP 200.
 
 MCP `pytest` (`mcp-server/tests/`) and E2E are **not** GitHub Actions jobs. Catalog and alias regressions only fail locally until Task 8.7.
 

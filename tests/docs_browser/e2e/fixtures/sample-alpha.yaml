@@ -1,0 +1,8 @@
+name: sample-alpha
+description: Fixture skill used only by mocked docs-browser e2e.
+version: 0.0.1
+author: e2e
+targets:
+  - cursor
+triggers:
+  - /sample-alpha

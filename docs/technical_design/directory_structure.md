@@ -54,10 +54,11 @@ ai-sdlc-harness/
 │
 ├── tests/
 │   ├── bats/installers.bats
+│   ├── docs_browser/            # Pages shell invariants + Playwright UI e2e
 │   └── e2e/
 │
 ├── .github/
-│   ├── workflows/               # metadata, lint, BATS, security
+│   ├── workflows/               # metadata, lint, BATS, security, Pages
 │   ├── scripts/validate_metadata.py
 │   └── CODEOWNERS
 │
@@ -71,13 +72,15 @@ ai-sdlc-harness/
     │   ├── directory_structure.md   ← this file
     │   ├── schemas.md
     │   └── sdlc-conductor.md        # Design note: default front-door driver (skill: skills/sdlc-conductor/)
-    └── guides/
-        ├── authoring-for-agy.md
-        ├── authoring-for-claude.md
-        ├── authoring-for-cursor.md
-        ├── authoring-for-ghcp.md
-        ├── installation-and-usage.md
-        └── testing.md
+    ├── guides/
+    │   ├── authoring-for-agy.md
+    │   ├── authoring-for-claude.md
+    │   ├── authoring-for-cursor.md
+    │   ├── authoring-for-ghcp.md
+    │   ├── installation-and-usage.md
+    │   ├── testing.md
+    │   └── github-pages.md      # Pages shell, live catalog from GitHub, one-time setting
+    └── browser/                 # Static Pages shell (HTML/CSS/JS); inventory is fetched at runtime
 ```
 
 ## Notes
@@ -88,5 +91,6 @@ ai-sdlc-harness/
 - **`skills/` and `rules/` are the runtime source of truth today.** They are the Lifecycle Drivers and ambient rules the installers expand into each harness dest. A top-level `agents/` tree is **deferred**; installers already tolerate a missing `agents/` directory (they print a skip message and continue).
 - `skill.yaml` / `rule.yaml` / `agent.yaml` (when present) are for humans, docs, and CI. Installer scripts do not parse them.
 - Target-specific subdirectories (`agy/`, `claude/`, `cursor/`, `ghcp/`) are optional per item. An item that only targets AGY only needs `agy/`.
+- There is no generated per-skill HTML tree. `docs/browser/` is a committed static shell; GitHub Pages deploys it as-is. The browser lists skills and MCP data from the live GitHub tree on `master`.
 - There is no `build/` directory. Installers expand `CONTENT.md` into each harness shell and write the resolved file to the destination.
 - `mcp-server/` is optional at *runtime*. A live installer currently needs host `python3` to merge MCP JSON; running the server also needs the repo venv. `--dry-run` does not call Python. Skill/rule copy/expand does not parse YAML.
