@@ -77,19 +77,21 @@ install/install_<harness>.sh | .ps1
     ├─ 5. Print summary: N items installed.
     │
     └─ 6. Configure MCP Server (unless --dry-run / -DryRun)
-            Merges sdlc-knowledge into the host config (keeps sibling servers):
-              Claude  → claude_desktop_config.json (`mcpServers`)
+            Bash merges sdlc-knowledge into the host config (keeps sibling servers)
+            and sets command to mcp-server/venv/bin/python (args: mcp-server/src/server.py).
+            PowerShell twins still create the file only when missing and invoke `python3`
+            (Task 12.2). Destinations:
+              Claude  → claude_desktop_config.json (`mcpServers`) — PS1 still writes claude.json
               Cursor  → <ws>/.cursor/mcp.json (`mcpServers`)
               AGY     → <ws>/.agents/mcp_config.json or ~/.gemini/config/mcp_config.json
               GHCP    → <ws>/.vscode/mcp.json (`servers` — VS Code / Copilot schema)
-            Bash MCP command: mcp-server/venv/bin/python (args: mcp-server/src/server.py)
 ```
 
 ## Design Principles
 
 - **No runtime dependencies for copy/expand**: Skill/rule expansion uses only native shell utilities (POSIX `bash`, `cp`, `mkdir` on Unix; native PowerShell on Windows). A live install currently invokes host `python3` to merge MCP JSON (Task 12.5).
 - **No metadata parsing**: `skill.yaml` / `rule.yaml` are read by humans and CI validators only. Installers do not parse them. They do expand `CONTENT.md` into `{{SKILL_BODY}}` / `{{RULE_BODY}}`.
-- **Idempotency**: Expanding the same `CONTENT.md` into the same destination is idempotent. Running installers multiple times is safe. Existing MCP JSON is **merged**: sibling servers stay; `sdlc-knowledge` is created or updated.
+- **Idempotency**: Expanding the same `CONTENT.md` into the same destination is idempotent. Running installers multiple times is safe. **Bash** merges existing MCP JSON (sibling servers stay; `sdlc-knowledge` is created or updated). **PowerShell** still writes the MCP file only when it is missing and does not update an existing `sdlc-knowledge` entry (Task 12.2).
 - **Isolation**: Each harness installer is independent. Running `install/install_claude.sh` does not affect Cursor or Antigravity configuration, and vice versa.
 
 ## MCP Knowledge Server & Dynamic Consultants

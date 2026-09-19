@@ -85,14 +85,15 @@ Simply execute the helper script:
 ```
 
 ### End-to-End (E2E) LLM Testing
-`tests/e2e/` has two suites. `test_agent_behavior.py` executes a real LLM (Gemini) with a **stub** `get_domain_consultant` function (it does not start `mcp-server`) to check that the expanded skill prompt applies domain constraints. `test_cli_integration.py` optionally drives installed `agy` / `claude` CLIs headlessly when those binaries are present. `run_tests.sh` runs the whole directory when `GEMINI_API_KEY` (or `gemini_api_key`) is set. If `python3` or `bats` is missing, the runner may still print a success banner (Task 8.6).
+`tests/e2e/` has two suites. `test_agent_behavior.py` executes a real LLM (Gemini) with a **stub** `get_domain_consultant` function (it does not start `mcp-server`) to check that the expanded skill prompt applies domain constraints. `test_cli_integration.py` optionally drives installed `agy` / `claude` CLIs headlessly when those binaries are present. `run_tests.sh` runs the whole directory when `GEMINI_API_KEY` (or `gemini_api_key`) is set. If `python3` or `bats` is missing, the runner may still print a success banner (Task 8.6). Direct `pytest tests/e2e/` without an API key fails rather than skips (Task 8.8).
 
-Because the Gemini suite runs a real LLM, it requires an API key and is automatically skipped in standard CI runs if the key is missing.
+Because the Gemini suite runs a real LLM, it requires an API key. `./run_tests.sh` skips the E2E directory when the key is unset. Running `pytest tests/e2e/` directly **fails** (`pytest.fail` in `test_agent_behavior.py`) if `GEMINI_API_KEY` is missing — it does not skip. CI does not run E2E.
 
 To run the E2E tests locally:
 ```bash
 # 1. Enter the MCP server directory and set up the virtual environment
 cd mcp-server
+python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 

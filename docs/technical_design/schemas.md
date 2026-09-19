@@ -47,7 +47,7 @@ targets:
   - ghcp
 triggers:
   - /review
-  - /cr
+  - "code review"
 ```
 
 ---

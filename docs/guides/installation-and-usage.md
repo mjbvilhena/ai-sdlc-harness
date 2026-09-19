@@ -22,7 +22,7 @@ On Windows, run the `.ps1` scripts from PowerShell (`-Workspace` / `-DryRun` ins
 
 `--dry-run` / `-DryRun` prints what would be removed, copied, and which MCP file would be written or merged, without creating or deleting files.
 
-Matching uninstallers live beside each installer (`install/uninstall_<harness>.sh` / `.ps1`). They remove only `sdlc-*` destinations and, where implemented, drop the `sdlc-knowledge` MCP server key without deleting the rest of the config. After PR #10, `uninstall_cursor.sh` still targets `.cursor/prompts/` while the Bash installer writes `.cursor/commands/` (Task 12.3).
+Matching uninstallers live beside each installer (`install/uninstall_<harness>.sh` / `.ps1`). They are **intended** to remove only `sdlc-*` destinations and drop the `sdlc-knowledge` MCP key without deleting sibling servers. They are not a reliable reverse of today's installers (Task 12.3): `uninstall_cursor.sh` still targets `.cursor/prompts/` while the Bash installer writes `.cursor/commands/`; `uninstall_claude.sh` deletes `sdlc-*.json` and ignores `--workspace`; GHCP never drops the MCP key; PowerShell uninstallers source missing `lib/sdlc_names.ps1` and fail before cleanup.
 
 ## Step 1: Install skills and configure MCP
 
@@ -96,7 +96,7 @@ To remove a harness install later:
 ./install/uninstall_ghcp.sh --workspace /path/to/your/real-project
 ```
 
-Uninstallers delete only `sdlc-*` artifacts. Cursor and AGY Bash uninstallers also remove the `sdlc-knowledge` MCP key from the host config. `uninstall_claude.sh` currently targets the global `~/.claude/commands` tree (workspace uninstall is not wired yet) and deletes `sdlc-*.json` while install writes `sdlc-*.md`. `uninstall_cursor.sh` currently removes `.cursor/prompts/sdlc-*.md`, not the `.cursor/commands/` files the installer now writes. `uninstall_ghcp.sh` / `.ps1` do not remove `sdlc-knowledge` from `.vscode/mcp.json`.
+When they run, uninstallers delete only `sdlc-*` artifacts (PowerShell uninstallers currently fail first — Task 12.3). Cursor and AGY Bash uninstallers also remove the `sdlc-knowledge` MCP key from the host config. `uninstall_claude.sh` currently targets the global `~/.claude/commands` tree (workspace uninstall is not wired yet) and deletes `sdlc-*.json` while install writes `sdlc-*.md`. `uninstall_cursor.sh` currently removes `.cursor/prompts/sdlc-*.md`, not the `.cursor/commands/` files the installer now writes. `uninstall_ghcp.sh` / `.ps1` do not remove `sdlc-knowledge` from `.vscode/mcp.json`.
 
 ## Step 2: Define your project constraints
 
