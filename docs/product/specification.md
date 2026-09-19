@@ -19,7 +19,7 @@ There is no CLI tool to install, no compiled package, and no compilation of one 
 1. The user clones this repository.
 2. The user runs the installer script for their preferred harness from the repo root (e.g., `./install/install_claude.sh`, `./install/install_cursor.sh`, `./install/install_ghcp.sh`, or `./install/install_agy.sh`).
 3. The script discovers all skill directories under `skills/` and rule directories under `rules/` that contain the corresponding harness subdirectory (e.g., `claude/`, `cursor/`, `ghcp/`, `agy/`).
-4. For each skill, the script copies the contents into the target harness's expected local configuration directory.
+4. For each skill, the script expands sibling `CONTENT.md` into the harness shell and writes the resolved file into the target harness's expected local configuration directory.
 5. The user opens or reloads their AI tool and the skills are immediately available.
 
 ### Journey 2: Author a new skill
@@ -80,11 +80,11 @@ Installers live under `install/` (`install/install_<harness>.sh` and `.ps1`).
 - `install/install_ghcp.sh`: Same pattern for `ghcp/instructions.md` → `<ws>/.github/instructions/sdlc-<name>.instructions.md`. Workspace defaults to `$PWD`.
 - `install/install_agy.sh`: Expands `agy/` files (typically `SKILL.md` / `RULE.md`) into `~/.gemini/antigravity-cli/builtin/skills/sdlc-<name>/` or `<ws>/.agents/skills/sdlc-<name>/`. Destination YAML `name:` is rewritten to the same `sdlc-` name.
 - `--workspace <path>` is optional for Claude and AGY (omit for user-global install). Cursor and GHCP are always workspace-scoped; omitting the flag uses `$PWD`.
-- `install/uninstall_<harness>.sh` / `.ps1`: Intended to remove previously installed `sdlc-*` artifacts from the same destinations and, where implemented, drop the `sdlc-knowledge` MCP server key without deleting sibling servers. Current reverse-path bugs are Epic 12 (Cursor still deletes `.cursor/prompts/`; Claude deletes `sdlc-*.json` while install writes `sdlc-*.md` and ignores `--workspace`; GHCP does not remove `.vscode/mcp.json`).
+- `install/uninstall_<harness>.sh` / `.ps1`: Intended to remove previously installed `sdlc-*` artifacts from the same destinations and, where implemented, drop the `sdlc-knowledge` MCP server key without deleting sibling servers. Current reverse-path bugs are Epic 12 (Cursor still deletes `.cursor/prompts/`; Claude deletes `sdlc-*.json` while install writes `sdlc-*.md` and ignores `--workspace`; GHCP does not remove the `sdlc-knowledge` key from `.vscode/mcp.json`; PowerShell uninstallers fail before cleanup because they source missing `lib/sdlc_names.ps1`).
 
 ### F5. Installer Behaviour
 
-- Installers MUST be idempotent: running the script multiple times must produce the same result.
+- Installers MUST be idempotent: running the script multiple times must produce the same result. Bash meets this for skill/rule dests and MCP merge. PowerShell MCP is still create-once (Task 12.2).
 - Installers MUST remove previously installed `sdlc-*` artifacts in the destination before writing new ones (dry-run must report those paths without deleting). Non-`sdlc-*` user files MUST be left untouched.
 - Installed destination names (and YAML frontmatter `name:` when present) MUST start with `sdlc-`. If a source folder basename already has that prefix it is used as-is; otherwise the installer prefixes it.
 - Installers MUST print a summary of what was installed and where.
@@ -151,7 +151,7 @@ The installer scripts MUST seamlessly configure the host IDE to communicate with
 - Antigravity: `<ws>/.agents/mcp_config.json` (workspace) or `~/.gemini/config/mcp_config.json` (global)
 - GitHub Copilot / VS Code: `<ws>/.vscode/mcp.json` (`servers` key — VS Code / Copilot workspace schema)
 
-Bash installers merge `sdlc-knowledge` into an existing file (they do not replace the whole JSON). The MCP `command` they write is `mcp-server/venv/bin/python` from this clone. A live install currently calls host `python3` to perform that merge.
+Bash installers merge `sdlc-knowledge` into an existing file (they do not replace the whole JSON). The MCP `command` they write is `mcp-server/venv/bin/python` from this clone. A live install currently calls host `python3` to perform that merge. PowerShell twins are not at that parity (create-once + `python3`; Claude PS1 still writes `claude.json` — Task 12.2).
 
 ## 7. Out of Scope for v1
 

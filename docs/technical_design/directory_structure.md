@@ -24,7 +24,7 @@ ai-sdlc-harness/
 │       └── Sdlc-Names.ps1       # PowerShell twin
 │
 ├── skills/                      # Lifecycle Driver skill definitions
-│   └── <skill-name>/            # e.g. sdlc-code-reviewer, sdlc-example-skill
+│   └── <skill-name>/            # e.g. sdlc-conductor, sdlc-ux-designer, sdlc-example-skill
 │       ├── skill.yaml           # Metadata only (not parsed by installers)
 │       ├── CONTENT.md           # Canonical body ({{SKILL_BODY}})
 │       ├── agy/
@@ -85,8 +85,8 @@ ai-sdlc-harness/
 - **Installers live under `install/`**. Invoke them as `./install/install_<harness>.sh` (or the `.ps1` twin). Uninstallers are `./install/uninstall_<harness>.sh` / `.ps1`.
 - **Cursor destinations are slash commands**: source `cursor/prompt.md` → `<ws>/.cursor/commands/sdlc-<name>.md`. Not `.cursor/prompts/` or `.cursor/rules/*.mdc`.
 - **GitHub Copilot destinations** are `<ws>/.github/instructions/sdlc-<name>.instructions.md` (source `ghcp/instructions.md`).
-- **`skills/` and `rules/` are the runtime source of truth today.** They are the Lifecycle Drivers and ambient rules the installers copy. A top-level `agents/` tree is **deferred**; installers already tolerate a missing `agents/` directory (they print a skip message and continue).
+- **`skills/` and `rules/` are the runtime source of truth today.** They are the Lifecycle Drivers and ambient rules the installers expand into each harness dest. A top-level `agents/` tree is **deferred**; installers already tolerate a missing `agents/` directory (they print a skip message and continue).
 - `skill.yaml` / `rule.yaml` / `agent.yaml` (when present) are for humans, docs, and CI. Installer scripts do not parse them.
 - Target-specific subdirectories (`agy/`, `claude/`, `cursor/`, `ghcp/`) are optional per item. An item that only targets AGY only needs `agy/`.
-- There is no `build/` directory. Files are copied directly from source to destination.
+- There is no `build/` directory. Installers expand `CONTENT.md` into each harness shell and write the resolved file to the destination.
 - `mcp-server/` is optional at *runtime*. A live installer currently needs host `python3` to merge MCP JSON; running the server also needs the repo venv. `--dry-run` does not call Python. Skill/rule copy/expand does not parse YAML.

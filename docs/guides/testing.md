@@ -27,7 +27,7 @@ Appended only when `GEMINI_API_KEY` or `gemini_api_key` is set. See the E2E sect
 ### 5. BATS (Bash Automated Testing System)
 BATS (`tests/bats/installers.bats`) evaluates the shell installer scripts under `install/` (`install_claude.sh`, `install_cursor.sh`, `install_ghcp.sh`, `install_agy.sh`). The suite covers dry-run (no files written), global vs `--workspace` paths, PWD default for Cursor/GHCP, idempotent re-runs, MCP **merge** (existing sibling servers are kept and `sdlc-knowledge` is added), flag/path errors, a missing `agents/` directory, `CONTENT.md` expansion, `sdlc-` destination naming, and cleanup of stale `sdlc-*` artifacts (neighbors without the prefix survive; dry-run reports cleanup without deleting). Cursor destinations under test are `<ws>/.cursor/commands/sdlc-*.md`. It uses a transient mock `$HOME` and workspace so your real machine config is not touched.
 
-Uninstallers (`install/uninstall_*.sh`) and the PowerShell twins are **not** covered by this BATS file.
+MCP merge assertions exist for Cursor and GHCP only (no Claude/AGY merge cases — Task 12.4). Uninstallers (`install/uninstall_*.sh`) and the PowerShell twins are **not** covered by this BATS file.
 
 ### 6. Gitleaks Secret Scan
 Run locally when the `gitleaks` binary is installed; always run in CI (`.github/workflows/security.yaml`).
@@ -38,7 +38,7 @@ Run locally when the `gitleaks` binary is installed; always run in CI (`.github/
 
 To ensure that the Tri-Dimensional Framework functions correctly, we have an E2E testing framework. `tests/e2e/test_agent_behavior.py` invokes a real LLM (Gemini) headlessly with a **stub** `get_domain_consultant` function (it does not start `mcp-server`) and checks that the expanded skill prompt applies a domain constraint. `tests/e2e/test_cli_integration.py` optionally drives installed `agy` / `claude` CLIs when those binaries are present. `run_tests.sh` runs the whole `tests/e2e/` directory.
 
-Because this test executes a real LLM, it requires an API key. **If you do not provide an API key, this test will gracefully skip itself** (both locally and in CI).
+Because this test executes a real LLM, it requires an API key. **`./run_tests.sh` skips the E2E directory when the key is unset.** Running `pytest tests/e2e/test_agent_behavior.py` directly **fails** (`pytest.fail`) if the key is missing — it does not skip (Task 8.8). CI does not run E2E.
 
 ### Running E2E Tests Locally
 
@@ -74,5 +74,5 @@ This repository is protected by automated security workflows (`.github/workflows
 2. **Bandit (Python SAST)**: Statically analyzes the Python code in the `mcp-server/` directory to identify common security vulnerabilities before they reach production.
 
 ### Real IDE CLI Integration Tests (Headless)
-We also include `tests/e2e/test_cli_integration.py` which dynamically checks if you have the `agy` or `claude` CLI installed on your machine. If it detects them, it will use Python's `subprocess` to spawn a headless, non-interactive execution (e.g., `agy -p "/sdlc-example-skill"`) to ensure that the installed skills actually load and execute in a real production binary.
+We also include `tests/e2e/test_cli_integration.py` which dynamically checks if you have the `agy` or `claude` CLI installed on your machine. If it detects them, it will use Python's `subprocess` to spawn a headless, non-interactive execution (e.g., `agy -p "/sdlc-example-skill"` — the installed AGY dest name; `skill.yaml` trigger is `/example`) to ensure that the installed skills actually load and execute in a real production binary.
 *(Note: If your local CLI is out of credits or requires interactive authentication, this test will gracefully skip itself).*

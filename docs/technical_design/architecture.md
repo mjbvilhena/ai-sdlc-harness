@@ -77,19 +77,21 @@ install/install_<harness>.sh | .ps1
     ├─ 5. Print summary: N items installed.
     │
     └─ 6. Configure MCP Server (unless --dry-run / -DryRun)
-            Merges sdlc-knowledge into the host config (keeps sibling servers):
-              Claude  → claude_desktop_config.json (`mcpServers`)
+            Bash merges sdlc-knowledge into the host config (keeps sibling servers)
+            and sets command to mcp-server/venv/bin/python (args: mcp-server/src/server.py).
+            PowerShell twins still create the file only when missing and invoke `python3`
+            (Task 12.2). Destinations:
+              Claude  → claude_desktop_config.json (`mcpServers`) — PS1 still writes claude.json
               Cursor  → <ws>/.cursor/mcp.json (`mcpServers`)
               AGY     → <ws>/.agents/mcp_config.json or ~/.gemini/config/mcp_config.json
               GHCP    → <ws>/.vscode/mcp.json (`servers` — VS Code / Copilot schema)
-            Bash MCP command: mcp-server/venv/bin/python (args: mcp-server/src/server.py)
 ```
 
 ## Design Principles
 
 - **No runtime dependencies for copy/expand**: Skill/rule expansion uses only native shell utilities (POSIX `bash`, `cp`, `mkdir` on Unix; native PowerShell on Windows). A live install currently invokes host `python3` to merge MCP JSON (Task 12.5).
 - **No metadata parsing**: `skill.yaml` / `rule.yaml` are read by humans and CI validators only. Installers do not parse them. They do expand `CONTENT.md` into `{{SKILL_BODY}}` / `{{RULE_BODY}}`.
-- **Idempotency**: Expanding the same `CONTENT.md` into the same destination is idempotent. Running installers multiple times is safe. Existing MCP JSON is **merged**: sibling servers stay; `sdlc-knowledge` is created or updated.
+- **Idempotency**: Expanding the same `CONTENT.md` into the same destination is idempotent. Running installers multiple times is safe. **Bash** merges existing MCP JSON (sibling servers stay; `sdlc-knowledge` is created or updated). **PowerShell** still writes the MCP file only when it is missing and does not update an existing `sdlc-knowledge` entry (Task 12.2).
 - **Isolation**: Each harness installer is independent. Running `install/install_claude.sh` does not affect Cursor or Antigravity configuration, and vice versa.
 
 ## MCP Knowledge Server & Dynamic Consultants
@@ -102,6 +104,6 @@ The MCP server acts as an intelligent knowledge retrieval layer for the Lifecycl
 - **Definitions of Done**: `get_definition_of_done` serves `mcp-server/data/dod/` (**13** files) for `bugfix`, `epic`, `feature`, `hotfix`, `release`, `pr`, `user story`, `security change`, `ui change`, `api change`, `data migration`, `research`, and `repository setup`.
 - **Dynamic Consultant Discovery**: Tools like `get_domain_consultant` and `get_layer_consultant` walk `WORKSPACE_ROOT` for `DOMAIN.md` and `LAYER.md` files. That path is `os.getenv("WORKSPACE_ROOT", os.getcwd())` in `mcp-server/src/server.py`. Bash installers write only `command` + `args` into the host MCP config — they do **not** set `env.WORKSPACE_ROOT` to the `--workspace` target — so discovery depends on the MCP host process CWD unless the IDE (or the user) sets the env var (Task 12.8).
 
-Lifecycle Driver prompts (e.g., `sdlc-conductor`, `sdlc-product-owner`, `sdlc-researcher`, `sdlc-setup-repository`, `sdlc-user-story-refiner`, `sdlc-code-reviewer`, `sdlc-rfc-drafter`, `sdlc-security-reviewer`, `sdlc-docs-backlog-review`) and the ambient `sdlc-dod-checker` **rule** explicitly instruct the model to query this MCP server for templates and constraints before generating artifacts. Tool names stay stable; only payloads, aliases, and tests expand.
+Lifecycle Driver prompts (e.g., `sdlc-conductor`, `sdlc-product-owner`, `sdlc-researcher`, `sdlc-setup-repository`, `sdlc-user-story-refiner`, `sdlc-ux-designer`, `sdlc-code-reviewer`, `sdlc-rfc-drafter`, `sdlc-security-reviewer`, `sdlc-docs-backlog-review`) and the ambient `sdlc-dod-checker` **rule** explicitly instruct the model to query this MCP server for templates and constraints before generating artifacts. Tool names stay stable; only payloads, aliases, and tests expand. There is **no** dedicated UX / wireframe template in the 24-item catalog — `sdlc-ux-designer` reuses `user story` + `ui change` DoD.
 
-The default front door is **`sdlc-conductor`** (`/sdlc-conductor`, `/conductor`, “what next?”). Design: [`sdlc-conductor.md`](sdlc-conductor.md). Runtime graph: `skills/sdlc-conductor/CONTENT.md`. It recommends the next legal pipeline step — including a first-class **design & planning** band after story refine, not stories → setup → code — and stewards cross-cutting memory. It must not replace child-skill authorship or `sdlc-docs-backlog-review`.
+The default front door is **`sdlc-conductor`** (`/sdlc-conductor`, `/conductor`, “what next?”). Design: [`sdlc-conductor.md`](sdlc-conductor.md). Runtime graph: `skills/sdlc-conductor/CONTENT.md`. It recommends the next legal pipeline step — including a first-class **design & planning** band after story refine (UI/UX via `sdlc-ux-designer`), not stories → setup → code — and stewards cross-cutting memory. It must not replace child-skill authorship or `sdlc-docs-backlog-review`.
