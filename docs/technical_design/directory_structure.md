@@ -69,7 +69,8 @@ ai-sdlc-harness/
     ├── technical_design/
     │   ├── architecture.md
     │   ├── directory_structure.md   ← this file
-    │   └── schemas.md
+    │   ├── schemas.md
+    │   └── sdlc-conductor.md        # Design note: default front-door driver (skill: skills/sdlc-conductor/)
     └── guides/
         ├── authoring-for-agy.md
         ├── authoring-for-claude.md
