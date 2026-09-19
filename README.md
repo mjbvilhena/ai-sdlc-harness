@@ -79,8 +79,9 @@ ai-sdlc-harness/
 │       └── ghcp/instructions.md
 ├── rules/                   # Ambient rules (same harness layout)
 ├── mcp-server/              # Optional Python MCP knowledge server
-├── tests/                   # BATS installer tests + E2E suites
+├── tests/                   # BATS installer tests + E2E suites + docs-browser invariants
 └── docs/
+    └── browser/             # GitHub Pages shell (live catalog from GitHub, not a frozen HTML tree)
 ```
 
 `agents/` is not populated. Installers iterate `agents/` when present and skip it otherwise.
@@ -130,10 +131,22 @@ To deploy this harness into a real project (including `--workspace` nuances, uni
 
 ## Testing
 
-To run the local test suites (metadata validation, MCP unit tests, Bandit, BATS shell tests, and Gitleaks when installed):
+To run the local test suites (metadata validation, docs-browser catalog invariants, MCP unit tests, Bandit, BATS installer tests, and Gitleaks when installed):
 
 ```bash
 ./run_tests.sh
 ```
 
 For End-to-End LLM evaluations using a Gemini API key, see the Testing section in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+## Catalog on GitHub Pages
+
+A static shell in [`docs/browser/`](docs/browser/) is deployed with GitHub Actions (`actions/upload-pages-artifact` + `actions/deploy-pages`). The **inventory is not generated at build time**. The page lists `skills/` and `mcp-server/data/` from the public GitHub tree on `master` when you load it, so a new skill or MCP markdown file appears on refresh without editing the site.
+
+One-time (Pages is not enabled yet): **Settings → Pages → Source = GitHub Actions**. After that, the site is `https://mjbvilhena.github.io/ai-sdlc-harness/`.
+
+```bash
+python3 -m http.server 8080 --directory docs/browser
+```
+
+See [`docs/guides/github-pages.md`](docs/guides/github-pages.md).
