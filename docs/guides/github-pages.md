@@ -6,10 +6,7 @@ After merge, new `skills/*/skill.yaml` packages and new markdown under `mcp-serv
 
 ## One-time repo setting
 
-Pages is not enabled on this repository until someone sets it:
-
-**Settings → Pages → Source = GitHub Actions**
-
+Pages is not enabled on this repository until someone sets **Settings → Pages → Source** to **GitHub Actions**.
 Until that is set, the deploy job on `master` may fail. The pull-request job only validates the shell; it does not deploy.
 
 The live site (project Pages) is:
