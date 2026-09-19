@@ -33,6 +33,9 @@ EXPECTED_TEMPLATES = {
     "repository setup",
     "product spec",
     "research",
+    "lifecycle pipeline",
+    "ux design",
+    "docs backlog review",
 }
 
 EXPECTED_DOD = {
@@ -72,6 +75,11 @@ def test_resolve_alias_longest_match_wins():
     assert resolve_alias("security change") == "security change"
     assert resolve_alias("user story") == "user story"
     assert resolve_alias("story") == "user story"
+    assert resolve_alias("sdlc conductor") == "lifecycle pipeline"
+    assert resolve_alias("conductor") == "lifecycle pipeline"
+    assert resolve_alias("ux playbook") == "ux design"
+    assert resolve_alias("playbook") == "runbook"
+    assert resolve_alias("docs backlog review") == "docs backlog review"
 
 
 def test_fuzzy_match_prefers_exact_option_over_short_alias():
@@ -130,6 +138,17 @@ def test_get_sdlc_template():
         ("layer", "Layer Consultant"),
         ("incident", "Incident Postmortem Template"),
         ("postmortem", "Incident Postmortem Template"),
+        ("lifecycle pipeline", "# Lifecycle Pipeline"),
+        ("conductor", "# Lifecycle Pipeline"),
+        ("sdlc conductor", "# Lifecycle Pipeline"),
+        ("ux design", "# UX Design"),
+        ("ux", "# UX Design"),
+        ("wireframe", "# UX Design"),
+        ("ux playbook", "# UX Design"),
+        ("docs backlog review", "# Docs Backlog Review"),
+        ("docs backlog", "# Docs Backlog Review"),
+        ("backlog review", "# Docs Backlog Review"),
+        ("full repo audit", "# Docs Backlog Review"),
     ],
 )
 def test_get_sdlc_template_new_names_and_aliases(query, needle):
@@ -142,6 +161,19 @@ def test_e2e_alias_does_not_collapse_to_unit_test_plan():
     result = get_sdlc_template("e2e test plan")
     assert "End-to-End Test Plan" in result
     assert "# Test Plan\n" not in result
+
+
+def test_playbook_alias_stays_runbook_not_ux():
+    result = get_sdlc_template("playbook")
+    assert "Runbook" in result
+    assert "# UX Design" not in result
+
+
+def test_conductor_aliases_do_not_collapse_to_code_review():
+    result = get_sdlc_template("conductor")
+    assert "# Lifecycle Pipeline" in result
+    assert "Skip policy" in result
+    assert "Code Review Template" not in result
 
 
 def test_get_definition_of_done():

@@ -1,6 +1,6 @@
 # Design note: `sdlc-conductor`
 
-Status: **implemented** as `skills/sdlc-conductor/` (runtime graph lives in that skill’s `CONTENT.md`). This note remains the human-facing design. Open questions in §9 may still be parked.
+Status: **implemented** as `skills/sdlc-conductor/` (runtime graph lives in MCP template `lifecycle pipeline`, fetched via `get_sdlc_template`). This note remains the human-facing design. Open questions in §9 may still be parked.
 
 This note records the agreed product intent for a default front-door Lifecycle Driver. Name: **`sdlc-conductor`** (not `sdlc-agent`). A dedicated `agents/` tree remains deferred, and “agent” collides with that future package type.
 
@@ -49,7 +49,7 @@ Rules:
 
 ## 3. Pipeline states
 
-Legal progression is a graph, not a slogan. The **runtime** graph lives in `skills/sdlc-conductor/CONTENT.md`. This section is the human-facing copy and must stay aligned with that file.
+Legal progression is a graph, not a slogan. The **runtime** graph lives in MCP template `lifecycle pipeline` (`get_sdlc_template`; aliases `conductor`, `sdlc conductor`). Skill `CONTENT.md` is thin orchestration that must fetch that payload first. This section is the human-facing copy and must stay aligned with the MCP template.
 
 ```
 vision
@@ -76,7 +76,7 @@ The **main path is not** stories → setup → code. Design and planning are fir
 | **Epic approval** | Scope is a product decision | **Human** (conductor recommends; does not invent sign-off) | Named approval or explicit “treat as approved” from the user |
 | **Story refine** | Per approved epic: BDD stories + AC | `sdlc-user-story-refiner` | Must AC are independently valuable and testable |
 | **Technical design** | Architecture, API shape, and accepted decisions for the slice about to be built | `sdlc-rfc-drafter`, `sdlc-api-designer`, `sdlc-adr-drafter`; MCP templates `rfc`, `api design` / `api contract`, `adr`. Domain/layer architects when bounds change (same band) | Agreed tech-design artefact exists for the epic/slice (RFC and/or API design/contract, plus ADR if a decision landed) |
-| **UI/UX design** | Agreed interaction, flow, and copy **before** UI is coded | `sdlc-ux-designer` (`/ux`, `/ux-design`). Conductor **must not invent UI**. An existing human or external artefact still satisfies this state. There is **no** dedicated UX MCP template in the catalog — do not invent one. `sdlc-a11y-auditor` is **verify-time**, not design-time | Agreed UX artefact exists (wireframes, flows, copy, or equivalent the user points at) **or** explicit skip recorded (e.g. no UI in this slice) |
+| **UI/UX design** | Agreed interaction, flow, and copy **before** UI is coded | `sdlc-ux-designer` (`/ux`, `/ux-design`). Conductor **must not invent UI**. An existing human or external artefact still satisfies this state. Fetch MCP template `ux design` (aliases `ux`, `wireframe`). `sdlc-a11y-auditor` is **verify-time**, not design-time | Agreed UX artefact exists (wireframes, flows, copy, or equivalent the user points at) **or** explicit skip recorded (e.g. no UI in this slice) |
 | **Test strategy** | How the slice will be proven, written **before** implementation tests are generated | MCP templates `test_plan`, `e2e_test_plan`. `sdlc-threat-modeler` / `sdlc-security-reviewer` (templates `threat_model`, `security review`) when the slice is security-sensitive. `sdlc-test-writer` / `sdlc-e2e-scripter` are **later execution**, not this state’s authors | Test plan (and e2e plan when there is a user journey) exists and is linked; threat/security artefacts exist when warranted |
 | **Domain / layer (in-band)** | Constraints match the design that is about to be built | `sdlc-domain-architect` / `sdlc-layer-architect` when a bounded context or layer is new or its constraints **actually changed**. Conductor does not invent `MUST` / `NEVER` | Relevant `DOMAIN.md` / `LAYER.md` exist and do not contradict the spec or tech design — or no bound changed |
 | **Setup-repo** | QA gates **after** planning and **before** first implement (or already satisfied) | `sdlc-setup-repository` when first code is about to land and checks are missing. Brownfield: treat as satisfied if CI/lint/secret-scan/ownership already exist, and say so | Repo has agreed checks **or** user agrees the repo is already set up |
@@ -151,7 +151,7 @@ If the checklist would become a large audit, **stop** and recommend `/docs-backl
 | **`sdlc-product-owner`** | Child for vision → epics / product spec. Conductor hands off; does not write sprint stories. |
 | **`sdlc-user-story-refiner`** | Child for per-epic BDD stories. Conductor waits for epic approval (or an explicit skip). |
 | **`sdlc-rfc-drafter` / `sdlc-api-designer` / `sdlc-adr-drafter`** | Children in the **technical design** band. Templates `rfc`, `api design` / `api contract`, `adr`. Conductor syncs links after they land; does not author the RFC/API/ADR body. |
-| **`sdlc-ux-designer`** | Child for the **UI/UX design** band. Authors wireframes/flows/copy from stories without inventing product claims. Conductor syncs links after the artefact lands; does not invent screens. A human/external artefact still satisfies the state. No dedicated UX MCP template (catalog remains 24). Task 13.6. |
+| **`sdlc-ux-designer`** | Child for the **UI/UX design** band. Authors wireframes/flows/copy from stories without inventing product claims. Fetch MCP template `ux design`. Conductor syncs links after the artefact lands; does not invent screens. A human/external artefact still satisfies the state. Task 13.6. |
 | **Test strategy vs execution** | Strategy uses MCP `test_plan` / `e2e_test_plan` (and `threat_model` / `security review` when warranted) **before** code. `sdlc-test-writer` / `sdlc-e2e-scripter` execute that plan at **verify** time. `sdlc-threat-modeler` / `sdlc-security-reviewer` sit in the planning band when the slice is security-sensitive. |
 | **`sdlc-setup-repository`** | Child **after** planning, when first code is about to land and repo QA is missing. Brownfield CI can satisfy this state. Conductor does not emit workflows itself. |
 | **`sdlc-domain-architect` / `sdlc-layer-architect`** | Authors of `DOMAIN.md` / `LAYER.md`. Fire in the design band when bounds actually change; conductor detects staleness and hands off; may add cross-links after. |
@@ -162,7 +162,7 @@ If the checklist would become a large audit, **stop** and recommend `/docs-backl
 | **Later / ops** (`sdlc-release-notes-generator`, `sdlc-runbook-writer`, `sdlc-migration-planner`, `sdlc-postmortem-writer`, `sdlc-ci-debugger`, …) | After a ship/ops need appears. Not where RFC, API design, or test strategy live. |
 | **`agents/`** | Still deferred. Conductor is a **skill**, not an agent package. |
 
-MCP: reuse existing tools (`get_sdlc_template`, `get_definition_of_done`, `get_domain_consultant`, `get_layer_consultant`). A new MCP tool is **not** required for v1 unless implementation proves the pipeline graph cannot stay a fetched document (see Task 13.4).
+MCP: reuse existing tools (`get_sdlc_template`, `get_definition_of_done`, `get_domain_consultant`, `get_layer_consultant`). Runtime payloads include `lifecycle pipeline`, `ux design`, and `docs backlog review`. A new MCP *tool* is **not** required.
 
 ## 7. Non-goals
 
@@ -179,16 +179,16 @@ MCP: reuse existing tools (`get_sdlc_template`, `get_definition_of_done`, `get_d
 
 Shipped as `skills/sdlc-conductor/` (PR #15) with thin four-harness shells. Triggers: `/sdlc-conductor`, `/conductor`, “what next?”, “drive the SDLC”.
 
-- The **pipeline graph** (states, legal edges, skip rule, discovery table) lives in `skills/sdlc-conductor/CONTENT.md` (no extra MCP pipeline template). Do not fork a second informal list in README, and do not collapse the graph to stories → setup → code.
-- UI/UX hand-off is `sdlc-ux-designer` (Task 13.6). There is still no dedicated UX MCP template — do not invent a catalog entry.
-- After handoff, run §5. If drift looks systemic, invoke `sdlc-docs-backlog-review`.
+- The **pipeline graph** (states, legal edges, skip rule, discovery table) lives in MCP template `lifecycle pipeline`. Skill `CONTENT.md` stays thin and must fetch that payload before executing. Do not fork a second informal list in README, and do not collapse the graph to stories → setup → code.
+- UI/UX hand-off is `sdlc-ux-designer` (Task 13.6). Fetch MCP template `ux design` (aliases `ux`, `wireframe`).
+- After handoff, run §5 (also in the pipeline template as Job B). If drift looks systemic, invoke `sdlc-docs-backlog-review` (template `docs backlog review`).
 - Safety language: no fake approvals, no invented constraints, no invented UI, no exploit/malware guidance, no merge of the landing PR.
 
 ## 9. Open questions
 
 1. **Approval evidence** — Is a backlog status flip enough for “epic approved”, or must the user type an explicit approval each time?
 2. **In-session handoff vs “please run `/skill`”** — Some hosts nest skills poorly. Prefer in-session follow-through when the child `CONTENT.md` is available; otherwise a one-line invoke.
-3. **Pipeline graph home** — Design note vs `CONTENT.md` vs a new MCP template (`lifecycle pipeline`). Recommendation: start in `CONTENT.md` (or a sibling file the skill reads); promote to MCP only if multiple skills must fetch the same graph.
+3. **Pipeline graph home** — **Resolved:** runtime SSOT is MCP template `lifecycle pipeline`; this design note stays human-facing; skill `CONTENT.md` is thin orchestration that fetches the template.
 4. **Target-repo conventions** — How far to standardize vision/spec/backlog paths vs “discover like docs-backlog-review”? Recommendation: discover first; only suggest `docs/product/` when the repo has no tracker.
 5. **Story index format** — New file vs a section in the spec vs links in the backlog? Leave to implementation once a real target repo is used.
 6. **Setup-repo vs brownfield** — For repos that already have CI, is the default “skip with recommendation” or “always ask”? Recommendation: if signals show checks exist, treat setup as satisfied and say so.

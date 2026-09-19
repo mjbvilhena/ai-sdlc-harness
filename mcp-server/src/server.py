@@ -94,6 +94,19 @@ ALIASES = {
     "research report": "research",
     "spike": "research",
     "investigation": "research",
+    "lifecycle pipeline": "lifecycle pipeline",
+    "sdlc conductor": "lifecycle pipeline",
+    "conductor": "lifecycle pipeline",
+    "ux design": "ux design",
+    "ux designer": "ux design",
+    "ux playbook": "ux design",
+    "wireframes": "ux design",
+    "wireframe": "ux design",
+    "ux": "ux design",
+    "docs backlog review": "docs backlog review",
+    "docs backlog": "docs backlog review",
+    "backlog review": "docs backlog review",
+    "full repo audit": "docs backlog review",
     # DoD (logical names share some aliases with templates; catalogs are separate)
     "bug fix": "bugfix",
     "hot fix": "hotfix",
@@ -149,11 +162,13 @@ def fuzzy_match(query: str, options: list[str]) -> str | None:
 def get_sdlc_template(template_type: str) -> str:
     """
     Retrieve a standard SDLC template (e.g., 'ADR', 'PR', 'User Story',
-    'threat model', 'api design', 'runbook').
+    'threat model', 'api design', 'runbook', 'lifecycle pipeline',
+    'ux design').
 
     Args:
         template_type: The type of template you are looking for. Aliases
-            such as 'pull request', 'stride', or 'changelog' also resolve.
+            such as 'pull request', 'stride', 'changelog', or 'conductor'
+            also resolve.
     """
     files = get_available_files("templates")
     options = list(files.keys())
