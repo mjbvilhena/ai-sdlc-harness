@@ -7,7 +7,8 @@ After merge, new `skills/*/skill.yaml` packages and new markdown under `mcp-serv
 ## One-time repo setting
 
 Pages is not enabled on this repository until someone sets **Settings → Pages → Source** to **GitHub Actions**.
-Until that is set, the deploy job on `master` may fail. The pull-request job only validates the shell; it does not deploy.
+
+Until that is set, the **deploy** job on `master` may fail and **e2e-live** will not run. Pull requests run shell validation plus mocked Playwright (`e2e-pr`); they do not deploy.
 
 The live site (project Pages) is:
 
@@ -21,7 +22,9 @@ Asset URLs in `docs/browser/index.html` are **relative**, so the same folder als
 
 - Runs on **push** to `master` / `main`, on **pull requests** to those branches, and on **workflow_dispatch**
 - **Always** runs `python3 tests/docs_browser/test_dynamic_catalog.py` (no hardcoded skill or MCP filename inventory in the shell)
+- **PRs** also run Playwright UI e2e (`e2e-pr`) against a local static server with a **mocked** GitHub API (fixture catalog, not the live inventory)
 - **Uploads and deploys** only on `master` / `main` (not on PRs), using `actions/upload-pages-artifact` and `actions/deploy-pages`, with `permissions: pages: write` + `id-token: write` and the `github-pages` environment
+- After a successful **deploy** on `master` / `main`, job **`e2e-live`** hits the live Pages URL (waits/retries until HTTP 200, then Playwright). Post-merge path: merge → deploy → live UI e2e.
 
 There is no `gh-pages` branch.
 
@@ -49,6 +52,26 @@ python3 -m http.server 8080 --directory docs/browser
 Then visit `http://127.0.0.1:8080/`. To point at a branch other than `master`:
 
 `http://127.0.0.1:8080/?ref=your-branch`
+
+## UI e2e (Playwright)
+
+From `tests/docs_browser/e2e/` (Chromium):
+
+```bash
+cd tests/docs_browser/e2e
+npm ci
+npx playwright install chromium
+
+# PR-style: local shell + mocked GitHub API (no live Pages, no API quota)
+MOCK_GITHUB=1 npm test
+
+# Against the deployed project Pages site
+BASE_URL=https://mjbvilhena.github.io/ai-sdlc-harness/ npm test
+```
+
+`MOCK_GITHUB=1 npm test` also starts `python3 -m http.server` on port 4173 for `docs/browser/` when `BASE_URL` is unset. Tests assert discovery populated skills/templates/DoD, markdown detail pages, search, and a visible error on a mocked 403 rate limit. They do **not** hardcode the production skill/template inventory.
+
+Live post-deploy e2e (`e2e-live` in CI) uses optional `GITHUB_TOKEN` only inside Playwright’s GitHub API route (never injected into the page) so Actions IPs are less likely to hit the unauthenticated 60/hour cap. Local live runs work unauthenticated.
 
 ## Adding catalog entries
 

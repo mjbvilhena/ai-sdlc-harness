@@ -1,0 +1,12 @@
+{
+  "name": "docs-browser-e2e",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:mocked": "MOCK_GITHUB=1 playwright test",
+    "test:live": "BASE_URL=https://mjbvilhena.github.io/ai-sdlc-harness/ playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}

@@ -149,4 +149,4 @@ One-time (Pages is not enabled yet): **Settings → Pages → Source = GitHub Ac
 python3 -m http.server 8080 --directory docs/browser
 ```
 
-See [`docs/guides/github-pages.md`](docs/guides/github-pages.md).
+See [`docs/guides/github-pages.md`](docs/guides/github-pages.md) for the one-time Pages setting, local preview, and Playwright UI e2e (`e2e-pr` on PRs; `e2e-live` after deploy on `master`).

@@ -477,7 +477,8 @@
     var triggers = asList(meta.triggers);
     var search = [skill.name, meta.description, triggers.join(" "), asList(meta.targets).join(" ")]
       .join(" ").toLowerCase();
-    return "<a class=\"card\" href=\"#/skills/" + encodeURIComponent(skill.name) + "\" data-search=\"" +
+    return "<a class=\"card\" href=\"#/skills/" + encodeURIComponent(skill.name) +
+      "\" data-catalog-item=\"skill\" data-search=\"" +
       escapeHtml(search) + "\">" +
       "<h3>" + escapeHtml(skill.name) + "</h3>" +
       "<p>" + escapeHtml(meta.description || "No description in skill.yaml") + "</p>" +
@@ -488,7 +489,8 @@
   function docCard(item) {
     var search = [item.slug, item.title, item.dir].join(" ").toLowerCase();
     return "<a class=\"card\" href=\"#/" + encodeURIComponent(item.dir) + "/" + encodeURIComponent(item.slug) +
-      "\" data-search=\"" + escapeHtml(search) + "\">" +
+      "\" data-catalog-item=\"doc\" data-catalog-dir=\"" + escapeHtml(item.dir) + "\" data-search=\"" +
+      escapeHtml(search) + "\">" +
       "<h3>" + escapeHtml(item.title) + "</h3>" +
       "<p class=\"muted\">" + escapeHtml(item.file) + "</p>" +
       "</a>";
@@ -508,15 +510,16 @@
       searchBox("Search skills and documents"),
       "<p id=\"filter-empty\" class=\"empty hidden\">No items match that filter.</p>",
       "<h2>Skills (" + catalog.skills.length + ")</h2>",
-      "<div class=\"card-grid\">" + catalog.skills.map(skillCard).join("") + "</div>"
+      "<div class=\"card-grid\" data-catalog=\"skills\">" + catalog.skills.map(skillCard).join("") + "</div>"
     ];
     catalog.dirNames.forEach(function (dir) {
       var items = catalog.dataDirs[dir];
       sections.push("<h2>" + escapeHtml(labelForDir(dir)) + " (" + items.length + ")</h2>");
-      sections.push("<div class=\"card-grid\">" + items.map(docCard).join("") + "</div>");
+      sections.push("<div class=\"card-grid\" data-catalog=\"" + escapeHtml(dir) + "\">" +
+        items.map(docCard).join("") + "</div>");
     });
     if (!catalog.skills.length && !catalog.dirNames.length) {
-      sections.push("<p class=\"empty\">No skills or MCP data files were found on this ref.</p>");
+      sections.push("<p class=\"empty\" data-catalog-empty=\"true\">No skills or MCP data files were found on this ref.</p>");
     }
     main.innerHTML = sections.join("");
     bindFilter();
@@ -529,7 +532,7 @@
       "<p class=\"lede\">Every directory under <code>skills/</code> that has <code>skill.yaml</code> or <code>CONTENT.md</code>.</p>",
       searchBox("Filter by name, description, or trigger"),
       "<p id=\"filter-empty\" class=\"empty hidden\">No skills match that filter.</p>",
-      "<div class=\"card-grid\">" + catalog.skills.map(skillCard).join("") + "</div>"
+      "<div class=\"card-grid\" data-catalog=\"skills\">" + catalog.skills.map(skillCard).join("") + "</div>"
     ].join("");
     bindFilter();
   }
@@ -543,8 +546,8 @@
       searchBox("Filter by name"),
       "<p id=\"filter-empty\" class=\"empty hidden\">No documents match that filter.</p>",
       items.length
-        ? "<div class=\"card-grid\">" + items.map(docCard).join("") + "</div>"
-        : "<p class=\"empty\">No markdown files in this folder on the current ref.</p>"
+        ? "<div class=\"card-grid\" data-catalog=\"" + escapeHtml(dir) + "\">" + items.map(docCard).join("") + "</div>"
+        : "<p class=\"empty\" data-catalog-empty=\"true\">No markdown files in this folder on the current ref.</p>"
     ].join("");
     bindFilter();
   }
@@ -558,7 +561,8 @@
       }
     }
     if (!skill) {
-      main.innerHTML = "<p class=\"banner error\">No skill named <code>" + escapeHtml(name) +
+      main.innerHTML = "<p class=\"banner error\" data-catalog-error=\"true\">No skill named <code>" +
+        escapeHtml(name) +
         "</code> on this ref. It may not exist yet on <code>" + escapeHtml(config.ref) + "</code>.</p>";
       return;
     }
@@ -566,9 +570,10 @@
     var body = "<p class=\"muted\">No <code>CONTENT.md</code> in this skill package.</p>";
     if (skill.contentPath) {
       try {
-        body = "<div class=\"prose\">" + renderMarkdown(await fetchText(skill.contentPath)) + "</div>";
+        body = "<div class=\"prose\" data-catalog-body=\"skill\">" +
+          renderMarkdown(await fetchText(skill.contentPath)) + "</div>";
       } catch (err) {
-        body = "<p class=\"banner error\">" + escapeHtml(err.message) + "</p>";
+        body = "<p class=\"banner error\" data-catalog-error=\"true\">" + escapeHtml(err.message) + "</p>";
       }
     }
     main.innerHTML = [
@@ -599,15 +604,16 @@
       }
     }
     if (!item) {
-      main.innerHTML = "<p class=\"banner error\">No file <code>" + escapeHtml(slug) +
+      main.innerHTML = "<p class=\"banner error\" data-catalog-error=\"true\">No file <code>" +
+        escapeHtml(slug) +
         ".md</code> under <code>mcp-server/data/" + escapeHtml(dir) + "/</code> on this ref.</p>";
       return;
     }
     var body;
     try {
-      body = "<div class=\"prose\">" + renderMarkdown(await fetchText(item.path)) + "</div>";
+      body = "<div class=\"prose\" data-catalog-body=\"doc\">" + renderMarkdown(await fetchText(item.path)) + "</div>";
     } catch (err) {
-      body = "<p class=\"banner error\">" + escapeHtml(err.message) + "</p>";
+      body = "<p class=\"banner error\" data-catalog-error=\"true\">" + escapeHtml(err.message) + "</p>";
     }
     main.innerHTML = [
       "<nav class=\"crumb\"><a href=\"#/\">Home</a> / <a href=\"#/" + encodeURIComponent(dir) + "\">" +
@@ -623,7 +629,7 @@
       ? "<p>If this tab loaded the tree earlier, try a refresh — sessionStorage may still have a cached inventory.</p>"
       : "<p>Check the network tab and that <code>" + escapeHtml(config.owner + "/" + config.repo) +
         "</code> is public on ref <code>" + escapeHtml(config.ref) + "</code>.</p>";
-    main.innerHTML = "<div class=\"banner error\"><strong>Could not load catalog.</strong><br>" +
+    main.innerHTML = "<div class=\"banner error\" data-catalog-error=\"true\"><strong>Could not load catalog.</strong><br>" +
       escapeHtml(err && err.message ? err.message : String(err)) + extra + "</div>";
   }
 
@@ -639,7 +645,7 @@
   async function render() {
     var route = parseRoute();
     document.title = "AI SDLC Harness — catalog";
-    main.innerHTML = "<p class=\"banner\">Loading catalog from GitHub…</p>";
+    main.innerHTML = "<p class=\"banner\" data-catalog-loading=\"true\">Loading catalog from GitHub…</p>";
     renderNav(null, route);
     try {
       var catalog = await loadCatalog();

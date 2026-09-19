@@ -54,7 +54,7 @@ ai-sdlc-harness/
 │
 ├── tests/
 │   ├── bats/installers.bats
-│   ├── docs_browser/            # Pages shell: no hardcoded catalog
+│   ├── docs_browser/            # Pages shell invariants + Playwright UI e2e
 │   └── e2e/
 │
 ├── .github/

@@ -66,7 +66,10 @@ Every Pull Request automatically executes the following CI checks:
    - `markdownlint` on `**/*.md`.
 3. **Metadata Validation** (`.github/workflows/validate-metadata.yaml`): Ensures no malformed or undocumented skills are merged into the library.
 4. **Security Scans**: Gitleaks + Bandit (`.github/workflows/security.yaml`).
-5. **GitHub Pages** (`.github/workflows/pages.yaml`): validates the docs-browser shell on every PR. Deploy (`upload-pages-artifact` + `deploy-pages`) runs only on `master` / `main` after Pages source is set to GitHub Actions.
+5. **GitHub Pages** (`.github/workflows/pages.yaml`):
+   - Validates the docs-browser shell on every PR.
+   - **`e2e-pr`**: Playwright against a local `docs/browser/` server with a mocked GitHub API.
+   - **`deploy`** + **`e2e-live`**: only on `master` / `main` after Pages source is GitHub Actions. Live e2e hits `https://mjbvilhena.github.io/ai-sdlc-harness/` (or the deploy `page_url`) after the site returns HTTP 200.
 
 MCP `pytest` (`mcp-server/tests/`) and E2E are **not** GitHub Actions jobs. Catalog and alias regressions only fail locally until Task 8.7.
 
