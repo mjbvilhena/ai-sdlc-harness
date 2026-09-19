@@ -24,7 +24,7 @@ ai-sdlc-harness/
 │       └── Sdlc-Names.ps1       # PowerShell twin
 │
 ├── skills/                      # Lifecycle Driver skill definitions
-│   └── <skill-name>/            # e.g. sdlc-code-reviewer, sdlc-example-skill
+│   └── <skill-name>/            # e.g. sdlc-conductor, sdlc-ux-designer, sdlc-example-skill
 │       ├── skill.yaml           # Metadata only (not parsed by installers)
 │       ├── CONTENT.md           # Canonical body ({{SKILL_BODY}})
 │       ├── agy/

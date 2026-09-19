@@ -15,7 +15,7 @@ Canonical design: if this clone has `docs/technical_design/sdlc-conductor.md`, t
 
 Trigger when the user asks “what next?”, “drive the SDLC”, uses `/sdlc-conductor` or `/conductor`, or wants a recommended next lifecycle step.
 
-If they already named a child skill (`/story`, `/rfc`, `/setup-repo`, …), do **not** force them back through earlier stages. Optionally note the skipped legal step and ask whether to record a skip.
+If they already named a child skill (`/story`, `/rfc`, `/ux`, `/setup-repo`, …), do **not** force them back through earlier stages. Optionally note the skipped legal step and ask whether to record a skip.
 
 ## MCP tools (when available)
 
@@ -38,7 +38,7 @@ vision
       → per-epic user-story refine
         → design & planning band (per epic or per release slice — may parallelize where legal):
              • technical design (architecture / API / RFC / ADR as needed)
-             • UI/UX design (no dedicated UX skill today — human or external artefact; do not invent UI)
+             • UI/UX design (`sdlc-ux-designer` — wireframes/flows/copy from stories; do not invent UI)
              • test strategy (test_plan + e2e_test_plan; threat / security review when warranted)
              • domain/layer update when bounds actually change (hand off to architects)
           → setup-repository (when first code is about to land, if QA not already present)
@@ -54,7 +54,7 @@ vision
 | **Epic approval** | **Human** — do not invent sign-off | Named approval or explicit “treat as approved” |
 | **Story refine** | `sdlc-user-story-refiner` | Must AC are independently valuable and testable |
 | **Technical design** | `sdlc-rfc-drafter`, `sdlc-api-designer`, `sdlc-adr-drafter`; templates `rfc`, `api design` / `api contract`, `adr` | Agreed RFC and/or API design/contract exists; ADR if a decision landed |
-| **UI/UX design** | **Skill gap.** Recommend human designer or existing wireframes/flows/copy. Never invent screens. `sdlc-a11y-auditor` is verify-time, not design-time | Agreed UX artefact exists, or explicit skip (e.g. no UI in this slice) |
+| **UI/UX design** | `sdlc-ux-designer` (`/ux`, `/ux-design`). Never invent screens. Existing human/external artefacts still satisfy this state. `sdlc-a11y-auditor` is verify-time, not design-time | Agreed UX artefact exists, or explicit skip (e.g. no UI in this slice) |
 | **Test strategy** | Templates `test_plan`, `e2e_test_plan`. `sdlc-threat-modeler` / `sdlc-security-reviewer` when security-sensitive. `sdlc-test-writer` / `sdlc-e2e-scripter` are **later execution**, not strategy authors | Test plan (and e2e plan when there is a journey) exists and is linked |
 | **Domain / layer (in-band)** | `sdlc-domain-architect` / `sdlc-layer-architect` only when bounds **actually changed** | Relevant `DOMAIN.md` / `LAYER.md` exist and do not contradict spec/design — or no bound changed |
 | **Setup-repo** | `sdlc-setup-repository` if first code is about to land and checks are missing. Brownfield: satisfied if CI/lint/secret-scan/ownership already exist — say so | Checks exist or user agrees the repo is already set up |
@@ -96,7 +96,7 @@ Signals are implications, not proofs.
 | **Story refine needed** | Approved epic with no BDD stories or missing Must AC. |
 | **Design / planning incomplete** | Stories exist for the slice about to be built, but RFC / API contract / UX artefact / test plan / e2e plan / threat model (when warranted) / stale `DOMAIN.md` is missing. **Not** ready to implement. |
 | **Technical design needed** | Slice touches architecture or a new/changed API and there is no RFC, API design/contract, or accepted ADR. |
-| **UI/UX needed** | Slice is user-facing and there is no agreed UX artefact. Do not invent screens. |
+| **UI/UX needed** | Slice is user-facing and there is no agreed UX artefact. Hand off to `sdlc-ux-designer`. Do not invent screens. |
 | **Test strategy needed** | Stories exist but no test plan (and no e2e plan when a journey exists). |
 | **Setup-repo needed** | Planning done or skipped; first code about to land; no CI / lint / SAST / secret-scan / `CODEOWNERS`. |
 | **Implement** | Stories + AC exist; design/planning satisfied **or** explicitly skipped; repo checks exist **or** skipped. |
@@ -128,7 +128,7 @@ If the checklist would become a full-repo audit, **stop** and recommend `/docs-b
 - **`sdlc-product-owner`** — vision → epics / spec.
 - **`sdlc-user-story-refiner`** — per-epic BDD stories after approval.
 - **`sdlc-rfc-drafter` / `sdlc-api-designer` / `sdlc-adr-drafter`** — technical design band. You sync links; they author bodies.
-- **UX** — no `sdlc-ux-designer` yet. Human or external artefact only.
+- **`sdlc-ux-designer`** — UI/UX design band. Authors wireframes/flows/copy from stories. You sync links; they author the artefact. A human/external artefact still satisfies the state. There is **no** dedicated UX MCP template (catalog remains 24). `sdlc-a11y-auditor` stays verify-time.
 - **Test strategy vs execution** — `test_plan` / `e2e_test_plan` (and threat/security when warranted) **before** code. `sdlc-test-writer` / `sdlc-e2e-scripter` execute at verify time.
 - **`sdlc-setup-repository`** — after planning, before first implement, unless brownfield CI already satisfies.
 - **`sdlc-domain-architect` / `sdlc-layer-architect`** — when bounds actually change.

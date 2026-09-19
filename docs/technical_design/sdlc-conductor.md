@@ -49,7 +49,7 @@ Rules:
 
 ## 3. Pipeline states
 
-Legal progression is a graph, not a slogan. Implementation must treat **one** graph as the source of truth (Epic 13; see §8). Until that artefact exists, this section is the graph.
+Legal progression is a graph, not a slogan. The **runtime** graph lives in `skills/sdlc-conductor/CONTENT.md`. This section is the human-facing copy and must stay aligned with that file.
 
 ```
 vision
@@ -58,7 +58,7 @@ vision
       → per-epic user-story refine
         → design & planning band (per epic or per release slice — may parallelize where legal):
              • technical design (architecture / API / RFC / ADR as needed)
-             • UI/UX design (honest: harness has weak dedicated UX skill today — a11y exists; note gap / human or external design artefact)
+             • UI/UX design (`sdlc-ux-designer` — wireframes/flows/copy from stories; do not invent UI. Human/external artefacts still satisfy this state. `sdlc-a11y-auditor` is verify-time.)
              • test strategy (test plan + e2e plan; threat model / security review when the slice warrants)
              • domain/layer update when bounds actually change (hand off to architects)
           → setup-repository (when first code is about to land, if QA not already present)
@@ -76,7 +76,7 @@ The **main path is not** stories → setup → code. Design and planning are fir
 | **Epic approval** | Scope is a product decision | **Human** (conductor recommends; does not invent sign-off) | Named approval or explicit “treat as approved” from the user |
 | **Story refine** | Per approved epic: BDD stories + AC | `sdlc-user-story-refiner` | Must AC are independently valuable and testable |
 | **Technical design** | Architecture, API shape, and accepted decisions for the slice about to be built | `sdlc-rfc-drafter`, `sdlc-api-designer`, `sdlc-adr-drafter`; MCP templates `rfc`, `api design` / `api contract`, `adr`. Domain/layer architects when bounds change (same band) | Agreed tech-design artefact exists for the epic/slice (RFC and/or API design/contract, plus ADR if a decision landed) |
-| **UI/UX design** | Agreed interaction, flow, and copy **before** UI is coded | **Skill gap:** no dedicated UX designer skill today. Conductor **must not invent UI**. Recommend a human designer, an existing external artefact (wireframes / flows / copy), or a future `sdlc-ux-designer`. `sdlc-a11y-auditor` is **verify-time**, not design-time | Agreed UX artefact exists (wireframes, flows, copy, or equivalent the user points at) **or** explicit skip recorded (e.g. no UI in this slice) |
+| **UI/UX design** | Agreed interaction, flow, and copy **before** UI is coded | `sdlc-ux-designer` (`/ux`, `/ux-design`). Conductor **must not invent UI**. An existing human or external artefact still satisfies this state. There is **no** dedicated UX MCP template in the catalog — do not invent one. `sdlc-a11y-auditor` is **verify-time**, not design-time | Agreed UX artefact exists (wireframes, flows, copy, or equivalent the user points at) **or** explicit skip recorded (e.g. no UI in this slice) |
 | **Test strategy** | How the slice will be proven, written **before** implementation tests are generated | MCP templates `test_plan`, `e2e_test_plan`. `sdlc-threat-modeler` / `sdlc-security-reviewer` (templates `threat_model`, `security review`) when the slice is security-sensitive. `sdlc-test-writer` / `sdlc-e2e-scripter` are **later execution**, not this state’s authors | Test plan (and e2e plan when there is a user journey) exists and is linked; threat/security artefacts exist when warranted |
 | **Domain / layer (in-band)** | Constraints match the design that is about to be built | `sdlc-domain-architect` / `sdlc-layer-architect` when a bounded context or layer is new or its constraints **actually changed**. Conductor does not invent `MUST` / `NEVER` | Relevant `DOMAIN.md` / `LAYER.md` exist and do not contradict the spec or tech design — or no bound changed |
 | **Setup-repo** | QA gates **after** planning and **before** first implement (or already satisfied) | `sdlc-setup-repository` when first code is about to land and checks are missing. Brownfield: treat as satisfied if CI/lint/secret-scan/ownership already exist, and say so | Repo has agreed checks **or** user agrees the repo is already set up |
@@ -111,7 +111,7 @@ Signals are **implications**, not proofs. Cite the files you actually opened.
 | **Story refine needed** | Approved (or user-confirmed) epic with no BDD stories, or stories that are tasks-in-disguise / missing Must AC. |
 | **Design / planning incomplete** | Stories (or Must AC) exist for the epic/slice about to be built, but one or more required band artefacts are missing: no technical design / RFC, no API design or `api_contract` when the slice adds or changes an interface, no UX artefact (wireframes/flows/copy) when the slice is user-facing, no `test_plan` / `e2e_test_plan`, no threat model when the slice is security-sensitive, or `DOMAIN.md` / `LAYER.md` missing/stale after a bound change. **Do not** treat this as “ready to implement”. |
 | **Technical design needed** | Slice touches architecture or a new/changed API and there is no RFC, API design/contract, or accepted ADR covering it. |
-| **UI/UX design needed** | Slice is user-facing and there is no agreed UX artefact. Do **not** invent screens; ask for human/external design or record an explicit skip. |
+| **UI/UX design needed** | Slice is user-facing and there is no agreed UX artefact. Do **not** invent screens; hand off to `sdlc-ux-designer`, accept an existing human/external artefact, or record an explicit skip. |
 | **Test strategy needed** | Slice has stories but no test plan (and no e2e plan when a journey exists). |
 | **Setup-repo needed** | Planning band is done or skipped; first implementation about to start; no CI, no lint/SAST/secret-scan, no `CODEOWNERS` (or repo equivalent); `sdlc-setup-repository` has never been run. |
 | **Implement** | Refined story + AC exist; **design/planning band satisfied or explicitly skipped**; repo checks exist **or** were explicitly skipped; working tree / branches show feature work. |
@@ -136,7 +136,7 @@ Run **after** a confirmed child outcome, not instead of the child. Keep the diff
 | **Backlog** | Status/evidence no longer match the repo; new leftover work appeared; a skip was agreed | Invent epics the user did not accept; mark Done without evidence |
 | **Vision ↔ spec links** | Spec or vision headings moved; MVP split changed | Rewrite the vision’s product claims |
 | **User-story index** | New stories landed; story IDs or paths changed | Author the stories (that is `sdlc-user-story-refiner`) |
-| **Design-artefact index** | RFC, API design/contract, test plan, e2e plan, UX artefact, or threat model **landed** (path + which epic/slice) | Author those bodies — children (or a human designer) do |
+| **Design-artefact index** | RFC, API design/contract, test plan, e2e plan, UX artefact, or threat model **landed** (path + which epic/slice) | Author those bodies — children (`sdlc-ux-designer` for UX) do |
 | **ADRs** | A decision was **accepted** in the session or a PR | Draft every design chat as an ADR; use `sdlc-adr-drafter` for the record body |
 | **`DOMAIN.md` / `LAYER.md`** | Evidence shows a boundary or constraint **already** shipped, designed, or already written elsewhere | Invent MUST/NEVER; replace architect skills |
 | **README / install / architecture pointers** | A shipped driver or path changed in *this* repo | Giant catalog rewrites (leave that to a review PR) |
@@ -151,7 +151,7 @@ If the checklist would become a large audit, **stop** and recommend `/docs-backl
 | **`sdlc-product-owner`** | Child for vision → epics / product spec. Conductor hands off; does not write sprint stories. |
 | **`sdlc-user-story-refiner`** | Child for per-epic BDD stories. Conductor waits for epic approval (or an explicit skip). |
 | **`sdlc-rfc-drafter` / `sdlc-api-designer` / `sdlc-adr-drafter`** | Children in the **technical design** band. Templates `rfc`, `api design` / `api contract`, `adr`. Conductor syncs links after they land; does not author the RFC/API/ADR body. |
-| **UX (gap)** | No dedicated `sdlc-ux-designer` (or similar) yet. Conductor must not invent UI. Recommend human/external artefact; optional future skill is Task 13.6. |
+| **`sdlc-ux-designer`** | Child for the **UI/UX design** band. Authors wireframes/flows/copy from stories without inventing product claims. Conductor syncs links after the artefact lands; does not invent screens. A human/external artefact still satisfies the state. No dedicated UX MCP template (catalog remains 24). Task 13.6. |
 | **Test strategy vs execution** | Strategy uses MCP `test_plan` / `e2e_test_plan` (and `threat_model` / `security review` when warranted) **before** code. `sdlc-test-writer` / `sdlc-e2e-scripter` execute that plan at **verify** time. `sdlc-threat-modeler` / `sdlc-security-reviewer` sit in the planning band when the slice is security-sensitive. |
 | **`sdlc-setup-repository`** | Child **after** planning, when first code is about to land and repo QA is missing. Brownfield CI can satisfy this state. Conductor does not emit workflows itself. |
 | **`sdlc-domain-architect` / `sdlc-layer-architect`** | Authors of `DOMAIN.md` / `LAYER.md`. Fire in the design band when bounds actually change; conductor detects staleness and hands off; may add cross-links after. |
@@ -167,19 +167,20 @@ MCP: reuse existing tools (`get_sdlc_template`, `get_definition_of_done`, `get_d
 ## 7. Non-goals
 
 - **Not a prison for power users.** Direct child-skill invocation stays first-class.
-- **Not inventing DOMAIN / LAYER rules or UI/UX.** Evidence only; missing file → recommend the architect skill or a human designer. No dedicated UX skill exists yet.
-- **Not replacing child authorship.** Spec, stories, RFC / API / test-plan bodies, setup instructions, DOMAIN/LAYER bodies, ADRs, and review PRs stay with their skills (or a human for UX).
+- **Not inventing DOMAIN / LAYER rules or UI/UX.** Evidence only; missing file → recommend the architect skill or `sdlc-ux-designer` (or accept an existing human artefact). The conductor still does not invent screens.
+- **Not replacing child authorship.** Spec, stories, RFC / API / test-plan / UX bodies, setup instructions, DOMAIN/LAYER bodies, ADRs, and review PRs stay with their skills.
 - **Not a silent daily rewrite engine.** That failure mode belongs to a misused docs-backlog-review, not to the conductor.
 - **Not treating design as “later drivers”.** Technical design, UX, and test strategy sit on the main line after stories and before (or tightly gated with) first implement.
 - **Not an `agents/` package** and not named `sdlc-agent`.
 - **Not auto-merge.** Consequential changes stay on a human-gated PR.
 - **Not a new product methodology.** It sequences skills this harness already ships (plus human gates).
 
-## 8. Implementation notes (for Epic 13 — not this PR)
+## 8. Implementation notes
 
-- Author once in `CONTENT.md` with thin four-harness shells (`agy`, `claude`, `cursor`, `ghcp`), same as every other Lifecycle Driver.
-- Suggested triggers: `/sdlc-conductor`, `/conductor`, “what next?”, “drive the SDLC”.
-- Encode the **pipeline graph** (states, legal edges, skip rule, discovery table) as a **single source of truth** the skill cites — including the design & planning band. Runtime copy: `skills/sdlc-conductor/CONTENT.md` (no extra MCP pipeline template in v1). Do not fork a second informal list in README, and do not collapse the graph to stories → setup → code.
+Shipped as `skills/sdlc-conductor/` (PR #15) with thin four-harness shells. Triggers: `/sdlc-conductor`, `/conductor`, “what next?”, “drive the SDLC”.
+
+- The **pipeline graph** (states, legal edges, skip rule, discovery table) lives in `skills/sdlc-conductor/CONTENT.md` (no extra MCP pipeline template). Do not fork a second informal list in README, and do not collapse the graph to stories → setup → code.
+- UI/UX hand-off is `sdlc-ux-designer` (Task 13.6). There is still no dedicated UX MCP template — do not invent a catalog entry.
 - After handoff, run §5. If drift looks systemic, invoke `sdlc-docs-backlog-review`.
 - Safety language: no fake approvals, no invented constraints, no invented UI, no exploit/malware guidance, no merge of the landing PR.
 

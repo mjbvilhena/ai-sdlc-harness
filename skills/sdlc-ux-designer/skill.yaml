@@ -1,0 +1,14 @@
+name: sdlc-ux-designer
+description: Authors wireframes, flows, and copy from user stories without inventing product claims.
+version: 0.1.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - cursor
+  - ghcp
+triggers:
+  - /ux
+  - /ux-design
+  - /sdlc-ux-designer
+  - "design UX"
