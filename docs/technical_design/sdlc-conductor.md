@@ -1,6 +1,6 @@
 # Design note: `sdlc-conductor`
 
-Status: **proposed** (design + backlog only). The skill is **not shipped**. Do not treat `/sdlc-conductor` as an installed driver until Epic 13 implements `skills/sdlc-conductor/`.
+Status: **implemented** as `skills/sdlc-conductor/` (runtime graph lives in that skill’s `CONTENT.md`). This note remains the human-facing design. Open questions in §9 may still be parked.
 
 This note records the agreed product intent for a default front-door Lifecycle Driver. Name: **`sdlc-conductor`** (not `sdlc-agent`). A dedicated `agents/` tree remains deferred, and “agent” collides with that future package type.
 
@@ -179,7 +179,7 @@ MCP: reuse existing tools (`get_sdlc_template`, `get_definition_of_done`, `get_d
 
 - Author once in `CONTENT.md` with thin four-harness shells (`agy`, `claude`, `cursor`, `ghcp`), same as every other Lifecycle Driver.
 - Suggested triggers: `/sdlc-conductor`, `/conductor`, “what next?”, “drive the SDLC”.
-- Encode the **pipeline graph** (states, legal edges, skip rule, discovery table) as a **single source of truth** the skill cites — including the design & planning band. Do not fork a second informal list in README, and do not collapse the graph to stories → setup → code.
+- Encode the **pipeline graph** (states, legal edges, skip rule, discovery table) as a **single source of truth** the skill cites — including the design & planning band. Runtime copy: `skills/sdlc-conductor/CONTENT.md` (no extra MCP pipeline template in v1). Do not fork a second informal list in README, and do not collapse the graph to stories → setup → code.
 - After handoff, run §5. If drift looks systemic, invoke `sdlc-docs-backlog-review`.
 - Safety language: no fake approvals, no invented constraints, no invented UI, no exploit/malware guidance, no merge of the landing PR.
 

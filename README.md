@@ -8,7 +8,7 @@ Skill/rule **copy and expand** is zero-dependency (shell or PowerShell). A live 
 
 Each skill is **authored once** in `CONTENT.md`. Thin harness shells (`agy/SKILL.md`, `claude/command.md`, `cursor/prompt.md`, `ghcp/instructions.md`) keep frontmatter, titles, and a `{{SKILL_BODY}}` placeholder. An installer under `install/` expands that body from `skills/` and `rules/` and writes the resolved file where the target tool expects it.
 
-Lifecycle Drivers today live as these `skills/` (and ambient `rules/`). A separate `agents/` tree is deferred; installers already skip it when the directory is absent. A planned default front door (`sdlc-conductor`) is design-only — see [`docs/technical_design/sdlc-conductor.md`](docs/technical_design/sdlc-conductor.md).
+Lifecycle Drivers today live as these `skills/` (and ambient `rules/`). A separate `agents/` tree is deferred; installers already skip it when the directory is absent. The default front door is **`sdlc-conductor`** (`/sdlc-conductor`, `/conductor`, “what next?”) — see [`docs/technical_design/sdlc-conductor.md`](docs/technical_design/sdlc-conductor.md).
 
 ## Supported Harnesses (v1)
 

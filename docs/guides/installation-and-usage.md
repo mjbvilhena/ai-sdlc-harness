@@ -111,16 +111,20 @@ The MCP tools `get_domain_consultant` and `get_layer_consultant` discover these 
 
 ## Step 3: Trigger a Lifecycle Driver
 
-Open the target project in Antigravity, Cursor, Claude Code, or VS Code with GitHub Copilot. Invoke a skill, for example:
+Open the target project in Antigravity, Cursor, Claude Code, or VS Code with GitHub Copilot. For “what next?”, invoke the default front door:
+
+> `Please run /sdlc-conductor` (also `/conductor`, or ask “what next?”)
+
+It inspects the repo, recommends the next legal pipeline step (including a design & planning band after stories — not stories → setup → code), confirms, and hands off. Experts may still call a specialist skill directly, for example:
 
 > `Please run the /review skill on my current branch.`
 
-**The model should:**
+**For `/sdlc-conductor`, the model should** inspect the workspace, recommend the next legal step (confirm before hand-off), and refuse to invent UI or domain rules.
+
+**For a specialist such as `/review`, the model should:**
 
 1. Recognize the `/review` instructions (Claude Trigger and `skills/sdlc-code-reviewer/skill.yaml`; Cursor dest filename is `sdlc-code-reviewer.md`).
 2. Query the MCP server for Domain/Layer consultants and, when relevant, Definition of Done.
 3. Review the change against those constraints plus the diff — without inventing product claims.
 
-Other drivers follow the same pattern: fetch templates or consultants from MCP, then write the artifact. Besides `/story`, `/threat`, `/e2e`, `/postmortem`, `/release-notes`, `/review`, `/pr`, and `/test`, the library includes `/sdlc-product-owner` (vision → epics / product spec), `/research`, `/setup-repo`, `/rfc`, `/triage`, `/runbook`, `/api-design`, `/security-review`, `/migration`, `/adr`, `/ci`, `/docs-backlog-review` (full-repo docs↔code + backlog hygiene; distinct from `/docs`, which updates docs for a recent code change), `/domain-architect`, and `/layer-architect`, plus the a11y and DoD rules. Primary triggers for every skill live in `skills/*/skill.yaml`.
-
-A default front door for “what next?” — **`sdlc-conductor`** — is designed but **not shipped** ([design note](../technical_design/sdlc-conductor.md), Epic 13). Until then, invoke the specialist skills above directly.
+Other drivers follow the same pattern: fetch templates or consultants from MCP, then write the artifact. Besides `/sdlc-conductor` (default front door), `/story`, `/threat`, `/e2e`, `/postmortem`, `/release-notes`, `/review`, `/pr`, and `/test`, the library includes `/sdlc-product-owner` (vision → epics / product spec), `/research`, `/setup-repo`, `/rfc`, `/triage`, `/runbook`, `/api-design`, `/security-review`, `/migration`, `/adr`, `/ci`, `/docs-backlog-review` (full-repo docs↔code + backlog hygiene; distinct from `/docs`, which updates docs for a recent code change), `/domain-architect`, and `/layer-architect`, plus the a11y and DoD rules. Primary triggers for every skill live in `skills/*/skill.yaml`. Design: [sdlc-conductor.md](../technical_design/sdlc-conductor.md).
