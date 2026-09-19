@@ -4,6 +4,8 @@ A shell-script-based installer that deploys a curated library of AI skills and r
 
 Skill/rule **copy and expand** is zero-dependency (shell or PowerShell). A live installer currently also needs host `python3` to merge MCP JSON. An optional MCP knowledge server under `mcp-server/` needs a local Python runtime if you want Just-In-Time SDLC templates, Definitions of Done, and Domain/Layer consultants. Payloads live in `mcp-server/data/templates/` and `mcp-server/data/dod/` (ADR, RFC, PR, product spec, research, repository setup, threat model, API design, runbook, migration, and change-type DoD such as `security change` / `api change`). Skills instruct the model to fetch those documents rather than hardcoding them.
 
+**Live catalog:** [Browse skills & MCP catalog](https://mjbvilhena.github.io/ai-sdlc-harness/).
+
 ## How It Works
 
 Each skill is **authored once** in `CONTENT.md`. Thin harness shells (`agy/SKILL.md`, `claude/command.md`, `cursor/prompt.md`, `ghcp/instructions.md`) keep frontmatter, titles, and a `{{SKILL_BODY}}` placeholder. An installer under `install/` expands that body from `skills/` and `rules/` and writes the resolved file where the target tool expects it.
