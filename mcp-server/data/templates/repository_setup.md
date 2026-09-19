@@ -16,6 +16,19 @@ Structured configuration output for initializing a repository's QA checks and fo
 
 2–3 sentences defining what this repository is built for and what type of content is expected to be maintained within it.
 
+## Stack mapping
+
+Propose only checks that match the repo's expected content. Use this mapping (similar to the `.github` workflows in `ai-sdlc-harness`) rather than inventing a different QA menu:
+
+| Content | Propose |
+|---|---|
+| Bash scripts | `bats` for testing and `shellcheck` for linting |
+| Python | SAST such as `bandit` (and the repo's existing test runner if one exists) |
+| Markdown documentation | `markdownlint` |
+| Any repo | Universal secret scanning (`gitleaks`) and a `CODEOWNERS` file |
+
+Do not propose language-specific checks for languages the user did not name.
+
 ## Configurations
 
 For each proposed check, provide the configuration snippet (e.g., the `.yaml` workflow file content) and a brief justification for why it was selected.
