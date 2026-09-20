@@ -176,6 +176,28 @@ def test_conductor_aliases_do_not_collapse_to_code_review():
     assert "Code Review Template" not in result
 
 
+def test_lifecycle_pipeline_mermaid_names_security_and_pr_skills():
+    result = get_sdlc_template("lifecycle pipeline")
+    assert "```mermaid" in result
+    fence = result.split("```mermaid", 1)[1].split("```", 1)[0]
+    for name in (
+        "sdlc-threat-modeler",
+        "sdlc-security-reviewer",
+        "sdlc-bug-triager",
+        "sdlc-pr-summarizer",
+    ):
+        assert name in fence, f"{name} must appear in the lifecycle pipeline mermaid"
+    # Placement: threat-modeler is design/planning, not a verify-only leaf.
+    design_band, rest = fence.split("subgraph Verify", 1)
+    assert "sdlc-threat-modeler" in design_band
+    assert "sdlc-security-reviewer" in rest
+    assert "sdlc-pr-summarizer" in rest
+    assert "sdlc-bug-triager" in rest
+    # Bug-triager must not be forced onto the setup → tests happy path.
+    assert "Setup --> Triage" not in fence
+    assert "Triage --> TestWriter" not in fence
+
+
 def test_get_definition_of_done():
     # Test valid
     result = get_definition_of_done("feature")

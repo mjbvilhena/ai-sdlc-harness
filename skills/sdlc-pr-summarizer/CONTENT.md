@@ -1,6 +1,6 @@
 ## Purpose
 
-This skill analyzes a set of changes and generates a comprehensive, well-structured Pull Request (PR) description. It is intended to save developers time when creating a PR.
+This skill analyzes a set of changes and generates a comprehensive, well-structured Pull Request (PR) description. It is intended to save developers time when creating a PR. It sits **before or with** **`sdlc-code-reviewer`** (`/review`) — packaging the change so a reviewer can judge it, not replacing the review.
 
 ## Activation
 

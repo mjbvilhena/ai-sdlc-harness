@@ -1,6 +1,6 @@
 ## Purpose
 
-Review a PR diff or working-tree changes for correctness, security, performance, and maintainability. Be constructive and evidence-based.
+Review a PR diff or working-tree changes for correctness, security, performance, and maintainability. Be constructive and evidence-based. If the PR body is missing or too thin for a reviewer to judge the change, recommend **`sdlc-pr-summarizer`** (`/pr`) first — packaging sits **before or with** this review, not instead of it. For a security-sensitive diff, **`sdlc-security-reviewer`** is the control checklist; this skill stays a general review.
 
 ## Activation
 

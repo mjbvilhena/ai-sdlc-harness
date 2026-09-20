@@ -23,16 +23,16 @@ When MCP is available:
 
 1. **CRITICAL**: Call `get_sdlc_template` with `template_type="lifecycle pipeline"` (aliases `conductor`, `sdlc conductor` also resolve). Follow that graph, skip policy, discovery table, and memory checklist. Do not invent a different sequence (especially not stories → setup → code).
 2. Call `get_definition_of_done` for the current state (`epic`, `user story`, `feature`, `pr`, `repository setup`, `api change`, `ui change`, `security change` as relevant).
-3. Call `get_sdlc_template` when handing off or checking that an artefact exists: `product spec`, `user story`, `rfc`, `api design` / `api contract`, `adr`, `ux design`, `test_plan`, `e2e_test_plan`, `threat_model`, `security review`, `repository setup`, `pr`.
+3. Call `get_sdlc_template` when handing off or checking that an artefact exists: `product spec`, `user story`, `rfc`, `api design` / `api contract`, `adr`, `ux design`, `test_plan`, `e2e_test_plan`, `threat_model`, `security review`, `repository setup`, `pr`, `bug report`.
 4. Call `get_domain_consultant` / `get_layer_consultant` when the slice names a domain or layer. Retry only names the tool lists.
 
-If MCP is unavailable, say so and still use vision → spec → **spec approval (human)** → **epic approval (human)** → stories → **story approval (human)** → design/planning (including `sdlc-ux-designer`) → **technical design / ADR approval (human)** → setup-repo → implement → verify → later/ops. Do not skip design/planning without an explicit user sentence. Drafted or merged files are not approval.
+If MCP is unavailable, say so and still use vision → spec → **spec approval (human)** → **epic approval (human)** → stories → **story approval (human)** → design/planning (including `sdlc-ux-designer` and, when security-sensitive, `sdlc-threat-modeler`) → **technical design / ADR approval (human)** → setup-repo → implement → verify (`sdlc-pr-summarizer`, `sdlc-code-reviewer`, `sdlc-security-reviewer`, tests, DoD, a11y) → later/ops (`sdlc-bug-triager` intake, release notes, …). Do not skip design/planning without an explicit user sentence. Drafted or merged files are not approval.
 
 ## Instructions
 
 1. **Inspect** the target workspace. Cite files you actually opened. Look for a **named** human sign-off or an explicit “treat as approved” sentence — a drafted or merged file is not approval.
 2. **Map** discovery signals from the fetched pipeline template to one next legal state. If several design-band items are missing, you may recommend a parallel set but still gate implement.
-3. **Recommend** the next step and why. Name the child skill or human gate. For user-facing slices with stories but no UX artefact, hand off to **`sdlc-ux-designer`** (`/ux`). Never invent screens.
+3. **Recommend** the next step and why. Name the child skill or human gate. For user-facing slices with stories but no UX artefact, hand off to **`sdlc-ux-designer`** (`/ux`). Never invent screens. For a security-sensitive slice with no threat model, hand off to **`sdlc-threat-modeler`**. For a vague defect, **`sdlc-bug-triager`** (intake → stories/fix — not the setup→tests happy path). For a thin PR body, **`sdlc-pr-summarizer`** before or with **`sdlc-code-reviewer`**; for a security-sensitive diff, **`sdlc-security-reviewer`**.
 4. **Confirm** — wait for explicit user agreement before handing off or skipping.
 5. **Hand off** — follow the child skill’s `CONTENT.md` / MCP contract in-session when available; otherwise tell the user to invoke that skill. After the outcome, run Job B from the pipeline template (small evidence-only memory sync). If that would become a full-repo audit, recommend `/docs-backlog-review`.
 6. Prefer the user’s existing branch. Docs-only PRs stay **open**. Consequential merges stay **human-gated**.
