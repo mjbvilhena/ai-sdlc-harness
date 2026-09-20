@@ -12,6 +12,7 @@ const TREE = {
     { type: "blob", path: "skills/sample-beta/skill.yaml" },
     { type: "blob", path: "skills/sample-beta/CONTENT.md" },
     { type: "blob", path: "mcp-server/data/templates/note.md" },
+    { type: "blob", path: "mcp-server/data/templates/lifecycle_pipeline.md" },
     { type: "blob", path: "mcp-server/data/dod/done.md" }
   ]
 };
@@ -22,6 +23,10 @@ const FILES = {
   "skills/sample-beta/skill.yaml": fs.readFileSync(path.join(FIXTURES, "sample-beta.yaml"), "utf8"),
   "skills/sample-beta/CONTENT.md": fs.readFileSync(path.join(FIXTURES, "sample-beta.md"), "utf8"),
   "mcp-server/data/templates/note.md": fs.readFileSync(path.join(FIXTURES, "note.md"), "utf8"),
+  "mcp-server/data/templates/lifecycle_pipeline.md": fs.readFileSync(
+    path.join(FIXTURES, "lifecycle_pipeline.md"),
+    "utf8"
+  ),
   "mcp-server/data/dod/done.md": fs.readFileSync(path.join(FIXTURES, "done.md"), "utf8")
 };
 

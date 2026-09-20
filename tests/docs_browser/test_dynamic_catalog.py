@@ -71,12 +71,30 @@ def main() -> None:
     if leaked_files:
         fail("assets/app.js hardcodes MCP data filenames: " + ", ".join(leaked_files))
 
+    mermaid_js = BROWSER / "assets" / "mermaid.min.js"
+    if not mermaid_js.is_file():
+        fail("docs/browser/assets/mermaid.min.js is missing (vendored Mermaid renderer)")
+
     # Project Pages + local preview both need relative asset URLs.
-    for rel in ('href="assets/style.css"', 'src="config.js"', 'src="assets/app.js"', 'src="assets/marked.min.js"'):
+    for rel in (
+        'href="assets/style.css"',
+        'src="config.js"',
+        'src="assets/app.js"',
+        'src="assets/marked.min.js"',
+        'src="assets/mermaid.min.js"',
+    ):
         if rel not in index:
             fail(f"index.html must use relative asset URL {rel}")
     if re.search(r"""(?:href|src)=["']/(?!/)""", index):
         fail("index.html has a root-absolute asset URL; use relative paths for project Pages")
+    if "cdn.jsdelivr.net" in index or "unpkg.com" in index or "cdnjs.cloudflare.com" in index:
+        fail("index.html must vendor Mermaid locally, not load it from a CDN")
+    if "mermaid.render" not in app:
+        fail("assets/app.js must run Mermaid on fenced diagrams (mermaid.render missing)")
+    if "data-home-pipeline-diagram" not in app:
+        fail("assets/app.js must render the lifecycle pipeline on Home")
+    if "extractPrimaryMermaid" not in app:
+        fail("assets/app.js must extract the primary mermaid block from the pipeline template")
 
     print(
         "docs browser invariants passed "

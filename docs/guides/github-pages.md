@@ -33,6 +33,8 @@ There is no `gh-pages` branch.
 3. Treats every `mcp-server/data/<dir>/*.md` as a catalog document (`templates/`, `dod/`, and any later data directory)
 4. Loads file bodies from `raw.githubusercontent.com` when you open an item (also cached in `sessionStorage`)
 5. Renders markdown in the page; skill cards use `skill.yaml` description / targets / triggers / version
+6. Turns mermaid fenced code blocks into diagrams via vendored `assets/mermaid.min.js` (dark theme, matching the catalog code-block well)
+7. On **Home**, fetches the discovered lifecycle pipeline MCP template and renders its primary mermaid block (the flowchart under “Pipeline graph”). If that fetch or extract fails, Home shows an error — not a hard-coded duplicate graph.
 
 Unauthenticated GitHub API traffic is limited (about 60 requests/hour/IP). The tree call is the expensive one; if GitHub returns 403/429, the UI shows a rate-limit message and will reuse a session cache when one exists. Override source with query parameters if needed: `?owner=…&repo=…&ref=…`.
 
@@ -67,7 +69,7 @@ MOCK_GITHUB=1 npm test
 BASE_URL=https://mjbvilhena.github.io/ai-sdlc-harness/ npm test
 ```
 
-`MOCK_GITHUB=1 npm test` also starts `python3 -m http.server` on port 4173 for `docs/browser/` when `BASE_URL` is unset. Tests assert discovery populated skills/templates/DoD, markdown detail pages, search, and a visible error on a mocked 403 rate limit. They do **not** hardcode the production skill/template inventory.
+`MOCK_GITHUB=1 npm test` also starts `python3 -m http.server` on port 4173 for `docs/browser/` when `BASE_URL` is unset. Tests assert discovery populated skills/templates/DoD, markdown detail pages, Mermaid diagrams (Home pipeline + fenced blocks), search, and a visible error on a mocked 403 rate limit. They do **not** hardcode the production skill/template inventory.
 
 Live post-deploy e2e (`e2e-live` in CI) uses optional `GITHUB_TOKEN` only inside Playwright’s GitHub API route (never injected into the page) so Actions IPs are less likely to hit the unauthenticated 60/hour cap. Local live runs work unauthenticated.
 

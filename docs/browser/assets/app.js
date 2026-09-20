@@ -21,6 +21,9 @@
   var nav = document.getElementById("site-nav");
   var sourceLine = document.getElementById("source-line");
   var catalogPromise = null;
+  var renderToken = 0;
+  var mermaidConfigured = false;
+  var mermaidSeq = 0;
 
   function apiUrl(pathAndQuery) {
     return "https://api.github.com/repos/" + config.owner + "/" + config.repo + pathAndQuery;
@@ -373,6 +376,191 @@
     return sanitizeHtml(html);
   }
 
+  function isMermaidCode(el) {
+    var cls = " " + (el.getAttribute("class") || "") + " ";
+    return /\blanguage-mermaid\b/.test(cls) || /\blang-mermaid\b/.test(cls);
+  }
+
+  function ensureMermaid() {
+    if (typeof mermaid === "undefined") {
+      return false;
+    }
+    if (!mermaidConfigured) {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: "dark",
+        securityLevel: "strict",
+        fontFamily: "Segoe UI, system-ui, sans-serif",
+        flowchart: { htmlLabels: false, useMaxWidth: true, curve: "basis" },
+        themeVariables: {
+          darkMode: true,
+          background: "#17211f",
+          primaryColor: "#245c50",
+          primaryTextColor: "#e8f0ed",
+          primaryBorderColor: "#7eb3a6",
+          lineColor: "#9cc4ba",
+          secondaryColor: "#243330",
+          tertiaryColor: "#1a2a26",
+          nodeTextColor: "#e8f0ed",
+          mainBkg: "#245c50",
+          clusterBkg: "#1a2a26",
+          titleColor: "#e8f0ed",
+          edgeLabelBackground: "#17211f",
+          tertiaryTextColor: "#e8f0ed",
+          secondaryTextColor: "#e8f0ed"
+        }
+      });
+      mermaidConfigured = true;
+    }
+    return true;
+  }
+
+  async function renderMermaidSource(host, source) {
+    if (!host) {
+      return;
+    }
+    if (!ensureMermaid()) {
+      host.className = "banner error";
+      host.setAttribute("data-mermaid-status", "error");
+      host.textContent = "Mermaid renderer failed to load.";
+      return;
+    }
+    try {
+      mermaidSeq += 1;
+      var id = "docs-mmd-" + mermaidSeq;
+      var result = await mermaid.render(id, source);
+      host.className = "mermaid-wrap";
+      host.innerHTML = result.svg;
+      if (typeof result.bindFunctions === "function") {
+        result.bindFunctions(host);
+      }
+      host.setAttribute("data-mermaid-status", "ready");
+    } catch (err) {
+      host.className = "mermaid-wrap";
+      host.setAttribute("data-mermaid-status", "error");
+      host.innerHTML = "<p class=\"banner error\">Could not render Mermaid diagram.</p>" +
+        "<pre class=\"error-detail\">" + escapeHtml(source) + "</pre>";
+    }
+  }
+
+  async function renderMermaidIn(root) {
+    if (!root) {
+      return;
+    }
+    var codes = root.querySelectorAll("pre code");
+    var jobs = [];
+    for (var i = 0; i < codes.length; i++) {
+      if (!isMermaidCode(codes[i])) {
+        continue;
+      }
+      var code = codes[i];
+      var pre = code.parentElement;
+      var source = (code.textContent || "").trim();
+      if (!source || !pre || !pre.parentNode) {
+        continue;
+      }
+      var host = document.createElement("div");
+      host.className = "mermaid-wrap";
+      host.setAttribute("data-mermaid-diagram", "true");
+      host.setAttribute("role", "figure");
+      host.setAttribute("data-mermaid-status", "loading");
+      pre.parentNode.replaceChild(host, pre);
+      jobs.push(renderMermaidSource(host, source));
+    }
+    await Promise.all(jobs);
+  }
+
+  function extractPrimaryMermaid(markdown) {
+    var text = String(markdown || "");
+    var fence = /```mermaid[ \t]*\r?\n([\s\S]*?)```/i;
+    var heading = /(^|\n)##[^\n]*pipeline graph[^\n]*\r?\n([\s\S]*)/i;
+    var fromHeading = text.match(heading);
+    var searchIn = fromHeading ? fromHeading[2] : text;
+    var match = searchIn.match(fence);
+    if (match) {
+      return match[1].trim();
+    }
+    if (fromHeading) {
+      match = text.match(fence);
+      if (match) {
+        return match[1].trim();
+      }
+    }
+    return "";
+  }
+
+  function findLifecyclePipelineDoc(catalog) {
+    var dirs = catalog && catalog.dataDirs ? catalog.dataDirs : {};
+    var names = Object.keys(dirs);
+    var best = null;
+    for (var i = 0; i < names.length; i++) {
+      var dir = names[i];
+      var items = dirs[dir] || [];
+      for (var j = 0; j < items.length; j++) {
+        var item = items[j];
+        var hay = [item.slug, item.title, item.file, item.path].join("\n").toLowerCase();
+        if (!/lifecycle[-_ ]?pipeline/.test(hay)) {
+          continue;
+        }
+        if (!best || dir === "templates") {
+          best = item;
+        }
+      }
+    }
+    return best;
+  }
+
+  function showPipelineError(host, message) {
+    if (!host) {
+      return;
+    }
+    host.className = "banner error";
+    host.setAttribute("data-mermaid-status", "error");
+    host.setAttribute("data-home-pipeline-error", "true");
+    host.textContent = message;
+  }
+
+  async function loadHomePipeline(catalog, token) {
+    var host = document.querySelector("[data-home-pipeline-diagram]");
+    if (!host) {
+      return;
+    }
+    var item = findLifecyclePipelineDoc(catalog);
+    var sourceSlot = document.querySelector("[data-home-pipeline-source]");
+    if (!item) {
+      showPipelineError(host, "No lifecycle pipeline template was found among the discovered MCP data files on this ref.");
+      return;
+    }
+    if (sourceSlot) {
+      sourceSlot.innerHTML = "<a href=\"#/" + encodeURIComponent(item.dir) + "/" +
+        encodeURIComponent(item.slug) + "\">Open template</a> · <a href=\"" +
+        githubBlobUrl(item.path) + "\">" + escapeHtml(item.path) + "</a>";
+    }
+    try {
+      var markdown = await fetchText(item.path);
+      if (token !== renderToken) {
+        return;
+      }
+      var diagram = extractPrimaryMermaid(markdown);
+      if (!diagram) {
+        showPipelineError(host, "The lifecycle pipeline template has no ```mermaid diagram to render.");
+        return;
+      }
+      host.setAttribute("role", "figure");
+      host.setAttribute("aria-label", "Lifecycle pipeline graph");
+      host.removeAttribute("data-home-pipeline-error");
+      await renderMermaidSource(host, diagram);
+      if (host.getAttribute("data-mermaid-status") === "error") {
+        host.setAttribute("data-home-pipeline-error", "true");
+      }
+    } catch (err) {
+      if (token !== renderToken) {
+        return;
+      }
+      showPipelineError(host, err && err.message ? err.message : String(err));
+    }
+  }
+
   function sanitizeHtml(html) {
     var doc = new DOMParser().parseFromString("<div>" + html + "</div>", "text/html");
     var root = doc.body.firstElementChild;
@@ -507,6 +695,12 @@
       "<h1>Catalog</h1>",
       "<p class=\"lede\">Lifecycle Driver skills and MCP knowledge files, listed from the live repository tree — not a hard-coded index.</p>",
       catalog.fromCache ? "<p class=\"banner\">Showing a session-cached tree. Refresh after the cache is cleared to force a new GitHub lookup.</p>" : "",
+      "<section class=\"home-pipeline\" data-home-pipeline=\"true\">" +
+        "<h2>Lifecycle pipeline</h2>" +
+        "<p class=\"lede\">The conductor graph from the live MCP lifecycle pipeline template on this ref — not a second copy kept in the catalog shell.</p>" +
+        "<p class=\"source-links\" data-home-pipeline-source></p>" +
+        "<div class=\"banner\" data-home-pipeline-diagram data-mermaid-status=\"loading\">Loading pipeline graph…</div>" +
+      "</section>",
       searchBox("Search skills and documents"),
       "<p id=\"filter-empty\" class=\"empty hidden\">No items match that filter.</p>",
       "<h2>Skills (" + catalog.skills.length + ")</h2>",
@@ -523,6 +717,11 @@
     }
     main.innerHTML = sections.join("");
     bindFilter();
+  }
+
+  async function finishHome(catalog, token) {
+    renderHome(catalog);
+    await loadHomePipeline(catalog, token);
   }
 
   function renderSkillIndex(catalog) {
@@ -592,6 +791,7 @@
       "</p>",
       "<article class=\"article\">" + body + "</article>"
     ].join("");
+    await renderMermaidIn(main);
   }
 
   async function renderDocDetail(catalog, dir, slug) {
@@ -622,6 +822,7 @@
       "<p class=\"source-links\"><a href=\"" + githubBlobUrl(item.path) + "\">" + escapeHtml(item.path) + "</a></p>",
       "<article class=\"article\">" + body + "</article>"
     ].join("");
+    await renderMermaidIn(main);
   }
 
   function renderError(err) {
@@ -643,15 +844,19 @@
   }
 
   async function render() {
+    var token = ++renderToken;
     var route = parseRoute();
     document.title = "AI SDLC Harness — catalog";
     main.innerHTML = "<p class=\"banner\" data-catalog-loading=\"true\">Loading catalog from GitHub…</p>";
     renderNav(null, route);
     try {
       var catalog = await loadCatalog();
+      if (token !== renderToken) {
+        return;
+      }
       renderNav(catalog, route);
       if (route.page === "home") {
-        renderHome(catalog);
+        await finishHome(catalog, token);
       } else if (route.page === "skills") {
         renderSkillIndex(catalog);
         document.title = "Skills — AI SDLC Harness";
@@ -666,6 +871,9 @@
         document.title = route.slug + " — AI SDLC Harness";
       }
     } catch (err) {
+      if (token !== renderToken) {
+        return;
+      }
       renderError(err);
     }
   }
