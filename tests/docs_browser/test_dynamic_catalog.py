@@ -123,6 +123,18 @@ def main() -> None:
         fail("lifecycle pipeline mermaid must not jump Setup → test-writer")
     if "Setup --> Implementer" not in mermaid:
         fail("lifecycle pipeline mermaid must include Setup → implementer")
+    if 'DoD -->|"red automation / DoD fail"| Implementer' not in mermaid:
+        fail("lifecycle pipeline mermaid must re-enter implementer on DoD fail")
+    if 'CodeReviewer -->|"needs changes"| Implementer' not in mermaid:
+        fail("lifecycle pipeline mermaid must re-enter implementer when review needs changes")
+    if 'SecReview -->|"blocking findings"| Implementer' not in mermaid:
+        fail("lifecycle pipeline mermaid must re-enter implementer on blocking security findings")
+    if 'Implementer -->|"unmet Must AC"| Refiner' not in mermaid:
+        fail("lifecycle pipeline mermaid must send unmet Must AC back to the story refiner")
+    if "Triage --> Refiner" not in mermaid:
+        fail("lifecycle pipeline mermaid must keep triage → refiner")
+    if "At most 3 re-entry loops" not in pipeline_text:
+        fail("lifecycle pipeline SSOT must cap re-entry at 3 loops then escalate")
 
     print(
         "docs browser invariants passed "

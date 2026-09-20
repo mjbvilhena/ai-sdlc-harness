@@ -34,7 +34,7 @@ If MCP is unavailable, say so and still use vision → spec → **spec approval 
 2. **Map** discovery signals from the fetched pipeline template to one next legal state. If several design-band items are missing, you may recommend a parallel set but still gate implement.
 3. **Recommend** the next step and why. Name the child skill or human gate. For user-facing slices with stories but no UX artefact, hand off to **`sdlc-ux-designer`** (`/ux`). Never invent screens. For a missing test plan, **`sdlc-test-planner`** (`/test-plan`) — not `sdlc-test-writer`. For a security-sensitive slice with no threat model, hand off to **`sdlc-threat-modeler`**. After planning + setup, **`sdlc-implementer`** (`/implement`) — not a jump from setup to test-writer. For a vague defect, **`sdlc-bug-triager`** (intake → stories/fix — not the setup→tests happy path). For a thin PR body, **`sdlc-pr-summarizer`** before or with **`sdlc-code-reviewer`**; for a security-sensitive diff, **`sdlc-security-reviewer`**.
 4. **Confirm** — wait for explicit user agreement before handing off or skipping.
-5. **Hand off** — follow the child skill’s `CONTENT.md` / MCP contract in-session when available; otherwise tell the user to invoke that skill. After the outcome, run Job B from the pipeline template (small evidence-only memory sync). If that would become a full-repo audit, recommend `/docs-backlog-review`.
+5. **Hand off** — follow the child skill’s `CONTENT.md` / MCP contract in-session when available; otherwise tell the user to invoke that skill. After the outcome, run Job B from the pipeline template (small evidence-only memory sync). If that would become a full-repo audit, recommend `/docs-backlog-review`. **Re-entry:** verify fail → `sdlc-implementer`; unmet Must AC → `sdlc-user-story-refiner` (no soft-pass); triage → refiner. **At most 3 loops** for the same slice or issue, then **escalate to the human** with evidence. Do not thrash.
 6. Prefer the user’s existing branch. Docs-only PRs stay **open**. Consequential merges stay **human-gated**.
 
 ## Safety
@@ -42,6 +42,7 @@ If MCP is unavailable, say so and still use vision → spec → **spec approval 
 - Do not invent product claims, personas, SLOs, DOMAIN/LAYER MUST/NEVER, or UI/UX.
 - Do not invent product spec, epic, story, or technical-design/ADR approval, or stakeholder sign-off. Drafted or merged files and a backlog status flip are not approval.
 - Do not mark a story Done when automation failed or Must AC are unmet. Do not soft-pass — split unmet Must AC into new stories.
+- Do not loop the same slice through verify↔implement, AC-split→refine, or triage→refine more than **3** times; after 3, escalate to the human with evidence.
 - Do not skip design/planning (or any other stage) without an explicit user sentence and a recorded skip.
 - Do not treat `sdlc-test-writer` as the test-strategy author (`sdlc-test-planner` owns that) or `sdlc-a11y-auditor` as a UX designer.
 - Do not merge PRs, force-push the default branch, or delete review branches.

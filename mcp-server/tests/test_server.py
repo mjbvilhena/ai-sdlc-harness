@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from src.server import (
     fuzzy_match,
@@ -207,6 +209,29 @@ def test_lifecycle_pipeline_mermaid_names_security_and_pr_skills():
     # Bug-triager must not be forced onto the setup → tests happy path.
     assert "Setup --> Triage" not in fence
     assert "Triage --> TestWriter" not in fence
+
+
+def test_lifecycle_pipeline_mermaid_shows_reentry_loops_and_max_three():
+    result = get_sdlc_template("lifecycle pipeline")
+    fence = result.split("```mermaid", 1)[1].split("```", 1)[0]
+    assert 'DoD -->|"red automation / DoD fail"| Implementer' in fence
+    assert 'CodeReviewer -->|"needs changes"| Implementer' in fence
+    assert 'SecReview -->|"blocking findings"| Implementer' in fence
+    assert 'Implementer -->|"unmet Must AC"| Refiner' in fence
+    assert "Triage --> Refiner" in fence
+    assert "## Re-entry loops (max 3)" in result
+    assert "At most 3 re-entry loops" in result
+    assert "escalate to the human" in result
+    conductor = (Path(__file__).resolve().parents[2] / "skills/sdlc-conductor/CONTENT.md").read_text(
+        encoding="utf-8"
+    )
+    assert "At most 3 loops" in conductor
+    assert "escalate to the human" in conductor
+    design = (
+        Path(__file__).resolve().parents[2] / "docs/technical_design/sdlc-conductor.md"
+    ).read_text(encoding="utf-8")
+    assert "At most 3 re-entry loops" in design
+    assert "escalate to the human" in design
 
 
 def test_get_definition_of_done():

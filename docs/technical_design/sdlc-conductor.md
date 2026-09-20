@@ -70,6 +70,10 @@ vision
                 → implement (`sdlc-implementer`) against user-story + feature DoD (+ change-type DoD)
                   → verify (automation + `sdlc-test-writer` / `sdlc-e2e-scripter` / `sdlc-pr-summarizer` / `sdlc-code-reviewer` / `sdlc-security-reviewer` / DoD / a11y) — Done only when tests pass with no errors AND all Must AC are met
                     → later/ops drivers as needed (`sdlc-bug-triager` is intake into triage → stories/fix, not the setup→tests happy path)
+                  ↺ verify fail → `sdlc-implementer` (red automation / needs changes / DoD fail)
+                  ↺ unmet Must AC → `sdlc-user-story-refiner` (new stories; no soft-pass)
+                  ↺ triage → `sdlc-user-story-refiner`
+                  (max 3 re-entry loops for the same slice/issue, then escalate to the human)
 ```
 
 The **main path is not** stories → setup → code. Design and planning are first-class. Do not dump RFC, API design, test strategy, or UX into “later drivers”.
@@ -102,7 +106,7 @@ Optional **on-ramp** (not a skip of vision): `sdlc-researcher` when the user nee
 - **Skip only** with an explicit user sentence (“skip setup-repo”, “we already have a spec, go to stories”, “skip UX — no UI in this epic”, “skip RFC, API already frozen in `docs/…`”).
 - **Human approval gates** (product spec, epics, **stories**, technical design/ADRs) advance only with a **named** human sign-off or an explicit “treat as approved” sentence. Merging a file or flipping a backlog status is **not** a skip and **not** approval.
 - On skip, record **what was skipped, why, and who agreed** in the backlog or a short note next to the spec — evidence, not folklore. Design/planning skips use the **same** bar as every other stage.
-- **Re-entry:** a skipped step can still be recommended later if discovery signals say it is missing (e.g. no CI when the first feature PR appears; no test plan when implementation starts).
+- **Re-entry:** a skipped step can still be recommended later if discovery signals say it is missing (e.g. no CI when the first feature PR appears; no test plan when implementation starts). **At most 3 re-entry loops** for the same slice or issue (verify↔implement, AC-split→refine, triage→refine). After 3, **stop and escalate to the human** with evidence — do not thrash. Same cap as artefact-approval “Max 3 iterations”; not a second budget. These loops are not artefact-approval edges.
 - **Experts:** may invoke any child skill directly. The conductor is a front door, not a prison. If the user already named `/sdlc-user-story-refiner` or `/rfc`, do not force them back through vision.
 - **Thin / chore epics:** an explicit skip of the design band is legal for pure docs or chore work; still record it. See open question 8.
 
@@ -127,7 +131,7 @@ Signals are **implications**, not proofs. Cite the files you actually opened.
 | **Test strategy needed** | Slice has stories but no test plan (and no e2e plan when a journey exists). Hand off to `sdlc-test-planner`. Security-sensitive slice with no threat model → hand off to `sdlc-threat-modeler`. |
 | **Setup-repo needed** | Planning band is done or skipped; first implementation about to start; no CI, no lint/SAST/secret-scan, no `CODEOWNERS` (or repo equivalent); `sdlc-setup-repository` has never been run. |
 | **Implement** | **Approved** story + AC; technical design/ADRs **approved** or explicitly skipped/treat-as-approved; **remaining design/planning band satisfied or explicitly skipped**; repo checks exist **or** were explicitly skipped; working tree / branches show feature work. Hand off to `sdlc-implementer` — not to `sdlc-test-writer`. |
-| **Verify needed** | Code exists for the slice but tests, review, or DoD evidence do not match the test strategy, automation is red, or Must AC are unmet. Thin or missing PR body → `sdlc-pr-summarizer`. Security-sensitive diff without a control checklist → `sdlc-security-reviewer`. |
+| **Verify needed** | Code exists for the slice but tests, review, or DoD evidence do not match the test strategy, automation is red, or Must AC are unmet. Red automation / needs-changes / DoD fail / blocking security findings → `sdlc-implementer`. Unmet Must AC → `sdlc-user-story-refiner` (no soft-pass). After **3** re-entry loops on the same slice, escalate to the human. Thin or missing PR body → `sdlc-pr-summarizer`. Security-sensitive diff without a control checklist → `sdlc-security-reviewer`. |
 | **Domain/layer steward needed** | Spec, RFC, or code names a bounded context or layer and `DOMAIN.md` / `LAYER.md` is missing, stale vs shipped or designed behavior, or contradicts the spec. **Hand off** to `sdlc-domain-architect` / `sdlc-layer-architect` for authorship; conductor only syncs indexes/links. |
 | **Deep docs audit needed** | Many docs disagree with the tree, counts are wrong, or the user asked for a full review. **Invoke** `sdlc-docs-backlog-review` — do not silently rewrite the tree. |
 | **Later / ops driver** | Incident → postmortem; failing CI log → `sdlc-ci-debugger`; user-facing ship → release notes; migration about to run → `sdlc-migration-planner`; vague “it’s broken” / undiagnosed defect → `sdlc-bug-triager` (may then feed `sdlc-user-story-refiner` or a scoped fix). Design-time RFC/ADR/threat work belongs in the planning band, not here. |
