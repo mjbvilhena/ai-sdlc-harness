@@ -10,10 +10,14 @@ flowchart TD
     Sec[sdlc-security-reviewer]
     Triage[sdlc-bug-triager]
     PRSum[sdlc-pr-summarizer]
+    Planner[sdlc-test-planner]
+    Implementer[sdlc-implementer]
     HOME_PIPELINE_NODE --> Threat
     HOME_PIPELINE_NODE --> Sec
     HOME_PIPELINE_NODE --> Triage
     HOME_PIPELINE_NODE --> PRSum
+    HOME_PIPELINE_NODE --> Planner
+    Planner --> Implementer
 ```
 
 Other template prose should not become a second diagram source of truth.

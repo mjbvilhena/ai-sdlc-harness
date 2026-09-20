@@ -1,0 +1,14 @@
+name: sdlc-test-planner
+description: Authors a risk-ranked test strategy from approved stories before implementation. Not the skill that writes executable tests.
+version: 0.1.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - cursor
+  - ghcp
+triggers:
+  - /test-plan
+  - /test-planner
+  - /sdlc-test-planner
+  - "plan tests"

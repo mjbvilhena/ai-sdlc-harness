@@ -1,6 +1,6 @@
 ## Purpose
 
-Write unit or integration tests for a function, class, or module using the project's existing framework. Prefer a risk-ranked plan before dumping cases.
+Write unit or integration tests for a function, class, or module using the project's existing framework. Prefer a risk-ranked plan before dumping cases. If the user asked for a **test strategy before code exists**, defer to **`sdlc-test-planner`** (`/test-plan`) — this skill **executes** tests at verify time.
 
 ## Activation
 
@@ -10,7 +10,7 @@ Trigger when the user asks to "write tests for X", "generate test stubs", or use
 
 When MCP is available:
 
-1. **CRITICAL**: Call `get_sdlc_template` with `template_type="test plan"`. Outline coverage in that shape, then emit tests. For journey-level work, defer to `sdlc-e2e-scripter` and fetch `e2e test plan` instead.
+1. **CRITICAL**: Call `get_sdlc_template` with `template_type="test plan"`. Outline coverage in that shape, then emit tests. If no test plan exists yet and there is no code to cover, stop and hand off to `sdlc-test-planner`. For journey-level work, defer to `sdlc-e2e-scripter` and fetch `e2e test plan` instead.
 2. Call `get_definition_of_done` with `component="feature"` or `bugfix` (use `bugfix` when the user is locking in a regression). Honor the returned test expectations.
 3. Call `get_layer_consultant` for the layer under test when it is inferable (`api`, `database`, `ui`). Honor testing MUST/NEVER.
 

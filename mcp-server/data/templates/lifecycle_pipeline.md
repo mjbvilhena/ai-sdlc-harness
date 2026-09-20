@@ -31,7 +31,6 @@ flowchart TD
 
     PO(sdlc-product-owner)
     Refiner(sdlc-user-story-refiner)
-    Setup(sdlc-setup-repository)
 
     subgraph DesignPlanning["Design and planning"]
         RFC(sdlc-rfc-drafter)
@@ -39,7 +38,11 @@ flowchart TD
         ADR(sdlc-adr-drafter)
         UX(sdlc-ux-designer)
         Threat(sdlc-threat-modeler)
+        TestPlanner(sdlc-test-planner)
     end
+
+    Setup(sdlc-setup-repository)
+    Implementer(sdlc-implementer)
 
     subgraph Verify["Verify"]
         TestWriter[sdlc-test-writer]
@@ -66,16 +69,20 @@ flowchart TD
     Conductor --> ADR
     Conductor --> UX
     Conductor --> Threat
+    Conductor --> TestPlanner
     Conductor --> Setup
+    Conductor --> Implementer
 
     PO --> Refiner
     Refiner --> RFC
     Refiner --> API
     Refiner --> UX
     Refiner --> Threat
+    Refiner --> TestPlanner
 
-    Setup --> TestWriter
-    Setup --> E2E
+    Setup --> Implementer
+    Implementer --> TestWriter
+    Implementer --> E2E
     TestWriter --> PRSum
     E2E --> PRSum
     PRSum --> CodeReviewer
@@ -103,11 +110,11 @@ vision
                  • technical design (architecture / API / RFC / ADR as needed)
                      → technical design / ADR approval (human)
                  • UI/UX design (`sdlc-ux-designer` — wireframes/flows/copy from stories; template `ux design`)
-                 • test strategy (test_plan + e2e_test_plan; `sdlc-threat-modeler` when security-sensitive)
+                 • test strategy (`sdlc-test-planner` — `test_plan` + `e2e_test_plan`; `sdlc-threat-modeler` when security-sensitive)
                  • domain/layer update when bounds actually change (hand off to architects)
               → setup-repository (when first code is about to land, if QA not already present)
-                → implement against user-story + feature DoD (+ change-type DoD)
-                  → verify (automation + `sdlc-pr-summarizer` / `sdlc-code-reviewer` / `sdlc-security-reviewer` / DoD / a11y) — Done only when tests pass with no errors AND all Must AC are met
+                → implement (`sdlc-implementer`) against user-story + feature DoD (+ change-type DoD)
+                  → verify (automation + `sdlc-test-writer` / `sdlc-e2e-scripter` / `sdlc-pr-summarizer` / `sdlc-code-reviewer` / `sdlc-security-reviewer` / DoD / a11y) — Done only when tests pass with no errors AND all Must AC are met
                     → later/ops drivers as needed (`sdlc-bug-triager` is intake into triage → stories/fix, not the setup→tests happy path)
 ```
 
@@ -124,10 +131,10 @@ Design and planning are first-class. Do not dump RFC, API design, test strategy,
 | **Technical design** | `sdlc-rfc-drafter`, `sdlc-api-designer`, `sdlc-adr-drafter`; templates `rfc`, `api design` / `api contract`, `adr` | RFC and/or API design/contract **drafted**; ADR drafted if a decision is being recorded. Draft ≠ approval |
 | **Technical design / ADR approval** | **Human** — do not invent sign-off | Named human sign-off or explicit “treat as approved” on the technical design documents **including ADRs**. Drafted or merged RFC/API/ADR files are **not** enough |
 | **UI/UX design** | `sdlc-ux-designer` (`/ux`, `/ux-design`); template `ux design`. Never invent screens. Existing human/external artefacts still satisfy this state. `sdlc-a11y-auditor` is verify-time, not design-time | Agreed UX artefact exists, or explicit skip (e.g. no UI in this slice) |
-| **Test strategy** | Templates `test_plan`, `e2e_test_plan`. `sdlc-threat-modeler` (template `threat_model`) when the slice is security-sensitive. `sdlc-security-reviewer` is **verify-time**. `sdlc-test-writer` / `sdlc-e2e-scripter` are **later execution**, not strategy authors | Test plan (and e2e plan when there is a journey) exists and is linked; threat model exists when warranted |
+| **Test strategy** | `sdlc-test-planner` (templates `test_plan`, `e2e_test_plan`). `sdlc-threat-modeler` (template `threat_model`) when the slice is security-sensitive. `sdlc-security-reviewer` is **verify-time**. `sdlc-test-writer` / `sdlc-e2e-scripter` are **later execution**, not strategy authors | Test plan (and e2e plan when there is a journey) exists and is linked; threat model exists when warranted |
 | **Domain / layer (in-band)** | `sdlc-domain-architect` / `sdlc-layer-architect` only when bounds **actually changed** | Relevant `DOMAIN.md` / `LAYER.md` exist and do not contradict spec/design — or no bound changed |
 | **Setup-repo** | `sdlc-setup-repository` if first code is about to land and checks are missing. Brownfield: satisfied if CI/lint/secret-scan/ownership already exist — say so | Checks exist or user agrees the repo is already set up |
-| **Implement** | Coding session against `user story` + `feature` DoD (and `ui change` / `api change` / `security change` when those apply) | Planning artefacts above are **approved** (or an explicit skip/treat-as-approved was recorded). Must AC in progress; no silent extra features |
+| **Implement** | `sdlc-implementer` — coding session against `user story` + `feature` DoD (and `ui change` / `api change` / `security change` when those apply) | Planning artefacts above are **approved** (or an explicit skip/treat-as-approved was recorded). Must AC in progress; no silent extra features. Done only when automation is green **and** all Must AC are met; unmet Must AC → new stories, no soft-pass |
 | **Verify** | `sdlc-test-writer`, `sdlc-e2e-scripter` (execute the strategy), `sdlc-pr-summarizer` (PR packaging before or with review), `sdlc-code-reviewer`, `sdlc-security-reviewer` (control checklist on the change), `sdlc-dod-checker`, `sdlc-a11y-auditor` | **Done** only when test automation passes without errors **and** all Must AC are fully met. If some Must AC cannot be met: do **not** soft-pass — create additional user stories. Human review for consequential merges |
 | **Later / ops** | `sdlc-bug-triager` (intake → diagnosable ticket → stories/fix), release notes, runbook, migration, postmortem, CI debugger | Current ship/ops or defect-intake need matches |
 
@@ -170,9 +177,9 @@ Signals are implications, not proofs.
 | **Technical design needed** | Slice touches architecture or a new/changed API and there is no RFC, API design/contract, or ADR covering it. |
 | **Technical design / ADR approval needed** | RFC / API design / ADR files exist; still draft / unapproved; no named human sign-off and no “treat as approved”. |
 | **UI/UX needed** | Slice is user-facing and there is no agreed UX artefact. Hand off to `sdlc-ux-designer`. Do not invent screens. |
-| **Test strategy needed** | Stories exist but no test plan (and no e2e plan when a journey exists). Security-sensitive slice with no threat model → `sdlc-threat-modeler`. |
+| **Test strategy needed** | Stories exist but no test plan (and no e2e plan when a journey exists). Hand off to `sdlc-test-planner`. Security-sensitive slice with no threat model → `sdlc-threat-modeler`. |
 | **Setup-repo needed** | Planning done or skipped; first code about to land; no CI / lint / SAST / secret-scan / `CODEOWNERS`. |
-| **Implement** | **Approved** stories + AC; technical design/ADRs **approved** or explicitly skipped/treat-as-approved; remaining design/planning satisfied **or** explicitly skipped; repo checks exist **or** skipped. |
+| **Implement** | **Approved** stories + AC; technical design/ADRs **approved** or explicitly skipped/treat-as-approved; remaining design/planning satisfied **or** explicitly skipped; repo checks exist **or** skipped. Hand off to `sdlc-implementer` — not to `sdlc-test-writer`. |
 | **Verify needed** | Code exists but tests/review/DoD do not match the test strategy, automation is red, or Must AC are unmet. Thin or missing PR body → `sdlc-pr-summarizer`. Security-sensitive diff without a control checklist → `sdlc-security-reviewer`. |
 | **Domain/layer steward** | Spec, RFC, or code names a context/layer and `DOMAIN.md` / `LAYER.md` is missing or contradicts design. Hand off to architect skills. |
 | **Deep docs audit** | Many docs disagree with the tree. Invoke `sdlc-docs-backlog-review` — do not silently rewrite. |
@@ -202,8 +209,9 @@ If the checklist would become a full-repo audit, **stop** and recommend `/docs-b
 - **`sdlc-user-story-refiner`** — per-epic BDD stories after epic approval. Drafting ≠ approval; next gate is human **story** approval.
 - **`sdlc-rfc-drafter` / `sdlc-api-designer` / `sdlc-adr-drafter`** — technical design band (draft). Next gate is human technical design / ADR approval. You sync links; they author bodies.
 - **`sdlc-ux-designer`** — UI/UX design band. Authors wireframes/flows/copy from stories via template `ux design`. You sync links; they author the artefact. A human/external artefact still satisfies the state. `sdlc-a11y-auditor` stays verify-time.
-- **Test strategy vs execution** — `test_plan` / `e2e_test_plan` and `sdlc-threat-modeler` (when the slice is security-sensitive) **before** code. `sdlc-test-writer` / `sdlc-e2e-scripter` execute at verify time. `sdlc-security-reviewer` is the verify-time control checklist, not the strategy author.
+- **Test strategy vs execution** — `sdlc-test-planner` authors `test_plan` / `e2e_test_plan` (and `sdlc-threat-modeler` when the slice is security-sensitive) **before** code. `sdlc-test-writer` / `sdlc-e2e-scripter` execute at verify time. `sdlc-security-reviewer` is the verify-time control checklist, not the strategy author.
 - **`sdlc-setup-repository`** — after planning, before first implement, unless brownfield CI already satisfies.
+- **`sdlc-implementer`** — after planning + setup. Builds approved stories against story/feature (+ change-type) DoD. Does not invent scope. Done = automation green **and** all Must AC met; unmet Must AC → new stories.
 - **`sdlc-domain-architect` / `sdlc-layer-architect`** — when bounds actually change.
 - **`sdlc-docs-backlog-review`** — deep audit + review PR left open (template `docs backlog review`). Invoke when drift is systemic. Not a silent daily rewrite.
 - **`sdlc-docs-updater`** — docs for a recent code change only.
@@ -225,5 +233,6 @@ If nothing material changed, do not open an empty PR. Report the recommendation 
 - Treating a draft, merge, or backlog status flip as approval
 - Marking a story Done when automation failed or Must AC are unmet (do not soft-pass — split unmet Must AC into new stories)
 - Skipping design/planning without an explicit user sentence and a recorded skip
-- Treating `sdlc-test-writer` as the test-strategy author or `sdlc-a11y-auditor` as a UX designer
+- Treating `sdlc-test-writer` as the test-strategy author (`sdlc-test-planner` owns that) or `sdlc-a11y-auditor` as a UX designer
+- Jumping Setup → test-writer and skipping `sdlc-implementer`
 - Merging PRs, force-pushing the default branch, or deleting review branches

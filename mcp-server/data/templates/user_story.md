@@ -76,6 +76,6 @@ stateDiagram-v2
     DraftStories --> HumanReview: Submit for Approval
     HumanReview --> DraftStories: Rejected (Max 3 iterations allowed)
     HumanReview --> Approved: Accepted
-    Approved --> DesignAndPlanning: Handoff (UX/RFC/API/ADR/threat when warranted)
+    Approved --> DesignAndPlanning: Handoff (UX/RFC/API/ADR/test-plan/threat when warranted)
     DesignAndPlanning --> [*]
 ```

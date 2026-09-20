@@ -114,9 +114,15 @@ def main() -> None:
         "sdlc-security-reviewer",
         "sdlc-bug-triager",
         "sdlc-pr-summarizer",
+        "sdlc-test-planner",
+        "sdlc-implementer",
     ):
         if name not in mermaid:
             fail(f"lifecycle pipeline mermaid must include {name}")
+    if "Setup --> TestWriter" in mermaid:
+        fail("lifecycle pipeline mermaid must not jump Setup → test-writer")
+    if "Setup --> Implementer" not in mermaid:
+        fail("lifecycle pipeline mermaid must include Setup → implementer")
 
     print(
         "docs browser invariants passed "

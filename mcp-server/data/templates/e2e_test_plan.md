@@ -1,6 +1,6 @@
 # End-to-End Test Plan
 
-Plan for journey-level tests (Playwright, Cypress, or the repo's runner). Pair with skill `sdlc-e2e-scripter` and the `user story` template for AC shape.
+Plan for journey-level tests (Playwright, Cypress, or the repo's runner). Pair with skill `sdlc-test-planner` (strategy, before implement) and the `user story` template for AC shape. `sdlc-e2e-scripter` **executes** this plan at verify time.
 
 **Quality bar:** One journey per critical user outcome. Selectors prefer role/name/label. Environments are local or explicitly documented — not production unless the user supplied that base URL.
 

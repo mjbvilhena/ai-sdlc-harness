@@ -1,6 +1,6 @@
 # Test Plan
 
-Plan for proving a change at unit and integration level. Pair with skill `sdlc-test-writer`. For full user journeys use `e2e_test_plan`.
+Plan for proving a change at unit and integration level. Pair with skill `sdlc-test-planner` (strategy, before implement). `sdlc-test-writer` **executes** this plan at verify time. For full user journeys use `e2e_test_plan`.
 
 **Quality bar:** Each item names the behavior, the layer, and how it fails closed. Tests match the repo's existing framework. No invented product behavior.
 

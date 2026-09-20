@@ -1,0 +1,13 @@
+name: sdlc-implementer
+description: Implements approved user stories after planning and repo setup, against story and change-type DoD. Does not invent product scope.
+version: 0.1.0
+author: ai-sdlc-harness-team
+targets:
+  - agy
+  - claude
+  - cursor
+  - ghcp
+triggers:
+  - /implement
+  - /sdlc-implementer
+  - "implement the story"

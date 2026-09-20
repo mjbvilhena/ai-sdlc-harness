@@ -1,6 +1,6 @@
 ## Purpose
 
-Scaffold Playwright or Cypress end-to-end tests from user-story acceptance criteria. Match the repo's existing test stack when one is present.
+Scaffold Playwright or Cypress end-to-end tests from user-story acceptance criteria. Match the repo's existing test stack when one is present. If the user asked for an **e2e strategy before code exists**, defer to **`sdlc-test-planner`** (`/test-plan`) — this skill **executes** journeys at verify time.
 
 ## MCP tools (required)
 

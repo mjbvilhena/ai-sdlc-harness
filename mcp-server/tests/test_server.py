@@ -185,14 +185,25 @@ def test_lifecycle_pipeline_mermaid_names_security_and_pr_skills():
         "sdlc-security-reviewer",
         "sdlc-bug-triager",
         "sdlc-pr-summarizer",
+        "sdlc-test-planner",
+        "sdlc-implementer",
     ):
         assert name in fence, f"{name} must appear in the lifecycle pipeline mermaid"
-    # Placement: threat-modeler is design/planning, not a verify-only leaf.
-    design_band, rest = fence.split("subgraph Verify", 1)
-    assert "sdlc-threat-modeler" in design_band
-    assert "sdlc-security-reviewer" in rest
-    assert "sdlc-pr-summarizer" in rest
-    assert "sdlc-bug-triager" in rest
+    planning = fence.split("subgraph DesignPlanning", 1)[1].split("end", 1)[0]
+    verify = fence.split("subgraph Verify", 1)[1].split("end", 1)[0]
+    assert "sdlc-threat-modeler" in planning
+    assert "sdlc-test-planner" in planning
+    assert "sdlc-implementer" not in planning
+    assert "sdlc-implementer" not in verify
+    assert "sdlc-security-reviewer" in verify
+    assert "sdlc-pr-summarizer" in verify
+    assert "sdlc-test-writer" in verify
+    assert "sdlc-bug-triager" in fence.split("subgraph Verify", 1)[1]
+    # Happy path is setup → implementer → verify, not setup → test-writer.
+    assert "Setup --> TestWriter" not in fence
+    assert "Setup --> E2E" not in fence
+    assert "Setup --> Implementer" in fence
+    assert "Implementer --> TestWriter" in fence
     # Bug-triager must not be forced onto the setup → tests happy path.
     assert "Setup --> Triage" not in fence
     assert "Triage --> TestWriter" not in fence

@@ -126,6 +126,8 @@ test("home renders the lifecycle pipeline mermaid from the template", async ({ p
   await expect(diagram).toContainText(/sdlc-security-reviewer/i);
   await expect(diagram).toContainText(/sdlc-bug-triager/i);
   await expect(diagram).toContainText(/sdlc-pr-summarizer/i);
+  await expect(diagram).toContainText(/sdlc-test-planner/i);
+  await expect(diagram).toContainText(/sdlc-implementer/i);
   if (!mocked) {
     await expect(diagram).toContainText(/sdlc-conductor/i);
   }
@@ -157,6 +159,8 @@ test("skill, template, and DoD mermaid fences render as diagrams", async ({ page
   await expect(page.locator('[data-catalog-body="doc"] pre code.language-mermaid')).toHaveCount(0);
   await expect(templateHost).toContainText(/sdlc-threat-modeler/i);
   await expect(templateHost).toContainText(/sdlc-security-reviewer/i);
+  await expect(templateHost).toContainText(/sdlc-test-planner/i);
+  await expect(templateHost).toContainText(/sdlc-implementer/i);
   if (!mocked) {
     await expect(templateHost).toContainText(/sdlc-conductor/i);
   }
