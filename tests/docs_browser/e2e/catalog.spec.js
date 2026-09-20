@@ -122,8 +122,19 @@ test("home renders the lifecycle pipeline mermaid from the template", async ({ p
   await expect(page.locator("[data-home-pipeline]")).toBeVisible();
   await expectRenderedMermaid(diagram, mocked ? "HOME_PIPELINE_MARK" : null);
   await expect(page.locator("[data-home-pipeline-error]")).toHaveCount(0);
+  await expect(diagram).toContainText(/sdlc-threat-modeler/i);
+  await expect(diagram).toContainText(/sdlc-security-reviewer/i);
+  await expect(diagram).toContainText(/sdlc-bug-triager/i);
+  await expect(diagram).toContainText(/sdlc-pr-summarizer/i);
+  await expect(diagram).toContainText(/sdlc-test-planner/i);
+  await expect(diagram).toContainText(/sdlc-implementer/i);
+  await expect(diagram).toContainText(/unmet Must AC/i);
+  await expect(diagram).toContainText(/needs changes/i);
+  await expect(diagram).toContainText(/red automation/i);
+  await expect(diagram).toContainText(/blocking findings/i);
   if (!mocked) {
     await expect(diagram).toContainText(/sdlc-conductor/i);
+    await expect(diagram).toContainText(/sdlc-user-story-refiner/i);
   }
 });
 
@@ -151,8 +162,16 @@ test("skill, template, and DoD mermaid fences render as diagrams", async ({ page
   const templateHost = page.locator('[data-catalog-body="doc"] [data-mermaid-diagram]');
   await expectRenderedMermaid(templateHost, mocked ? "HOME_PIPELINE_MARK" : null);
   await expect(page.locator('[data-catalog-body="doc"] pre code.language-mermaid')).toHaveCount(0);
+  await expect(templateHost).toContainText(/sdlc-threat-modeler/i);
+  await expect(templateHost).toContainText(/sdlc-security-reviewer/i);
+  await expect(templateHost).toContainText(/sdlc-test-planner/i);
+  await expect(templateHost).toContainText(/sdlc-implementer/i);
+  await expect(templateHost).toContainText(/unmet Must AC/i);
+  await expect(templateHost).toContainText(/needs changes/i);
+  await expect(templateHost).toContainText(/red automation/i);
   if (!mocked) {
     await expect(templateHost).toContainText(/sdlc-conductor/i);
+    await expect(templateHost).toContainText(/sdlc-user-story-refiner/i);
   }
 
   if (mocked) {

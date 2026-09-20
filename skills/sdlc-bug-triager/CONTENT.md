@@ -1,6 +1,6 @@
 ## Purpose
 
-Convert a vague "it's broken" report into a diagnosable bug ticket and a clear path to a fix. You are triaging, not silently shipping a speculative patch unless the user asked for a fix.
+Convert a vague "it's broken" report into a diagnosable bug ticket and a clear path to a fix. You are triaging, not silently shipping a speculative patch unless the user asked for a fix. You sit on the **intake / later-ops** path into triage → stories/fix — not on the setup→tests happy path. After a ticket is characterized, the next legal step is often **`sdlc-user-story-refiner`** (or a scoped fix against bugfix DoD), not jumping to implement.
 
 ## MCP tools (required)
 

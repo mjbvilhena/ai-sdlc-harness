@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from src.server import (
     fuzzy_match,
@@ -174,6 +176,62 @@ def test_conductor_aliases_do_not_collapse_to_code_review():
     assert "# Lifecycle Pipeline" in result
     assert "Skip policy" in result
     assert "Code Review Template" not in result
+
+
+def test_lifecycle_pipeline_mermaid_names_security_and_pr_skills():
+    result = get_sdlc_template("lifecycle pipeline")
+    assert "```mermaid" in result
+    fence = result.split("```mermaid", 1)[1].split("```", 1)[0]
+    for name in (
+        "sdlc-threat-modeler",
+        "sdlc-security-reviewer",
+        "sdlc-bug-triager",
+        "sdlc-pr-summarizer",
+        "sdlc-test-planner",
+        "sdlc-implementer",
+    ):
+        assert name in fence, f"{name} must appear in the lifecycle pipeline mermaid"
+    planning = fence.split("subgraph DesignPlanning", 1)[1].split("end", 1)[0]
+    verify = fence.split("subgraph Verify", 1)[1].split("end", 1)[0]
+    assert "sdlc-threat-modeler" in planning
+    assert "sdlc-test-planner" in planning
+    assert "sdlc-implementer" not in planning
+    assert "sdlc-implementer" not in verify
+    assert "sdlc-security-reviewer" in verify
+    assert "sdlc-pr-summarizer" in verify
+    assert "sdlc-test-writer" in verify
+    assert "sdlc-bug-triager" in fence.split("subgraph Verify", 1)[1]
+    # Happy path is setup → implementer → verify, not setup → test-writer.
+    assert "Setup --> TestWriter" not in fence
+    assert "Setup --> E2E" not in fence
+    assert "Setup --> Implementer" in fence
+    assert "Implementer --> TestWriter" in fence
+    # Bug-triager must not be forced onto the setup → tests happy path.
+    assert "Setup --> Triage" not in fence
+    assert "Triage --> TestWriter" not in fence
+
+
+def test_lifecycle_pipeline_mermaid_shows_reentry_loops_and_max_three():
+    result = get_sdlc_template("lifecycle pipeline")
+    fence = result.split("```mermaid", 1)[1].split("```", 1)[0]
+    assert 'DoD -->|"red automation / DoD fail"| Implementer' in fence
+    assert 'CodeReviewer -->|"needs changes"| Implementer' in fence
+    assert 'SecReview -->|"blocking findings"| Implementer' in fence
+    assert 'Implementer -->|"unmet Must AC"| Refiner' in fence
+    assert "Triage --> Refiner" in fence
+    assert "## Re-entry loops (max 3)" in result
+    assert "At most 3 re-entry loops" in result
+    assert "escalate to the human" in result
+    conductor = (Path(__file__).resolve().parents[2] / "skills/sdlc-conductor/CONTENT.md").read_text(
+        encoding="utf-8"
+    )
+    assert "At most 3 loops" in conductor
+    assert "escalate to the human" in conductor
+    design = (
+        Path(__file__).resolve().parents[2] / "docs/technical_design/sdlc-conductor.md"
+    ).read_text(encoding="utf-8")
+    assert "At most 3 re-entry loops" in design
+    assert "escalate to the human" in design
 
 
 def test_get_definition_of_done():

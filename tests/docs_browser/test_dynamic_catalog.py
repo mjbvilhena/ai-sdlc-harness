@@ -96,6 +96,46 @@ def main() -> None:
     if "extractPrimaryMermaid" not in app:
         fail("assets/app.js must extract the primary mermaid block from the pipeline template")
 
+    pipeline = ROOT / "mcp-server/data/templates/lifecycle_pipeline.md"
+    if not pipeline.is_file():
+        fail("mcp-server/data/templates/lifecycle_pipeline.md is missing (Home pipeline source)")
+    pipeline_text = pipeline.read_text(encoding="utf-8")
+    heading = re.search(
+        r"(?is)##[^\n]*pipeline graph[^\n]*\n(.*)",
+        pipeline_text,
+    )
+    search_in = heading.group(1) if heading else pipeline_text
+    fence = re.search(r"```mermaid[ \t]*\r?\n(.*?)```", search_in, re.S)
+    if not fence:
+        fail("lifecycle_pipeline.md must have a mermaid fence under Pipeline graph (Home renders it)")
+    mermaid = fence.group(1)
+    for name in (
+        "sdlc-threat-modeler",
+        "sdlc-security-reviewer",
+        "sdlc-bug-triager",
+        "sdlc-pr-summarizer",
+        "sdlc-test-planner",
+        "sdlc-implementer",
+    ):
+        if name not in mermaid:
+            fail(f"lifecycle pipeline mermaid must include {name}")
+    if "Setup --> TestWriter" in mermaid:
+        fail("lifecycle pipeline mermaid must not jump Setup → test-writer")
+    if "Setup --> Implementer" not in mermaid:
+        fail("lifecycle pipeline mermaid must include Setup → implementer")
+    if 'DoD -->|"red automation / DoD fail"| Implementer' not in mermaid:
+        fail("lifecycle pipeline mermaid must re-enter implementer on DoD fail")
+    if 'CodeReviewer -->|"needs changes"| Implementer' not in mermaid:
+        fail("lifecycle pipeline mermaid must re-enter implementer when review needs changes")
+    if 'SecReview -->|"blocking findings"| Implementer' not in mermaid:
+        fail("lifecycle pipeline mermaid must re-enter implementer on blocking security findings")
+    if 'Implementer -->|"unmet Must AC"| Refiner' not in mermaid:
+        fail("lifecycle pipeline mermaid must send unmet Must AC back to the story refiner")
+    if "Triage --> Refiner" not in mermaid:
+        fail("lifecycle pipeline mermaid must keep triage → refiner")
+    if "At most 3 re-entry loops" not in pipeline_text:
+        fail("lifecycle pipeline SSOT must cap re-entry at 3 loops then escalate")
+
     print(
         "docs browser invariants passed "
         f"({len(skill_names)} skills on disk; no hardcoded inventory in app.js)."

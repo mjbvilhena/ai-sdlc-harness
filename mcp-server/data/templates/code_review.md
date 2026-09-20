@@ -1,6 +1,6 @@
 # Code Review Template
 
-Structured review of a diff. Pair with skill `sdlc-code-reviewer` and Definition of Done `pr` plus the change-type DoD (`feature`, `bugfix`, `api change`, …).
+Structured review of a diff. Pair with skill `sdlc-code-reviewer` and Definition of Done `pr` plus the change-type DoD (`feature`, `bugfix`, `api change`, …). If the PR description is missing or too thin, run `sdlc-pr-summarizer` first (packaging before or with this review). For a security-sensitive change, also use `sdlc-security-reviewer`.
 
 **Quality bar:** Every issue is grounded in the diff or fetched Domain/Layer/DoD rules. Suggestions are concrete. Verdict is merge, comment, or request-changes — not "LGTM" when secrets or blocking DoD gaps remain.
 

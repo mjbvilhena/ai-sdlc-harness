@@ -67,6 +67,8 @@ teardown() {
     [ -d "$MOCK_HOME/.claude/commands" ]
     [ -f "$MOCK_HOME/.claude/commands/sdlc-code-reviewer.md" ]
     [ -f "$MOCK_HOME/.claude/commands/sdlc-a11y-auditor.md" ]
+    [ -f "$MOCK_HOME/.claude/commands/sdlc-test-planner.md" ]
+    [ -f "$MOCK_HOME/.claude/commands/sdlc-implementer.md" ]
 }
 
 @test "install_claude.sh workspace install works" {
@@ -109,6 +111,8 @@ teardown() {
     [ "$status" -eq 0 ]
     [ -d "$MOCK_WORKSPACE/.cursor/commands" ]
     [ -f "$MOCK_WORKSPACE/.cursor/commands/sdlc-code-reviewer.md" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/commands/sdlc-test-planner.md" ]
+    [ -f "$MOCK_WORKSPACE/.cursor/commands/sdlc-implementer.md" ]
     [ -f "$MOCK_WORKSPACE/.cursor/mcp.json" ]
 }
 

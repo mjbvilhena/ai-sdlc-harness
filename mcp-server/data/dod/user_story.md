@@ -2,7 +2,7 @@
 
 A user story **artefact** is ready for the human approval gate when the shape checks below pass. Drafting that artefact (or merging the file) is **not** approval — a **named** human sign-off or an explicit “treat as approved” sentence is required. Do not invent stakeholder sign-off.
 
-A user story’s **implementation** is **Done** when a user (or stated actor) can achieve the `So that` using the shipped increment, **test automation passes without errors**, and **all Must acceptance criteria are fully met**. Pair with template `user_story` and skill `sdlc-user-story-refiner`.
+A user story’s **implementation** is **Done** when a user (or stated actor) can achieve the `So that` using the shipped increment, **test automation passes without errors**, and **all Must acceptance criteria are fully met**. Pair with template `user_story`, skill `sdlc-user-story-refiner` (artefact), and `sdlc-implementer` (code).
 
 If some Must AC cannot be met: do **not** soft-pass — **create additional user stories** for the unmet criteria (this story stays not-Done until its remaining Musts are met).
 

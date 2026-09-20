@@ -18,4 +18,4 @@ If MCP is unavailable, say so and use a standard "As a / I want / So that" story
 2. Split large asks into independently valuable stories. Do not add features, personas, or metrics the user did not provide.
 3. Write acceptance criteria as testable Given/When/Then scenarios, including one unhappy path when it is implied.
 4. Call out open questions and out-of-scope items instead of filling gaps with fiction.
-5. These stories are **drafts**. Drafting or merging them is **not** approval. Tell the user the next step is **human story approval** (a named sign-off or an explicit “treat as approved” sentence) before design or implement. Do not invent stakeholder sign-off. Epic approval is not story approval.
+5. These stories are **drafts**. Drafting or merging them is **not** approval. Tell the user the next step is **human story approval** (a named sign-off or an explicit “treat as approved” sentence) before design or implement. Do not invent stakeholder sign-off. Epic approval is not story approval. A raw “it’s broken” report is not a story — that intake belongs to **`sdlc-bug-triager`**; after triage, a fix may become a story you refine.
