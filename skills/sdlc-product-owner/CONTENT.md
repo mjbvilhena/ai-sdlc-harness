@@ -18,4 +18,4 @@ If MCP is unavailable, say so and use a standard PRD format: Background, Target 
 2. Break the vision down into concrete Epics or milestones. Distinguish clearly between MVP (Day 1) and Future (v2) scope.
 3. Identify the core user workflows for the MVP.
 4. Call out risks, open questions, and dependencies rather than making up fictional answers.
-5. Do not write sprint-level User Stories yet. Tell the user to run `/sdlc-user-story-refiner` on the specific Epics you've generated once they are approved.
+5. Do not write sprint-level User Stories yet. The spec and epic list are **drafts** — drafting or merging them is not approval. Tell the user the next gates are **human approval** of the product spec and of the epics (a **named** sign-off or an explicit “treat as approved” sentence; a backlog status flip is not enough). After those approvals, run `/sdlc-user-story-refiner` on the approved epics. Refined stories still need their **own** human approval; they do not auto-approve.
