@@ -80,3 +80,17 @@ Leave blank until review concludes. Then: accept / accept with changes / reject,
 - Hidden breaking changes
 - Security or compliance certifications as rhetoric
 - Writing as if the RFC is already approved
+
+## Skill State Machine (sdlc-rfc-drafter)
+
+```mermaid
+stateDiagram-v2
+    [*] --> DraftRFC
+    DraftRFC --> Review: Submit for Comments
+    Review --> DraftRFC: Needs Revision (Max 3 iterations allowed)
+    Review --> Accepted: Approved
+    Review --> Rejected: Declined
+    Accepted --> sdlc_adr_drafter: Record Decision
+    Rejected --> [*]
+    sdlc_adr_drafter --> [*]
+```

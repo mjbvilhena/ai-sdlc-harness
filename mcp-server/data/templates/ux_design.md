@@ -83,3 +83,15 @@ Numbered, with the role that can answer. Do not silently resolve product choices
 - Exploit, phishing, or dark-pattern guidance
 - Secrets, tokens, or real personal data in copy examples
 - Merging PRs or treating green CI as design approval
+
+## Skill State Machine (sdlc-ux-designer)
+
+```mermaid
+stateDiagram-v2
+    [*] --> DraftUX
+    DraftUX --> Review: Submit for Approval
+    Review --> DraftUX: Needs Revision (Max 3 iterations allowed)
+    Review --> Approved: Accepted
+    Approved --> Implementation: Handoff
+    Implementation --> [*]
+```

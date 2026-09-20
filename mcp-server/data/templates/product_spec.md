@@ -36,3 +36,15 @@ Keep it narrative; leave Given/When/Then to the user stories.
 ## Open Questions
 - [ ] Question 1 (@owner)
 - [ ] Question 2 (@owner)
+
+## Skill State Machine (sdlc-product-owner)
+
+```mermaid
+stateDiagram-v2
+    [*] --> DraftSpec
+    DraftSpec --> HumanReview: Submit for Approval
+    HumanReview --> DraftSpec: Rejected (Max 3 iterations allowed)
+    HumanReview --> Approved: Accepted
+    Approved --> sdlc_user_story_refiner: Handoff
+    sdlc_user_story_refiner --> [*]
+```

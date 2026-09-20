@@ -24,6 +24,56 @@ After the planning artefacts above are approved:
 
 ## Pipeline graph
 
+```mermaid
+flowchart TD
+    %% Parent Node
+    Conductor([sdlc-conductor])
+
+    %% Middle Nodes
+    PO(sdlc-product-owner)
+    Refiner(sdlc-user-story-refiner)
+    RFC(sdlc-rfc-drafter)
+    API(sdlc-api-designer)
+    ADR(sdlc-adr-drafter)
+    UX(sdlc-ux-designer)
+    Setup(sdlc-setup-repository)
+
+    %% Leaf Nodes
+    TestWriter[sdlc-test-writer]
+    E2E[sdlc-e2e-scripter]
+    CodeReviewer[sdlc-code-reviewer]
+    DoD[sdlc-dod-checker]
+    A11y[sdlc-a11y-auditor]
+    Release[sdlc-release-notes-generator]
+    Runbook[sdlc-runbook-writer]
+    Postmortem[sdlc-postmortem-writer]
+
+    %% Hierarchy / Execution flow
+    Conductor --> PO
+    Conductor --> Refiner
+    Conductor --> RFC
+    Conductor --> API
+    Conductor --> ADR
+    Conductor --> UX
+    Conductor --> Setup
+    
+    PO --> Refiner
+    Refiner --> RFC
+    Refiner --> API
+    Refiner --> UX
+    
+    Setup --> TestWriter
+    Setup --> E2E
+    TestWriter --> CodeReviewer
+    E2E --> CodeReviewer
+    CodeReviewer --> DoD
+    CodeReviewer --> A11y
+    
+    DoD --> Release
+    DoD --> Runbook
+    DoD --> Postmortem
+```
+
 ```
 vision
   → product-owner / product spec (draft)

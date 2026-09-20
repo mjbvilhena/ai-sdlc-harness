@@ -72,3 +72,16 @@ How an agent or reviewer checks that new work honors this ADR:
 - Hidden decisions buried in a PR description
 - Status `Accepted` with empty consequences
 - Re-litigating a stable ADR inside a user story instead of superseding it
+
+## Skill State Machine (sdlc-adr-drafter)
+
+```mermaid
+stateDiagram-v2
+    [*] --> DraftADR
+    DraftADR --> Review: Submit for Approval
+    Review --> DraftADR: Needs Revision (Max 3 iterations allowed)
+    Review --> Accepted: Approved
+    Review --> Rejected: Declined
+    Accepted --> Implementation: Handoff / Enforce
+    Rejected --> [*]
+```

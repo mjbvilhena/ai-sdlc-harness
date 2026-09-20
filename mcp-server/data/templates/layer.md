@@ -60,3 +60,15 @@ If a dependency is missing from this table, treat it as **disallowed** until a h
 - "Use best practices" with no concrete rule
 - Allowed-dependency lists that include everything in `package.json`
 - Invented frameworks or certifications not present in the repo
+
+## Skill State Machine (sdlc-layer-architect)
+
+```mermaid
+stateDiagram-v2
+    [*] --> DraftLayer
+    DraftLayer --> Review: Submit for Approval
+    Review --> DraftLayer: Needs Revision (Max 3 iterations allowed)
+    Review --> Approved: Accepted
+    Approved --> Implementation: Handoff
+    Implementation --> [*]
+```

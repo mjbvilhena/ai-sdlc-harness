@@ -67,3 +67,15 @@ Optional, short: likely layer, existing modules, "do not touch X". Not a design 
 - AC that restates the story without an observable Then
 - Hidden scope ("and also rewrite settings")
 - Invented SLAs, conversion lifts, or personas
+
+## Skill State Machine (sdlc-user-story-refiner)
+
+```mermaid
+stateDiagram-v2
+    [*] --> DraftStories
+    DraftStories --> HumanReview: Submit for Approval
+    HumanReview --> DraftStories: Rejected (Max 3 iterations allowed)
+    HumanReview --> Approved: Accepted
+    Approved --> DesignAndPlanning: Handoff (UX/RFC/API/ADR)
+    DesignAndPlanning --> [*]
+```

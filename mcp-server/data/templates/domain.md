@@ -64,3 +64,15 @@ Hard prohibitions. Prefer these over soft "avoid".
 - MUST rules that are technical layer concerns (those belong in `LAYER.md`)
 - Invented regulatory claims or certifications
 - Empty NEVER lists on a domain that handles money, identity, or personal data
+
+## Skill State Machine (sdlc-domain-architect)
+
+```mermaid
+stateDiagram-v2
+    [*] --> DraftDomain
+    DraftDomain --> Review: Submit for Approval
+    Review --> DraftDomain: Needs Revision (Max 3 iterations allowed)
+    Review --> Approved: Accepted
+    Approved --> Implementation: Handoff
+    Implementation --> [*]
+```
