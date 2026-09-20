@@ -4,9 +4,9 @@ A feature is **Done** when the acceptance criteria are true in the target enviro
 
 ## Required
 
-- [ ] **Acceptance criteria met** — every `Must` scenario on the story is demonstrably true (test or recorded manual check)
+- [ ] **Acceptance criteria met** — every `Must` scenario on the story is fully met **and** test automation for those criteria passes without errors. If a Must AC cannot be met, do **not** soft-pass: create an additional user story for the unmet criterion (this feature stays not-Done until the remaining Musts are met)
 - [ ] **Scope honest** — no silent extra features; Nice-to-haves are split or explicitly dropped
-- [ ] **Tests** — unit and/or integration tests for new behavior and one meaningful failure path; match the repo's frameworks
+- [ ] **Tests** — unit and/or integration tests for new behavior and one meaningful failure path; match the repo's frameworks; the suite that covers Must AC is green
 - [ ] **Reviewed** — human review against Domain/Layer consultants
 - [ ] **Docs** — user-facing or API docs updated when behavior is visible; internal notes if the change is operator-facing
 - [ ] **CI/CD** — pipeline green; merge revision is the tested revision
@@ -22,6 +22,7 @@ Do not treat a single coverage percentage as Done. Prefer risk-based tests from 
 
 - AC were rewritten after implementation to match the code without product agreement
 - "Works on my machine" is the only evidence
+- Automation is red, skipped, or absent for Must AC, or unmet Must AC were soft-passed instead of split into new stories
 - Breaking API changes shipped without `api change` DoD
 
 ## Agent notes

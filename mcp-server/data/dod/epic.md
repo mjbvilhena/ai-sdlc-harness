@@ -22,4 +22,4 @@ An epic is **Done** when the outcome is in users' hands (or explicitly shelved),
 
 ## Agent notes
 
-Fetch `epic` plus `feature` / `user story` as needed. Do not mark an epic Done because CI is green on one service.
+Fetch `epic` plus `feature` / `user story` as needed. Do not mark an epic Done because CI is green on one service. **Planning-time** epic approval is a separate human gate (named sign-off or “treat as approved”; a backlog status flip is not enough) before stories; this DoD is the **shipped** outcome, not that planning gate.
