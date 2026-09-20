@@ -145,10 +145,10 @@ For End-to-End LLM evaluations using a Gemini API key, see the Testing section i
 
 A static shell in [`docs/browser/`](docs/browser/) is deployed with GitHub Actions (`actions/upload-pages-artifact` + `actions/deploy-pages`). The **inventory is not generated at build time**. The page lists `skills/` and `mcp-server/data/` from the public GitHub tree on `master` when you load it, so a new skill or MCP markdown file appears on refresh without editing the site.
 
-One-time (Pages is not enabled yet): **Settings → Pages → Source = GitHub Actions**. After that, the site is `https://mjbvilhena.github.io/ai-sdlc-harness/`.
+Pages source is **GitHub Actions**. The live catalog is `https://mjbvilhena.github.io/ai-sdlc-harness/`.
 
 ```bash
 python3 -m http.server 8080 --directory docs/browser
 ```
 
-See [`docs/guides/github-pages.md`](docs/guides/github-pages.md) for the one-time Pages setting, local preview, and Playwright UI e2e (`e2e-pr` on PRs; `e2e-live` after deploy on `master`).
+See [`docs/guides/github-pages.md`](docs/guides/github-pages.md) for local preview and Playwright UI e2e (`e2e-pr` on PRs; `e2e-live` after deploy on `master`).

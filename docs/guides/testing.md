@@ -69,7 +69,7 @@ Every Pull Request automatically executes the following CI checks:
 5. **GitHub Pages** (`.github/workflows/pages.yaml`):
    - Validates the docs-browser shell on every PR.
    - **`e2e-pr`**: Playwright against a local `docs/browser/` server with a mocked GitHub API.
-   - **`deploy`** + **`e2e-live`**: only on `master` / `main` after Pages source is GitHub Actions. Live e2e hits `https://mjbvilhena.github.io/ai-sdlc-harness/` (or the deploy `page_url`) after the site returns HTTP 200.
+   - **`deploy`** + **`e2e-live`**: on `master` / `main`. Pages source is already GitHub Actions; the live catalog is `https://mjbvilhena.github.io/ai-sdlc-harness/`. Live e2e hits that URL (or the deploy `page_url`) after the site returns HTTP 200.
 
 MCP `pytest` (`mcp-server/tests/`) and E2E are **not** GitHub Actions jobs. Catalog and alias regressions only fail locally until Task 8.7.
 

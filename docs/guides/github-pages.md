@@ -4,15 +4,13 @@ A thin static shell under `docs/browser/` lists **skills** and **MCP knowledge f
 
 After merge, new `skills/*/skill.yaml` packages and new markdown under `mcp-server/data/*/` show up on **refresh**. You do not need to edit the site or wait for a content rebuild.
 
-## One-time repo setting
+## Pages source
 
-Pages is not enabled on this repository until someone sets **Settings → Pages → Source** to **GitHub Actions**.
-
-Until that is set, the **deploy** job on `master` may fail and **e2e-live** will not run. Pull requests run shell validation plus mocked Playwright (`e2e-pr`); they do not deploy.
-
-The live site (project Pages) is:
+Pages is **enabled**. Source is **GitHub Actions** (`build_type: workflow`). The live project site is:
 
 `https://mjbvilhena.github.io/ai-sdlc-harness/`
+
+`deploy` + `e2e-live` run on push to `master` / `main`. Pull requests run shell validation plus mocked Playwright (`e2e-pr`); they do not deploy.
 
 Asset URLs in `docs/browser/index.html` are **relative**, so the same folder also works at that subpath and when served locally.
 

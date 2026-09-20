@@ -79,7 +79,7 @@ ai-sdlc-harness/
     │   ├── authoring-for-ghcp.md
     │   ├── installation-and-usage.md
     │   ├── testing.md
-    │   └── github-pages.md      # Pages shell, live catalog from GitHub, one-time setting
+    │   └── github-pages.md      # Pages catalog (live from GitHub; local preview + Playwright)
     └── browser/                 # Static Pages shell (HTML/CSS/JS); inventory is fetched at runtime
 ```
 

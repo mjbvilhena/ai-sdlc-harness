@@ -76,7 +76,7 @@ Before submitting a Pull Request, please ensure:
 
 ## Testing
 
-This repository includes a unified testing script `run_tests.sh` at the root, which executes Metadata Validation, MCP Server unit tests, Bandit, BATS installer tests, and (when installed) Gitleaks. E2E tests run only when `GEMINI_API_KEY` is set.
+This repository includes a unified testing script `run_tests.sh` at the root, which executes Metadata Validation, docs-browser catalog invariants (`tests/docs_browser/test_dynamic_catalog.py`), MCP Server unit tests, Bandit, BATS installer tests, and (when installed) Gitleaks. Playwright UI e2e for the catalog is CI-only (see [`docs/guides/github-pages.md`](docs/guides/github-pages.md)). E2E LLM tests run only when `GEMINI_API_KEY` is set.
 
 ### Running the Tests Locally
 Simply execute the helper script:
