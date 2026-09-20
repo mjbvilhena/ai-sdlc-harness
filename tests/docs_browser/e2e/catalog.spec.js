@@ -50,7 +50,7 @@ test("home lists skills, templates, and DoD from discovery", async ({ page }) =>
 
   if (mocked) {
     await expect(skills).toHaveCount(2);
-    await expect(templates).toHaveCount(1);
+    await expect(templates).toHaveCount(2);
     await expect(dod).toHaveCount(1);
   }
 });
@@ -82,7 +82,10 @@ test("skill detail renders markdown body", async ({ page }) => {
 
 test("template and DoD details render markdown bodies", async ({ page }) => {
   await waitForHome(page);
-  await page.locator('[data-catalog="templates"] [data-catalog-item="doc"]').first().click();
+  const templateCard = mocked
+    ? page.locator('[data-catalog="templates"] [data-catalog-item="doc"]').filter({ hasText: "note.md" })
+    : page.locator('[data-catalog="templates"] [data-catalog-item="doc"]').first();
+  await templateCard.click();
   await expect(page.locator("[data-catalog-loading]")).toHaveCount(0);
   await assertCatalogHealthy(page);
   const templateBody = page.locator('[data-catalog-body="doc"]');
@@ -102,6 +105,83 @@ test("template and DoD details render markdown bodies", async ({ page }) => {
   if (mocked) {
     await expect(dodBody).toContainText("DOD_MARKDOWN_BODY");
   }
+});
+
+async function expectRenderedMermaid(host, mark) {
+  await expect(host).toHaveAttribute("data-mermaid-status", "ready", { timeout: 45_000 });
+  await expect(host.locator("svg")).toBeVisible();
+  await expect(host.locator("pre code.language-mermaid")).toHaveCount(0);
+  if (mark) {
+    await expect(host).toContainText(mark);
+  }
+}
+
+test("home renders the lifecycle pipeline mermaid from the template", async ({ page }) => {
+  await waitForHome(page);
+  const diagram = page.locator("[data-home-pipeline-diagram]");
+  await expect(page.locator("[data-home-pipeline]")).toBeVisible();
+  await expectRenderedMermaid(diagram, mocked ? "HOME_PIPELINE_MARK" : null);
+  await expect(page.locator("[data-home-pipeline-error]")).toHaveCount(0);
+  if (!mocked) {
+    await expect(diagram).toContainText(/sdlc-conductor/i);
+  }
+});
+
+test("skill, template, and DoD mermaid fences render as diagrams", async ({ page }) => {
+  await waitForHome(page);
+
+  if (mocked) {
+    await page.locator('[data-catalog="skills"] [data-catalog-item="skill"]').first().click();
+    await expect(page.locator("[data-catalog-loading]")).toHaveCount(0);
+    await assertCatalogHealthy(page);
+    const skillHost = page.locator('[data-catalog-body="skill"] [data-mermaid-diagram]');
+    await expectRenderedMermaid(skillHost, "SKILL_MERMAID_MARK");
+    await expect(page.locator('[data-catalog-body="skill"] pre code.language-mermaid')).toHaveCount(0);
+    await page.goto("./");
+    await expect(page.locator('[data-catalog="templates"] [data-catalog-item="doc"]').first()).toBeVisible();
+  }
+
+  const templateCard = page
+    .locator('[data-catalog="templates"] [data-catalog-item="doc"]')
+    .filter({ hasText: /lifecycle/i });
+  await expect(templateCard).toBeVisible();
+  await templateCard.click();
+  await expect(page.locator("[data-catalog-loading]")).toHaveCount(0);
+  await assertCatalogHealthy(page);
+  const templateHost = page.locator('[data-catalog-body="doc"] [data-mermaid-diagram]');
+  await expectRenderedMermaid(templateHost, mocked ? "HOME_PIPELINE_MARK" : null);
+  await expect(page.locator('[data-catalog-body="doc"] pre code.language-mermaid')).toHaveCount(0);
+  if (!mocked) {
+    await expect(templateHost).toContainText(/sdlc-conductor/i);
+  }
+
+  if (mocked) {
+    await page.locator('nav.site-nav a', { hasText: "Definitions of Done" }).click();
+    await page.locator('[data-catalog="dod"] [data-catalog-item="doc"]').first().click();
+    await assertCatalogHealthy(page);
+    const dodHost = page.locator('[data-catalog-body="doc"] [data-mermaid-diagram]');
+    await expectRenderedMermaid(dodHost, "DOD_MERMAID_MARK");
+    await expect(page.locator('[data-catalog-body="doc"] pre code.language-mermaid')).toHaveCount(0);
+  }
+});
+
+test("home shows an error when the lifecycle pipeline template cannot be read", async ({ page }) => {
+  test.skip(!mocked, "injects a 404; live e2e should not hide the real template");
+  await page.route("https://raw.githubusercontent.com/**", async (route) => {
+    if (route.request().url().includes("lifecycle_pipeline.md")) {
+      await route.fulfill({ status: 404, body: "missing pipeline" });
+      return;
+    }
+    await route.fallback();
+  });
+  await page.goto("./");
+  await expect(page.locator('[data-catalog="skills"] [data-catalog-item="skill"]').first()).toBeVisible({
+    timeout: 45_000
+  });
+  const error = page.locator("[data-home-pipeline-error]");
+  await expect(error).toBeVisible();
+  await expect(error).toContainText(/could not read|lifecycle pipeline/i);
+  await expect(page.locator("[data-home-pipeline-diagram] svg")).toHaveCount(0);
 });
 
 test("rate-limited GitHub API shows a clear error", async ({ page }) => {
