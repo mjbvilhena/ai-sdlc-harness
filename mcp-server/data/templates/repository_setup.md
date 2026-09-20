@@ -64,3 +64,15 @@ For each proposed check, provide the configuration snippet (e.g., the `.yaml` wo
 - Proposing language-specific checks for languages not used in the repo.
 - Missing universal secret scanning.
 - Over-complicating the initial setup with heavy E2E tests when no code exists yet.
+
+## Skill State Machine (sdlc-setup-repository)
+
+```mermaid
+stateDiagram-v2
+    [*] --> DraftSetup
+    DraftSetup --> Review: Submit for Approval
+    Review --> DraftSetup: Needs Changes (Max 3 iterations allowed)
+    Review --> Approved: Accepted
+    Approved --> Implementation: Handoff
+    Implementation --> [*]
+```

@@ -74,3 +74,15 @@ Numbered, with the role that can answer.
 - "Returns 200 with an error body" unless the repo already does that
 - Invented OAuth/product claims
 - Mixing `api_contract` field dumps here without the design rationale
+
+## Skill State Machine (sdlc-api-designer)
+
+```mermaid
+stateDiagram-v2
+    [*] --> DraftAPI
+    DraftAPI --> Review: Submit for Review
+    Review --> DraftAPI: Revision Required (Max 3 iterations allowed)
+    Review --> Approved: Accepted
+    Approved --> Implementation: Handoff
+    Implementation --> [*]
+```
