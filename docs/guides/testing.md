@@ -19,7 +19,7 @@ A custom Python script (`.github/scripts/validate_metadata.py`, CI workflow `.gi
 `tests/docs_browser/test_dynamic_catalog.py` checks that `docs/browser/` stays a thin shell: relative asset URLs, default `mjbvilhena/ai-sdlc-harness@master`, live git-tree discovery, and **no hardcoded skill or MCP filename inventory**. The same check runs in `.github/workflows/pages.yaml` on every PR.
 
 ### 2. MCP Server Unit Tests
-Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files. On disk there are **27** templates (including `product_spec.md`, `research.md`, `repository_setup.md`, `lifecycle_pipeline.md`, `ux_design.md`, and `docs_backlog_review.md`) and **13** Definitions of Done. `test_catalog_templates_and_dod` asserts the same 27 / 13 names. Remaining alias/regression coverage for older payloads is Task 10.9. These tests run locally via `./run_tests.sh`; GitHub Actions does **not** run `pytest` today (Task 8.7).
+Standard `pytest` unit tests (`mcp-server/tests/test_server.py`) that evaluate the MCP Python Server. This tests the fuzzy matching logic (`thefuzz`) and verifies that Dynamic Consultants correctly scan the mock workspace for `DOMAIN.md` and `LAYER.md` files. On disk there are **27** templates (including `product_spec.md`, `research.md`, `repository_setup.md`, `lifecycle_pipeline.md`, `ux_design.md`, and `docs_backlog_review.md`) and **13** Definitions of Done. `test_catalog_templates_and_dod` asserts the same 27 / 13 names. Remaining alias/regression coverage for older payloads is Task 10.9. These tests run locally via `./run_tests.sh`; GitHub Actions does **not** run MCP `pytest` today (Task 8.7). Pages CI does run `tests/docs_browser/test_dynamic_catalog.py` (catalog shell + lifecycle-pipeline mermaid strings) and Playwright UI e2e — that is not a substitute for the MCP catalog/alias suite.
 
 ### 3. Python Security Scan (Bandit)
 `run_tests.sh` runs Bandit against `mcp-server/` (excluding tests and `venv`) when Python is available. The same scan runs in CI via `.github/workflows/security.yaml`.
@@ -41,7 +41,7 @@ Run locally when the `gitleaks` binary is installed; always run in CI (`.github/
 
 To ensure that the Tri-Dimensional Framework functions correctly, we have an E2E testing framework. `tests/e2e/test_agent_behavior.py` invokes a real LLM (Gemini) headlessly with a **stub** `get_domain_consultant` function (it does not start `mcp-server`) and checks that the expanded skill prompt applies a domain constraint. `tests/e2e/test_cli_integration.py` optionally drives installed `agy` / `claude` CLIs when those binaries are present. `run_tests.sh` runs the whole `tests/e2e/` directory.
 
-Because this test executes a real LLM, it requires an API key. **`./run_tests.sh` skips the E2E directory when the key is unset.** Running `pytest tests/e2e/test_agent_behavior.py` directly **fails** (`pytest.fail`) if the key is missing — it does not skip (Task 8.8). CI does not run E2E.
+Because this test executes a real LLM, it requires an API key. **`./run_tests.sh` skips the E2E directory when the key is unset.** Running `pytest tests/e2e/test_agent_behavior.py` directly **fails** (`pytest.fail`) if the key is missing — it does not skip (Task 8.8). CI does not run the Gemini E2E suite.
 
 ### Running E2E Tests Locally
 
@@ -71,7 +71,7 @@ Every Pull Request automatically executes the following CI checks:
    - **`e2e-pr`**: Playwright against a local `docs/browser/` server with a mocked GitHub API.
    - **`deploy`** + **`e2e-live`**: on `master` / `main`. Pages source is already GitHub Actions; the live catalog is `https://mjbvilhena.github.io/ai-sdlc-harness/`. Live e2e hits that URL (or the deploy `page_url`) after the site returns HTTP 200.
 
-MCP `pytest` (`mcp-server/tests/`) and E2E are **not** GitHub Actions jobs. Catalog and alias regressions only fail locally until Task 8.7.
+MCP `pytest` (`mcp-server/tests/`) and Gemini E2E are **not** GitHub Actions jobs. Template/DoD catalog counts and alias tables only fail in MCP pytest until Task 8.7. Pages CI still runs browser invariants and Playwright (including mermaid).
 
 ## Security Scanning
 

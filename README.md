@@ -143,7 +143,7 @@ For End-to-End LLM evaluations using a Gemini API key, see the Testing section i
 
 ## Catalog on GitHub Pages
 
-A static shell in [`docs/browser/`](docs/browser/) is deployed with GitHub Actions (`actions/upload-pages-artifact` + `actions/deploy-pages`). The **inventory is not generated at build time**. The page lists `skills/` and `mcp-server/data/` from the public GitHub tree on `master` when you load it, so a new skill or MCP markdown file appears on refresh without editing the site.
+A static shell in [`docs/browser/`](docs/browser/) is deployed with GitHub Actions (`actions/upload-pages-artifact` + `actions/deploy-pages`). The **inventory is not generated at build time**. The page lists `skills/` and `mcp-server/data/` from the public GitHub tree on `master` when you load it, so a new skill or MCP markdown file appears on refresh without editing the site. Mermaid fences in those files render as diagrams; Home shows the conductor graph from the live `lifecycle pipeline` template (not a second copy kept in the shell).
 
 Pages source is **GitHub Actions**. The live catalog is `https://mjbvilhena.github.io/ai-sdlc-harness/`.
 
